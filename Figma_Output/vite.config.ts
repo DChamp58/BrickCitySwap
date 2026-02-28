@@ -19,4 +19,7 @@ export default defineConfig({
 
   // File types to support raw imports. Never add .css, .tsx, or .ts files to this.
   assetsInclude: ['**/*.svg', '**/*.csv'],
+
+  // Relative base so built assets resolve correctly from /Figma_Output/dist/
+  base: './',
 })

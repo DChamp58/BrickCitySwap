@@ -2,7 +2,7 @@ import React from 'react';
 import { Home, Package, User, LogOut, Plus } from 'lucide-react';
 import { Button } from './ui/button';
 import { useAuth } from './auth-context';
-import pricingIcon from 'figma:asset/57339c2f1c137c45ea12885696f5320e34a64609.png';
+import pricingIcon from '../../assets/57339c2f1c137c45ea12885696f5320e34a64609.png';
 
 interface HeaderProps {
   currentView: 'home' | 'housing' | 'marketplace' | 'profile' | 'my-listings' | 'pricing';

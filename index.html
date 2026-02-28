@@ -208,6 +208,31 @@
     footer a { color: rgba(247,105,2,0.7); text-decoration: none; }
     footer a:hover { color: var(--rit-orange); }
 
+    /* ─── Preview App button ─────────────────────────────── */
+    .preview-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 2rem;
+      padding: 0.85rem 2rem;
+      background: var(--rit-orange);
+      color: var(--dark);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 500;
+      text-decoration: none;
+      border-radius: 8px;
+      letter-spacing: 0.03em;
+      opacity: 0;
+      animation: fadeUp 0.8s 1.05s forwards;
+      transition: background 0.2s, transform 0.15s;
+    }
+
+    .preview-btn:hover {
+      background: #ff7a1a;
+      transform: translateY(-2px);
+    }
+
     /* ─── Diagonal stripe accent ─────────────────────────── */
     .stripe-bar {
       position: fixed;
@@ -261,6 +286,10 @@
         <p>We're hard at work building something great for RIT. Check back soon — launch is right around the corner.</p>
       </div>
     </div>
+
+    <a href="Figma_Output/dist/index.html" class="preview-btn">
+      Preview the App &rarr;
+    </a>
 
   </div>
 

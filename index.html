@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BrickCitySwap — Brick Clicker</title>
+  <title>BrickCitySwap — Coming Soon</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300&display=swap" rel="stylesheet" />
@@ -25,9 +25,7 @@
       background-color: var(--dark);
       color: var(--cream);
       font-family: 'DM Sans', sans-serif;
-      overflow: hidden;
-      user-select: none;
-      -webkit-user-select: none;
+      overflow-x: hidden;
     }
 
     /* ─── Brick texture overlay ─────────────────────────── */
@@ -37,19 +35,261 @@
       inset: 0;
       background-image:
         repeating-linear-gradient(
-          0deg, transparent, transparent 28px,
-          rgba(255,255,255,0.025) 28px, rgba(255,255,255,0.025) 29px
+          0deg,
+          transparent,
+          transparent 28px,
+          rgba(255,255,255,0.025) 28px,
+          rgba(255,255,255,0.025) 29px
         ),
         repeating-linear-gradient(
-          90deg, transparent, transparent 58px,
-          rgba(255,255,255,0.025) 58px, rgba(255,255,255,0.025) 59px
+          90deg,
+          transparent,
+          transparent 58px,
+          rgba(255,255,255,0.025) 58px,
+          rgba(255,255,255,0.025) 59px
         );
       pointer-events: none;
       z-index: 0;
     }
 
-    /* ─── Game canvas ──────────────────────────────────── */
-    #gameCanvas {
+    /* ═══════════════════════════════════════════════════════
+       LANDING PAGE STYLES
+       ═══════════════════════════════════════════════════════ */
+
+    /* ─── Falling bricks canvas (landing bg) ────────────── */
+    #brickCanvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ─── Glowing blob ──────────────────────────────────── */
+    .blob {
+      position: fixed;
+      width: 650px;
+      height: 650px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(247,105,2,0.18) 0%, transparent 70%);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -55%);
+      pointer-events: none;
+      z-index: 0;
+      animation: pulse 6s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: translate(-50%, -55%) scale(1); opacity: 1; }
+      50%       { transform: translate(-50%, -55%) scale(1.08); opacity: 0.75; }
+    }
+
+    /* ─── Layout ────────────────────────────────────────── */
+    .container {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 1.5rem;
+      text-align: center;
+    }
+
+    /* ─── Badge ─────────────────────────────────────────── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(247,105,2,0.12);
+      border: 1px solid rgba(247,105,2,0.35);
+      border-radius: 999px;
+      padding: 0.35rem 1rem;
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--rit-orange);
+      margin-bottom: 2rem;
+      opacity: 0;
+      animation: fadeUp 0.7s 0.2s forwards;
+    }
+
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--rit-orange);
+      animation: blink 1.4s ease-in-out infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.2; }
+    }
+
+    /* ─── Wordmark ──────────────────────────────────────── */
+    .wordmark {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(4.5rem, 16vw, 11rem);
+      line-height: 0.9;
+      letter-spacing: 0.02em;
+      color: var(--cream);
+      opacity: 0;
+      animation: fadeUp 0.8s 0.45s forwards;
+      position: relative;
+    }
+
+    .wordmark span { color: var(--rit-orange); }
+
+    .wordmark::after {
+      content: '';
+      display: block;
+      height: 4px;
+      width: 80px;
+      background: var(--rit-orange);
+      border-radius: 2px;
+      margin: 1rem auto 0;
+    }
+
+    /* ─── Tagline ────────────────────────────────────────── */
+    .tagline {
+      margin-top: 1.8rem;
+      font-size: clamp(1rem, 2.5vw, 1.25rem);
+      font-weight: 300;
+      color: var(--cream);
+      max-width: 520px;
+      line-height: 1.6;
+      opacity: 0;
+      animation: fadeUp 0.8s 0.65s forwards;
+    }
+
+    /* ─── Under construction banner ─────────────────────── */
+    .under-construction {
+      margin-top: 3rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      background: rgba(247, 105, 2, 0.08);
+      border: 1px solid rgba(247, 105, 2, 0.25);
+      border-radius: 12px;
+      padding: 1.1rem 1.8rem;
+      max-width: 480px;
+      opacity: 0;
+      animation: fadeUp 0.8s 0.85s forwards;
+    }
+
+    .construction-icon { font-size: 1.8rem; flex-shrink: 0; }
+
+    .construction-text { text-align: left; }
+
+    .construction-text strong {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--rit-orange);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 0.2rem;
+    }
+
+    .construction-text p {
+      font-size: 0.82rem;
+      font-weight: 300;
+      color: rgba(245,240,232,0.65);
+      line-height: 1.5;
+    }
+
+    /* ─── Play game button ──────────────────────────────── */
+    .play-game-btn {
+      margin-top: 2rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--rit-orange);
+      color: #fff;
+      border: none;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.3rem;
+      letter-spacing: 0.08em;
+      padding: 0.7rem 2rem;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 0 20px rgba(247,105,2,0.25);
+      opacity: 0;
+      animation: fadeUp 0.8s 1.05s forwards;
+    }
+
+    .play-game-btn:hover {
+      background: var(--rit-orange-dark);
+      transform: scale(1.05);
+      box-shadow: 0 0 30px rgba(247,105,2,0.4);
+    }
+
+    .play-game-btn .btn-icon {
+      font-size: 1.1rem;
+    }
+
+    /* ─── Footer ─────────────────────────────────────────── */
+    footer {
+      position: relative;
+      z-index: 1;
+      padding: 1.5rem;
+      text-align: center;
+      font-size: 0.72rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+    }
+
+    footer a { color: rgba(247,105,2,0.7); text-decoration: none; }
+    footer a:hover { color: var(--rit-orange); }
+
+    /* ─── Keyframes ──────────────────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 480px) {
+      .under-construction { padding: 1rem 1.2rem; }
+    }
+
+    /* ─── Diagonal stripe accent ─────────────────────────── */
+    .stripe-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 5px;
+      background: repeating-linear-gradient(
+        -45deg,
+        var(--rit-orange) 0px,
+        var(--rit-orange) 12px,
+        var(--dark) 12px,
+        var(--dark) 24px
+      );
+      z-index: 100;
+    }
+
+    /* ─── Landing wrapper ────────────────────────────────── */
+    #landingPage { display: block; }
+    #landingPage.hidden { display: none; }
+
+    /* ═══════════════════════════════════════════════════════
+       GAME STYLES
+       ═══════════════════════════════════════════════════════ */
+
+    #gamePage {
+      display: none;
+    }
+
+    #gamePage.active {
+      display: block;
+    }
+
+    #gamePage canvas {
       position: fixed;
       inset: 0;
       width: 100%;
@@ -150,7 +390,7 @@
       gap: 0.6rem;
     }
 
-    .shop-btn, .reset-btn {
+    .shop-btn, .reset-btn, .back-btn {
       background: rgba(247,105,2,0.15);
       border: 1px solid rgba(247,105,2,0.4);
       color: var(--rit-orange);
@@ -164,7 +404,7 @@
       letter-spacing: 0.03em;
     }
 
-    .shop-btn:hover {
+    .shop-btn:hover, .back-btn:hover {
       background: rgba(247,105,2,0.25);
       border-color: var(--rit-orange);
       box-shadow: 0 0 12px rgba(247,105,2,0.2);
@@ -277,9 +517,7 @@
       border-color: rgba(247,105,2,0.2);
     }
 
-    .upgrade-card.maxed {
-      opacity: 0.5;
-    }
+    .upgrade-card.maxed { opacity: 0.5; }
 
     .upgrade-icon {
       width: 44px;
@@ -294,10 +532,7 @@
       border: 1px solid rgba(247,105,2,0.2);
     }
 
-    .upgrade-info {
-      flex: 1;
-      min-width: 0;
-    }
+    .upgrade-info { flex: 1; min-width: 0; }
 
     .upgrade-name {
       font-weight: 600;
@@ -416,89 +651,6 @@
       font-weight: 600;
     }
 
-    /* ─── Stripe bar ───────────────────────────────────── */
-    .stripe-bar {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 5px;
-      background: repeating-linear-gradient(
-        -45deg,
-        var(--rit-orange) 0px, var(--rit-orange) 12px,
-        var(--dark) 12px, var(--dark) 24px
-      );
-      z-index: 10;
-    }
-
-    /* ─── Start screen ─────────────────────────────────── */
-    .start-screen {
-      position: fixed;
-      inset: 0;
-      z-index: 100;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background: var(--dark);
-      text-align: center;
-      padding: 2rem;
-    }
-
-    .start-screen.hidden { display: none; }
-
-    .start-title {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(3rem, 12vw, 7rem);
-      line-height: 0.9;
-      letter-spacing: 0.02em;
-      margin-bottom: 0.5rem;
-    }
-
-    .start-title span { color: var(--rit-orange); }
-
-    .start-subtitle {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(1.4rem, 5vw, 2.5rem);
-      color: var(--rit-orange);
-      margin-bottom: 1.5rem;
-      letter-spacing: 0.08em;
-    }
-
-    .start-desc {
-      font-size: 0.95rem;
-      color: var(--muted);
-      max-width: 400px;
-      line-height: 1.6;
-      margin-bottom: 2.5rem;
-    }
-
-    .start-btn {
-      background: var(--rit-orange);
-      color: #fff;
-      border: none;
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 1.8rem;
-      letter-spacing: 0.1em;
-      padding: 0.8rem 3rem;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: all 0.2s;
-      box-shadow: 0 0 30px rgba(247,105,2,0.3);
-    }
-
-    .start-btn:hover {
-      background: var(--rit-orange-dark);
-      transform: scale(1.05);
-      box-shadow: 0 0 40px rgba(247,105,2,0.5);
-    }
-
-    .start-hint {
-      margin-top: 1.5rem;
-      font-size: 0.72rem;
-      color: var(--muted);
-    }
-
     /* ─── Scrollbar styling ────────────────────────────── */
     .shop-panel::-webkit-scrollbar { width: 6px; }
     .shop-panel::-webkit-scrollbar-track { background: transparent; }
@@ -518,7 +670,7 @@
       .coin-amount { font-size: 1.3rem; }
       .hud-title { font-size: 1.2rem; }
       .hud-stats { font-size: 0.68rem; gap: 0.6rem; }
-      .shop-btn { font-size: 0.72rem; padding: 0.4rem 0.7rem; }
+      .shop-btn, .back-btn { font-size: 0.72rem; padding: 0.4rem 0.7rem; }
       .reset-btn { font-size: 0.65rem; padding: 0.4rem 0.5rem; }
       .shop-panel { padding: 1.2rem; }
       .combo-display { bottom: 50px; }
@@ -528,67 +680,226 @@
 </head>
 <body>
 
-  <!-- Start Screen -->
-  <div class="start-screen" id="startScreen">
-    <h1 class="start-title">Brick<span>City</span>Swap</h1>
-    <div class="start-subtitle">Brick Clicker</div>
-    <p class="start-desc">
-      Click falling bricks to earn coins. Buy upgrades to become the ultimate brick collector. How rich can you get?
-    </p>
-    <button class="start-btn" id="startBtn">PLAY</button>
-    <p class="start-hint">Click bricks as they fall &bull; Earn coins &bull; Buy upgrades</p>
+  <!-- ═══════════════════════════════════════════════════════
+       LANDING PAGE
+       ═══════════════════════════════════════════════════════ -->
+  <div id="landingPage">
+    <canvas id="brickCanvas"></canvas>
+    <div class="blob"></div>
+
+    <div class="container">
+
+      <div class="badge">
+        <span class="badge-dot"></span>
+        Coming Soon
+      </div>
+
+      <h1 class="wordmark">Brick<span>City</span>Swap</h1>
+
+      <p class="tagline">
+        The housing and item marketplace built by and for the RIT community. Buy, sell, and trade with fellow Tigers — all in one place.
+      </p>
+
+      <div class="under-construction">
+        <span class="construction-icon">🧱</span>
+        <div class="construction-text">
+          <strong>Under Construction</strong>
+          <p>We're hard at work building something great for RIT. Check back soon — launch is right around the corner.</p>
+        </div>
+      </div>
+
+      <button class="play-game-btn" id="playGameBtn">
+        <span class="btn-icon">🎮</span>
+        Play Brick Clicker
+      </button>
+
+    </div>
+
+    <footer>
+      &copy; 2025 BrickCitySwap &nbsp;·&nbsp; Not affiliated with <a href="https://www.rit.edu" target="_blank">Rochester Institute of Technology</a>
+    </footer>
   </div>
 
-  <!-- Game Canvas -->
-  <canvas id="gameCanvas"></canvas>
+  <!-- ═══════════════════════════════════════════════════════
+       BRICK CLICKER GAME
+       ═══════════════════════════════════════════════════════ -->
+  <div id="gamePage">
 
-  <!-- HUD -->
-  <div class="hud" id="hud" style="display:none;">
-    <div class="hud-left">
-      <div class="hud-title">Brick<span>City</span> Clicker</div>
-      <div class="hud-stats">
-        <span>Per click: <strong id="statPerClick">1</strong></span>
-        <span>Per sec: <strong id="statPerSec">0</strong></span>
-        <span>Clicked: <strong id="statClicked">0</strong></span>
-      </div>
-    </div>
-    <div class="hud-center">
-      <div class="coin-icon">B</div>
-      <div>
-        <div class="coin-amount" id="coinDisplay">0</div>
-        <div class="coin-label">Brick Coins</div>
-      </div>
-    </div>
-    <div class="hud-right">
-      <button class="shop-btn" id="shopBtn">UPGRADES</button>
-      <button class="reset-btn" id="resetBtn">RESET</button>
-    </div>
-  </div>
+    <!-- Game Canvas -->
+    <canvas id="gameCanvas"></canvas>
 
-  <!-- Combo Display -->
-  <div class="combo-display" id="comboDisplay">
-    <div class="combo-count" id="comboCount">0x</div>
-    <div class="combo-label">Combo</div>
-    <div class="combo-bonus" id="comboBonus">+0% bonus</div>
-  </div>
-
-  <!-- Shop Overlay -->
-  <div class="shop-overlay" id="shopOverlay">
-    <div class="shop-panel">
-      <div class="shop-header">
-        <h2>UPGRADE SHOP</h2>
-        <button class="shop-close" id="shopClose">&times;</button>
+    <!-- HUD -->
+    <div class="hud" id="hud">
+      <div class="hud-left">
+        <div class="hud-title">Brick<span>City</span> Clicker</div>
+        <div class="hud-stats">
+          <span>Per click: <strong id="statPerClick">1</strong></span>
+          <span>Per sec: <strong id="statPerSec">0</strong></span>
+          <span>Clicked: <strong id="statClicked">0</strong></span>
+        </div>
       </div>
-      <div class="shop-balance">
-        Balance: <strong id="shopBalance">0</strong> Brick Coins
+      <div class="hud-center">
+        <div class="coin-icon">B</div>
+        <div>
+          <div class="coin-amount" id="coinDisplay">0</div>
+          <div class="coin-label">Brick Coins</div>
+        </div>
       </div>
-      <div id="upgradeList"></div>
+      <div class="hud-right">
+        <button class="back-btn" id="backBtn">BACK</button>
+        <button class="shop-btn" id="shopBtn">UPGRADES</button>
+        <button class="reset-btn" id="resetBtn">RESET</button>
+      </div>
     </div>
+
+    <!-- Combo Display -->
+    <div class="combo-display" id="comboDisplay">
+      <div class="combo-count" id="comboCount">0x</div>
+      <div class="combo-label">Combo</div>
+      <div class="combo-bonus" id="comboBonus">+0% bonus</div>
+    </div>
+
+    <!-- Shop Overlay -->
+    <div class="shop-overlay" id="shopOverlay">
+      <div class="shop-panel">
+        <div class="shop-header">
+          <h2>UPGRADE SHOP</h2>
+          <button class="shop-close" id="shopClose">&times;</button>
+        </div>
+        <div class="shop-balance">
+          Balance: <strong id="shopBalance">0</strong> Brick Coins
+        </div>
+        <div id="upgradeList"></div>
+      </div>
+    </div>
+
   </div>
 
   <div class="stripe-bar"></div>
 
   <script>
+    // ═══════════════════════════════════════════════════════
+    //  LANDING PAGE — Falling Bricks Animation
+    // ═══════════════════════════════════════════════════════
+    const landingCanvas = document.getElementById('brickCanvas');
+    const landingCtx = landingCanvas.getContext('2d');
+
+    function resizeLanding() {
+      landingCanvas.width  = window.innerWidth;
+      landingCanvas.height = window.innerHeight;
+    }
+    resizeLanding();
+    window.addEventListener('resize', resizeLanding);
+
+    const LANDING_BRICK_COLORS = [
+      'rgba(120, 55, 30, 0.18)',
+      'rgba(90,  40, 20, 0.14)',
+      'rgba(150, 70, 35, 0.12)',
+      'rgba(100, 45, 22, 0.16)',
+      'rgba(180, 90, 40, 0.10)',
+    ];
+
+    const NUM_LANDING_BRICKS = 28;
+
+    class LandingBrick {
+      constructor(randomY) {
+        this.reset(randomY);
+      }
+
+      reset(startAbove) {
+        this.w    = 34 + Math.random() * 14;
+        this.h    = 16 + Math.random() * 8;
+        this.x    = Math.random() * (landingCanvas.width + this.w * 2) - this.w;
+        this.y    = startAbove
+                      ? Math.random() * -landingCanvas.height
+                      : -(this.h + Math.random() * 80);
+        this.speed       = 0.3 + Math.random() * 0.6;
+        this.rotate      = Math.random() * Math.PI * 2;
+        this.rotateSpeed = (Math.random() - 0.5) * 0.007;
+        this.color       = LANDING_BRICK_COLORS[Math.floor(Math.random() * LANDING_BRICK_COLORS.length)];
+      }
+
+      update() {
+        this.y      += this.speed;
+        this.rotate += this.rotateSpeed;
+        if (this.y > landingCanvas.height + this.h + 10) {
+          this.reset(false);
+        }
+      }
+
+      draw() {
+        landingCtx.save();
+        landingCtx.translate(this.x + this.w / 2, this.y + this.h / 2);
+        landingCtx.rotate(this.rotate);
+
+        landingCtx.fillStyle = this.color;
+        landingCtx.beginPath();
+        landingCtx.roundRect(-this.w / 2, -this.h / 2, this.w, this.h, 2);
+        landingCtx.fill();
+
+        landingCtx.strokeStyle = 'rgba(255,255,255,0.04)';
+        landingCtx.lineWidth = 0.8;
+
+        landingCtx.beginPath();
+        landingCtx.moveTo(-this.w / 2 + 3, 0);
+        landingCtx.lineTo( this.w / 2 - 3, 0);
+        landingCtx.stroke();
+
+        landingCtx.beginPath();
+        landingCtx.moveTo(-this.w / 6, -this.h / 2 + 2);
+        landingCtx.lineTo(-this.w / 6, -1);
+        landingCtx.stroke();
+
+        landingCtx.beginPath();
+        landingCtx.moveTo(this.w / 6, 1);
+        landingCtx.lineTo(this.w / 6, this.h / 2 - 2);
+        landingCtx.stroke();
+
+        landingCtx.restore();
+      }
+    }
+
+    const landingBricks = Array.from({ length: NUM_LANDING_BRICKS }, () => new LandingBrick(true));
+
+    let landingRunning = true;
+
+    function landingLoop() {
+      if (!landingRunning) return;
+      landingCtx.clearRect(0, 0, landingCanvas.width, landingCanvas.height);
+      landingBricks.forEach(b => { b.update(); b.draw(); });
+      requestAnimationFrame(landingLoop);
+    }
+
+    landingLoop();
+
+    // ═══════════════════════════════════════════════════════
+    //  PAGE SWITCHING
+    // ═══════════════════════════════════════════════════════
+    const landingPage = document.getElementById('landingPage');
+    const gamePage = document.getElementById('gamePage');
+
+    function showGame() {
+      landingRunning = false;
+      landingPage.classList.add('hidden');
+      gamePage.classList.add('active');
+      document.body.style.overflow = 'hidden';
+      document.body.style.userSelect = 'none';
+      initGame();
+    }
+
+    function showLanding() {
+      gamePage.classList.remove('active');
+      landingPage.classList.remove('hidden');
+      landingRunning = true;
+      document.body.style.overflow = '';
+      gameRunning = false;
+      saveGame();
+      landingLoop();
+    }
+
+    document.getElementById('playGameBtn').addEventListener('click', showGame);
+    document.getElementById('backBtn').addEventListener('click', showLanding);
+
     // ═══════════════════════════════════════════════════════
     //  BRICK CLICKER GAME
     // ═══════════════════════════════════════════════════════
@@ -604,17 +915,9 @@
       };
     }
 
-    const canvas = document.getElementById('gameCanvas');
-    const ctx = canvas.getContext('2d');
-
-    function resize() {
-      const dpr = window.devicePixelRatio || 1;
-      canvas.width = window.innerWidth * dpr;
-      canvas.height = window.innerHeight * dpr;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    }
-    resize();
-    window.addEventListener('resize', resize);
+    let gameCanvas, gameCtx;
+    let gameRunning = false;
+    let gameInitialized = false;
 
     // ─── Save / Load ──────────────────────────────────────
     const SAVE_KEY = 'brickclicker_save';
@@ -655,7 +958,6 @@
       totalEarned: 0,
       combo: 0,
       comboTimer: 0,
-      started: false,
       lastAutoTick: 0,
     };
 
@@ -779,7 +1081,7 @@
     const GOLD_FILL = '#FFD700';
 
     // ─── Brick Class ──────────────────────────────────────
-    class Brick {
+    class GameBrick {
       constructor(randomY) {
         this.reset(randomY);
       }
@@ -818,80 +1120,79 @@
 
       draw() {
         if (!this.alive) return;
-        ctx.save();
+        gameCtx.save();
         const cx = this.x + this.w / 2;
         const cy = this.y + this.h / 2;
-        ctx.translate(cx, cy);
-        ctx.rotate(this.rotate);
+        gameCtx.translate(cx, cy);
+        gameCtx.rotate(this.rotate);
 
         let scale = 1;
         if (this.hitAnim > 0) {
           scale = 1 + this.hitAnim * 0.3;
           this.hitAnim -= 0.05;
         }
-        ctx.scale(scale, scale);
+        gameCtx.scale(scale, scale);
 
         // Shadow
-        ctx.fillStyle = 'rgba(0,0,0,0.3)';
-        ctx.beginPath();
-        ctx.roundRect(-this.w / 2 + 2, -this.h / 2 + 3, this.w, this.h, 3);
-        ctx.fill();
+        gameCtx.fillStyle = 'rgba(0,0,0,0.3)';
+        gameCtx.beginPath();
+        gameCtx.roundRect(-this.w / 2 + 2, -this.h / 2 + 3, this.w, this.h, 3);
+        gameCtx.fill();
 
         // Body
-        ctx.fillStyle = this.color;
-        ctx.globalAlpha = this.opacity;
-        ctx.beginPath();
-        ctx.roundRect(-this.w / 2, -this.h / 2, this.w, this.h, 3);
-        ctx.fill();
+        gameCtx.fillStyle = this.color;
+        gameCtx.globalAlpha = this.opacity;
+        gameCtx.beginPath();
+        gameCtx.roundRect(-this.w / 2, -this.h / 2, this.w, this.h, 3);
+        gameCtx.fill();
 
         // Highlight
-        ctx.fillStyle = this.isGold
+        gameCtx.fillStyle = this.isGold
           ? 'rgba(255,255,255,0.35)'
           : 'rgba(255,255,255,0.12)';
-        ctx.beginPath();
-        ctx.roundRect(-this.w / 2 + 2, -this.h / 2 + 1, this.w - 4, this.h * 0.4, 2);
-        ctx.fill();
+        gameCtx.beginPath();
+        gameCtx.roundRect(-this.w / 2 + 2, -this.h / 2 + 1, this.w - 4, this.h * 0.4, 2);
+        gameCtx.fill();
 
         // Mortar lines
-        ctx.strokeStyle = this.isGold
+        gameCtx.strokeStyle = this.isGold
           ? 'rgba(180,150,0,0.4)'
           : 'rgba(0,0,0,0.25)';
-        ctx.lineWidth = 1;
+        gameCtx.lineWidth = 1;
 
-        ctx.beginPath();
-        ctx.moveTo(-this.w / 2 + 3, 0);
-        ctx.lineTo(this.w / 2 - 3, 0);
-        ctx.stroke();
+        gameCtx.beginPath();
+        gameCtx.moveTo(-this.w / 2 + 3, 0);
+        gameCtx.lineTo(this.w / 2 - 3, 0);
+        gameCtx.stroke();
 
-        ctx.beginPath();
-        ctx.moveTo(-this.w / 6, -this.h / 2 + 2);
-        ctx.lineTo(-this.w / 6, -1);
-        ctx.stroke();
+        gameCtx.beginPath();
+        gameCtx.moveTo(-this.w / 6, -this.h / 2 + 2);
+        gameCtx.lineTo(-this.w / 6, -1);
+        gameCtx.stroke();
 
-        ctx.beginPath();
-        ctx.moveTo(this.w / 5, 1);
-        ctx.lineTo(this.w / 5, this.h / 2 - 2);
-        ctx.stroke();
+        gameCtx.beginPath();
+        gameCtx.moveTo(this.w / 5, 1);
+        gameCtx.lineTo(this.w / 5, this.h / 2 - 2);
+        gameCtx.stroke();
 
         // Gold sparkle
         if (this.isGold) {
-          ctx.fillStyle = 'rgba(255,255,255,0.7)';
+          gameCtx.fillStyle = 'rgba(255,255,255,0.7)';
           const t = Date.now() / 300;
           for (let i = 0; i < 3; i++) {
             const sx = Math.sin(t + i * 2.1) * (this.w / 3);
             const sy = Math.cos(t + i * 1.7) * (this.h / 3);
-            ctx.beginPath();
-            ctx.arc(sx, sy, 1.5, 0, Math.PI * 2);
-            ctx.fill();
+            gameCtx.beginPath();
+            gameCtx.arc(sx, sy, 1.5, 0, Math.PI * 2);
+            gameCtx.fill();
           }
         }
 
-        ctx.restore();
+        gameCtx.restore();
       }
 
       hitTest(mx, my) {
         if (!this.alive) return false;
-        // Simple AABB, accounting for rotation approximately
         const pad = 5;
         return mx >= this.x - pad && mx <= this.x + this.w + pad &&
                my >= this.y - pad && my <= this.y + this.h + pad;
@@ -928,13 +1229,13 @@
 
     function drawParticles() {
       for (const p of particles) {
-        ctx.save();
-        ctx.globalAlpha = p.life;
-        ctx.fillStyle = p.color;
-        ctx.beginPath();
-        ctx.roundRect(p.x - p.size / 2, p.y - p.size / 2, p.size, p.size * 0.6, 1);
-        ctx.fill();
-        ctx.restore();
+        gameCtx.save();
+        gameCtx.globalAlpha = p.life;
+        gameCtx.fillStyle = p.color;
+        gameCtx.beginPath();
+        gameCtx.roundRect(p.x - p.size / 2, p.y - p.size / 2, p.size, p.size * 0.6, 1);
+        gameCtx.fill();
+        gameCtx.restore();
       }
     }
 
@@ -950,46 +1251,41 @@
     }
 
     // ─── Bricks Array ─────────────────────────────────────
-    let bricks = [];
+    let gameBricks = [];
 
     function syncBrickCount() {
       const target = upgrades.brickFrequency.effect(upgrades.brickFrequency.level);
-      while (bricks.length < target) {
-        bricks.push(new Brick(true));
+      while (gameBricks.length < target) {
+        gameBricks.push(new GameBrick(true));
       }
-      while (bricks.length > target + 10) {
-        bricks.pop();
+      while (gameBricks.length > target + 10) {
+        gameBricks.pop();
       }
     }
 
     // ─── Click / Touch Handler ─────────────────────────────
     function handleBrickClick(clientX, clientY) {
-      if (!game.started) return;
-      const rect = canvas.getBoundingClientRect();
+      if (!gameRunning) return;
+      const rect = gameCanvas.getBoundingClientRect();
       const mx = clientX - rect.left;
       const my = clientY - rect.top;
 
-      // Check bricks from top (front) to back
-      for (let i = bricks.length - 1; i >= 0; i--) {
-        const b = bricks[i];
+      for (let i = gameBricks.length - 1; i >= 0; i--) {
+        const b = gameBricks[i];
         if (b.hitTest(mx, my)) {
-          // Calculate value
           let value = getClickValue();
           let isCrit = false;
           let isGoldHit = b.isGold;
 
-          // Lucky crit
           if (Math.random() < upgrades.luckyClick.effect(upgrades.luckyClick.level)) {
             value *= 5;
             isCrit = true;
           }
 
-          // Gold brick bonus
           if (isGoldHit) {
             value *= 10;
           }
 
-          // Combo
           game.combo++;
           game.comboTimer = 2000 + upgrades.comboMaster.level * 300;
           const comboMult = getComboMultiplier();
@@ -999,7 +1295,6 @@
           game.totalClicked++;
           game.totalEarned += value;
 
-          // Visual feedback
           b.hitAnim = 1;
           const pcx = b.x + b.w / 2;
           const pcy = b.y + b.h / 2;
@@ -1013,23 +1308,11 @@
             cls
           );
 
-          // Reset brick
           b.reset(false);
           break;
         }
       }
     }
-
-    canvas.addEventListener('click', (e) => {
-      handleBrickClick(e.clientX, e.clientY);
-    });
-
-    canvas.addEventListener('touchstart', (e) => {
-      e.preventDefault();
-      for (const touch of e.changedTouches) {
-        handleBrickClick(touch.clientX, touch.clientY);
-      }
-    }, { passive: false });
 
     // ─── Number Formatting ────────────────────────────────
     function formatNumber(n) {
@@ -1041,51 +1324,26 @@
     }
 
     // ─── UI Updates ───────────────────────────────────────
-    const coinDisplay = document.getElementById('coinDisplay');
-    const statPerClick = document.getElementById('statPerClick');
-    const statPerSec = document.getElementById('statPerSec');
-    const statClicked = document.getElementById('statClicked');
-    const comboDisplay = document.getElementById('comboDisplay');
-    const comboCount = document.getElementById('comboCount');
-    const comboBonus = document.getElementById('comboBonus');
-
     function updateHUD() {
-      coinDisplay.textContent = formatNumber(game.coins);
-      statPerClick.textContent = formatNumber(getClickValue());
-      statPerSec.textContent = formatNumber(getAutoIncome());
-      statClicked.textContent = formatNumber(game.totalClicked);
+      document.getElementById('coinDisplay').textContent = formatNumber(game.coins);
+      document.getElementById('statPerClick').textContent = formatNumber(getClickValue());
+      document.getElementById('statPerSec').textContent = formatNumber(getAutoIncome());
+      document.getElementById('statClicked').textContent = formatNumber(game.totalClicked);
 
-      // Combo display
       if (game.combo >= 2) {
-        comboDisplay.classList.add('active');
-        comboCount.textContent = game.combo + 'x';
+        document.getElementById('comboDisplay').classList.add('active');
+        document.getElementById('comboCount').textContent = game.combo + 'x';
         const bonus = Math.round((getComboMultiplier() - 1) * 100);
-        comboBonus.textContent = '+' + bonus + '% bonus';
+        document.getElementById('comboBonus').textContent = '+' + bonus + '% bonus';
       } else {
-        comboDisplay.classList.remove('active');
+        document.getElementById('comboDisplay').classList.remove('active');
       }
     }
 
     // ─── Shop UI ──────────────────────────────────────────
-    const shopOverlay = document.getElementById('shopOverlay');
-    const shopBalance = document.getElementById('shopBalance');
-    const upgradeList = document.getElementById('upgradeList');
-
-    document.getElementById('shopBtn').addEventListener('click', () => {
-      shopOverlay.classList.add('open');
-      renderShop();
-    });
-
-    document.getElementById('shopClose').addEventListener('click', () => {
-      shopOverlay.classList.remove('open');
-    });
-
-    shopOverlay.addEventListener('click', (e) => {
-      if (e.target === shopOverlay) shopOverlay.classList.remove('open');
-    });
-
     function renderShop() {
-      shopBalance.textContent = formatNumber(game.coins);
+      document.getElementById('shopBalance').textContent = formatNumber(game.coins);
+      const upgradeList = document.getElementById('upgradeList');
       upgradeList.innerHTML = '';
 
       for (const [key, upg] of Object.entries(upgrades)) {
@@ -1132,99 +1390,123 @@
       }
     }
 
-    // ─── Reset ────────────────────────────────────────────
-    document.getElementById('resetBtn').addEventListener('click', () => {
-      if (confirm('Reset all progress? This cannot be undone!')) {
-        localStorage.removeItem(SAVE_KEY);
-        game.coins = 0;
-        game.totalClicked = 0;
-        game.totalEarned = 0;
-        game.combo = 0;
-        for (const upg of Object.values(upgrades)) upg.level = 0;
-        bricks = [];
-        syncBrickCount();
-        updateHUD();
-      }
-    });
-
     // ─── Game Loop ────────────────────────────────────────
     let lastTime = 0;
     let saveTimer = 0;
 
     function gameLoop(timestamp) {
+      if (!gameRunning) return;
+
       const dt = lastTime ? Math.min(timestamp - lastTime, 50) : 16;
       lastTime = timestamp;
 
-      ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+      gameCtx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 
-      if (game.started) {
-        // Combo timer
-        if (game.comboTimer > 0) {
-          game.comboTimer -= dt;
-          if (game.comboTimer <= 0) {
-            game.combo = 0;
-          }
+      // Combo timer
+      if (game.comboTimer > 0) {
+        game.comboTimer -= dt;
+        if (game.comboTimer <= 0) {
+          game.combo = 0;
         }
+      }
 
-        // Auto income
-        game.lastAutoTick += dt;
-        if (game.lastAutoTick >= 1000) {
-          const autoIncome = getAutoIncome();
-          if (autoIncome > 0) {
-            game.coins += autoIncome;
-            game.totalEarned += autoIncome;
-          }
-          game.lastAutoTick -= 1000;
+      // Auto income
+      game.lastAutoTick += dt;
+      if (game.lastAutoTick >= 1000) {
+        const autoIncome = getAutoIncome();
+        if (autoIncome > 0) {
+          game.coins += autoIncome;
+          game.totalEarned += autoIncome;
         }
+        game.lastAutoTick -= 1000;
+      }
 
-        // Update bricks
-        for (const b of bricks) b.update(dt);
-        updateParticles(dt);
+      // Update bricks
+      for (const b of gameBricks) b.update(dt);
+      updateParticles(dt);
 
-        // Draw bricks
-        for (const b of bricks) b.draw();
-        drawParticles();
+      // Draw bricks
+      for (const b of gameBricks) b.draw();
+      drawParticles();
 
-        updateHUD();
+      updateHUD();
 
-        // Autosave every 10 seconds
-        saveTimer += dt;
-        if (saveTimer >= 10000) {
-          saveGame();
-          saveTimer = 0;
-        }
-      } else {
-        // Ambient bricks on start screen
-        for (const b of bricks) { b.update(dt); b.draw(); }
+      // Autosave every 10 seconds
+      saveTimer += dt;
+      if (saveTimer >= 10000) {
+        saveGame();
+        saveTimer = 0;
       }
 
       requestAnimationFrame(gameLoop);
     }
 
-    // ─── Start ────────────────────────────────────────────
-    document.getElementById('startBtn').addEventListener('click', () => {
-      game.started = true;
-      document.getElementById('startScreen').classList.add('hidden');
-      document.getElementById('hud').style.display = 'flex';
+    // ─── Initialize Game ────────────────────────────────
+    function initGame() {
+      gameCanvas = document.getElementById('gameCanvas');
+      gameCtx = gameCanvas.getContext('2d');
+
+      function resizeGame() {
+        const dpr = window.devicePixelRatio || 1;
+        gameCanvas.width = window.innerWidth * dpr;
+        gameCanvas.height = window.innerHeight * dpr;
+        gameCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+      resizeGame();
+      window.addEventListener('resize', resizeGame);
+
+      if (!gameInitialized) {
+        // Event listeners (only bind once)
+        gameCanvas.addEventListener('click', (e) => {
+          handleBrickClick(e.clientX, e.clientY);
+        });
+
+        gameCanvas.addEventListener('touchstart', (e) => {
+          e.preventDefault();
+          for (const touch of e.changedTouches) {
+            handleBrickClick(touch.clientX, touch.clientY);
+          }
+        }, { passive: false });
+
+        document.getElementById('shopBtn').addEventListener('click', () => {
+          document.getElementById('shopOverlay').classList.add('open');
+          renderShop();
+        });
+
+        document.getElementById('shopClose').addEventListener('click', () => {
+          document.getElementById('shopOverlay').classList.remove('open');
+        });
+
+        document.getElementById('shopOverlay').addEventListener('click', (e) => {
+          if (e.target === document.getElementById('shopOverlay')) {
+            document.getElementById('shopOverlay').classList.remove('open');
+          }
+        });
+
+        document.getElementById('resetBtn').addEventListener('click', () => {
+          if (confirm('Reset all progress? This cannot be undone!')) {
+            localStorage.removeItem(SAVE_KEY);
+            game.coins = 0;
+            game.totalClicked = 0;
+            game.totalEarned = 0;
+            game.combo = 0;
+            for (const upg of Object.values(upgrades)) upg.level = 0;
+            gameBricks = [];
+            syncBrickCount();
+            updateHUD();
+          }
+        });
+
+        gameInitialized = true;
+      }
+
+      loadGame();
       syncBrickCount();
+      gameRunning = true;
+      lastTime = 0;
       updateHUD();
-    });
-
-    // Initialize ambient bricks for start screen
-    for (let i = 0; i < 12; i++) bricks.push(new Brick(true));
-
-    // Load saved game
-    loadGame();
-    syncBrickCount();
-
-    // Auto-start if save exists
-    if (game.totalClicked > 0 || game.coins > 0) {
-      game.started = true;
-      document.getElementById('startScreen').classList.add('hidden');
-      document.getElementById('hud').style.display = 'flex';
+      requestAnimationFrame(gameLoop);
     }
-
-    requestAnimationFrame(gameLoop);
   </script>
 </body>
 </html>

@@ -1,17 +1,22 @@
 import React from 'react';
-import { Home, Package, User, LogOut, Plus } from 'lucide-react';
+import { Home, Package, User, LogOut, Plus, MessageSquare } from 'lucide-react';
 import { Button } from './ui/button';
 import { useAuth } from './auth-context';
+import { useMessaging } from './messaging-context';
 import pricingIcon from '../../assets/57339c2f1c137c45ea12885696f5320e34a64609.png';
 
+type View = 'home' | 'housing' | 'marketplace' | 'profile' | 'my-listings' | 'pricing' | 'messages';
+
 interface HeaderProps {
-  currentView: 'home' | 'housing' | 'marketplace' | 'profile' | 'my-listings' | 'pricing';
-  onViewChange: (view: 'home' | 'housing' | 'marketplace' | 'profile' | 'my-listings' | 'pricing') => void;
+  currentView: View;
+  onViewChange: (view: View) => void;
   onCreateListing: () => void;
 }
 
 export function Header({ currentView, onViewChange, onCreateListing }: HeaderProps) {
   const { user, signOut } = useAuth();
+  const { getUnreadCount } = useMessaging();
+  const unreadCount = user ? getUnreadCount(user.id) : 0;
 
   return (
     <header className="bg-[#F76902] text-white shadow-md sticky top-0 z-50">
@@ -65,6 +70,21 @@ export function Header({ currentView, onViewChange, onCreateListing }: HeaderPro
                   className={currentView === 'my-listings' ? '' : 'text-white hover:bg-white/20'}
                 >
                   My Listings
+                </Button>
+
+                <Button
+                  variant={currentView === 'messages' ? 'secondary' : 'ghost'}
+                  size="sm"
+                  onClick={() => onViewChange('messages')}
+                  className={`relative ${currentView === 'messages' ? '' : 'text-white hover:bg-white/20'}`}
+                >
+                  <MessageSquare className="w-4 h-4 mr-2" />
+                  Messages
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-white text-[#F76902] text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center leading-none">
+                      {unreadCount > 9 ? '9+' : unreadCount}
+                    </span>
+                  )}
                 </Button>
 
                 <Button

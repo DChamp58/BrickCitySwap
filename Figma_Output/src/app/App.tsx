@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { AuthProvider, useAuth } from './components/auth-context';
+import { MessagingProvider } from './components/messaging-context';
 import { Header } from './components/header';
 import { AuthView } from './components/auth-view';
 import { ListingsView } from './components/listings-view';
 import { MyListingsView } from './components/my-listings-view';
+import { MessagesView } from './components/messages-view';
 import { CreateListingDialog } from './components/create-listing-dialog';
 import { ContactDialog } from './components/contact-dialog';
 import { ListingDetailDialog } from './components/listing-detail-dialog';
@@ -15,7 +17,7 @@ import { Listing } from './components/listing-card';
 import { Toaster } from './components/ui/sonner';
 import { Card, CardContent } from './components/ui/card';
 
-type View = 'home' | 'housing' | 'marketplace' | 'profile' | 'my-listings' | 'pricing';
+type View = 'home' | 'housing' | 'marketplace' | 'profile' | 'my-listings' | 'pricing' | 'messages';
 
 function AppContent() {
   const { user, accessToken, loading } = useAuth();
@@ -26,6 +28,7 @@ function AppContent() {
   const [selectedListing, setSelectedListing] = useState<Listing | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
   const [showHero, setShowHero] = useState(true);
+  const [openConversationId, setOpenConversationId] = useState<string | null>(null);
 
   const handleCreateListing = () => {
     if (!user) {
@@ -51,6 +54,11 @@ function AppContent() {
 
   const handleListingCreated = () => {
     setRefreshKey(prev => prev + 1);
+  };
+
+  const handleConversationStarted = (conversationId: string) => {
+    setOpenConversationId(conversationId);
+    setCurrentView('messages');
   };
 
   if (loading) {
@@ -125,6 +133,12 @@ function AppContent() {
             <PricingView />
           </div>
         )}
+
+        {currentView === 'messages' && (
+          <div key={`messages-${openConversationId}`}>
+            <MessagesView openConversationId={openConversationId} />
+          </div>
+        )}
       </main>
 
       {/* Free user ad */}
@@ -152,6 +166,7 @@ function AppContent() {
         onClose={() => setContactDialogOpen(false)}
         listing={selectedListing}
         accessToken={accessToken}
+        onConversationStarted={handleConversationStarted}
       />
 
       <ListingDetailDialog
@@ -171,7 +186,9 @@ function AppContent() {
 export default function App() {
   return (
     <AuthProvider>
-      <AppContent />
+      <MessagingProvider>
+        <AppContent />
+      </MessagingProvider>
     </AuthProvider>
   );
 }

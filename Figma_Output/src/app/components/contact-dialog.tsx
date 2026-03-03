@@ -14,12 +14,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { toast } from 'sonner';
 import { Listing } from './listing-card';
 import { MapPin } from 'lucide-react';
+import { useAuth } from './auth-context';
+import { useMessaging } from './messaging-context';
 
 interface ContactDialogProps {
   open: boolean;
   onClose: () => void;
   listing: Listing | null;
   accessToken: string | null;
+  /** Called after a conversation is created so the parent can navigate to it */
+  onConversationStarted?: (conversationId: string) => void;
 }
 
 const campusLocations = [
@@ -31,31 +35,56 @@ const campusLocations = [
   { value: 'other', label: 'Other (specify)', walkingTime: '' },
 ];
 
-export function ContactDialog({ open, onClose, listing, accessToken }: ContactDialogProps) {
+export function ContactDialog({
+  open,
+  onClose,
+  listing,
+  accessToken,
+  onConversationStarted,
+}: ContactDialogProps) {
+  const { user } = useAuth();
+  const { startConversation } = useMessaging();
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [meetupLocation, setMeetupLocation] = useState('');
   const [customLocation, setCustomLocation] = useState('');
 
   const handleSendMessage = async () => {
-    if (!listing || !accessToken) return;
+    if (!listing || !user) return;
 
-    const finalMessage = meetupLocation
-      ? `${message}\n\n📍 Suggested meetup location: ${
-          meetupLocation === 'other' ? customLocation : campusLocations.find(l => l.value === meetupLocation)?.label
+    const locationSuffix = meetupLocation
+      ? `\n\n📍 Suggested meetup location: ${
+          meetupLocation === 'other'
+            ? customLocation
+            : campusLocations.find(l => l.value === meetupLocation)?.label
         }`
-      : message;
+      : '';
+    const finalMessage = message + locationSuffix;
 
     setLoading(true);
     try {
-      // TODO: implement real messaging
-      await new Promise(resolve => setTimeout(resolve, 500));
-      toast.success('Message sent! The seller will be in touch.');
+      const sellerId = listing.userId;
+      const sellerName = listing.userId === user.id ? user.name : `Seller #${listing.userId}`;
+
+      const convo = startConversation({
+        listingId: listing.id,
+        listingTitle: listing.title,
+        listingType: listing.type,
+        listingPrice: listing.price,
+        sellerId,
+        sellerName,
+        buyerId: user.id,
+        buyerName: user.name,
+        initialMessage: finalMessage,
+      });
+
+      toast.success('Message sent! Opening your conversation…');
       setMessage('');
       setMeetupLocation('');
       setCustomLocation('');
       onClose();
-    } catch (error) {
+      onConversationStarted?.(convo.id);
+    } catch {
       toast.error('Failed to send message');
     } finally {
       setLoading(false);
@@ -141,7 +170,7 @@ export function ContactDialog({ open, onClose, listing, accessToken }: ContactDi
               disabled={!message.trim() || loading || (meetupLocation === 'other' && !customLocation.trim())}
               className="bg-[#F76902] hover:bg-[#D85802]"
             >
-              {loading ? 'Sending...' : 'Send Message'}
+              {loading ? 'Sending…' : 'Send Message'}
             </Button>
           </div>
         </div>

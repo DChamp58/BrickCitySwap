@@ -52,8 +52,12 @@
     #gameCanvas {
       position: fixed;
       inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
       z-index: 1;
       cursor: crosshair;
+      touch-action: none;
     }
 
     /* ─── HUD ──────────────────────────────────────────── */
@@ -589,12 +593,25 @@
     //  BRICK CLICKER GAME
     // ═══════════════════════════════════════════════════════
 
+    // ─── roundRect polyfill for older browsers ────────────
+    if (typeof CanvasRenderingContext2D.prototype.roundRect !== 'function') {
+      CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, radii) {
+        const r = typeof radii === 'number' ? radii : (Array.isArray(radii) ? radii[0] : 0);
+        if (w < 2 * r) { const rr = w / 2; this.moveTo(x + rr, y); this.arcTo(x + w, y, x + w, y + h, rr); this.arcTo(x + w, y + h, x, y + h, rr); this.arcTo(x, y + h, x, y, rr); this.arcTo(x, y, x + w, y, rr); }
+        else if (h < 2 * r) { const rr = h / 2; this.moveTo(x + rr, y); this.arcTo(x + w, y, x + w, y + h, rr); this.arcTo(x + w, y + h, x, y + h, rr); this.arcTo(x, y + h, x, y, rr); this.arcTo(x, y, x + w, y, rr); }
+        else { this.moveTo(x + r, y); this.arcTo(x + w, y, x + w, y + h, r); this.arcTo(x + w, y + h, x, y + h, r); this.arcTo(x, y + h, x, y, r); this.arcTo(x, y, x + w, y, r); }
+        return this;
+      };
+    }
+
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
 
     function resize() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = window.innerWidth * dpr;
+      canvas.height = window.innerHeight * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
     resize();
     window.addEventListener('resize', resize);
@@ -773,9 +790,9 @@
         this.baseH = 22 + Math.random() * 10;
         this.w = this.baseW * sizeMult;
         this.h = this.baseH * sizeMult;
-        this.x = Math.random() * (canvas.width - this.w);
+        this.x = Math.random() * (window.innerWidth - this.w);
         this.y = startRandom
-          ? Math.random() * canvas.height
+          ? Math.random() * window.innerHeight
           : -(this.h + Math.random() * 150);
         const speedMult = upgrades.slowDown.effect(upgrades.slowDown.level);
         this.speed = (0.8 + Math.random() * 1.2) * speedMult;
@@ -794,7 +811,7 @@
         if (!this.alive) return;
         this.y += this.speed * (dt / 16);
         this.rotate += this.rotateSpeed * (dt / 16);
-        if (this.y > canvas.height + this.h + 20) {
+        if (this.y > window.innerHeight + this.h + 20) {
           this.reset(false);
         }
       }
@@ -945,12 +962,12 @@
       }
     }
 
-    // ─── Click Handler ────────────────────────────────────
-    canvas.addEventListener('click', (e) => {
+    // ─── Click / Touch Handler ─────────────────────────────
+    function handleBrickClick(clientX, clientY) {
       if (!game.started) return;
       const rect = canvas.getBoundingClientRect();
-      const mx = e.clientX - rect.left;
-      const my = e.clientY - rect.top;
+      const mx = clientX - rect.left;
+      const my = clientY - rect.top;
 
       // Check bricks from top (front) to back
       for (let i = bricks.length - 1; i >= 0; i--) {
@@ -990,8 +1007,8 @@
 
           const cls = isGoldHit ? 'gold-text' : (isCrit ? 'crit' : '');
           showFloatText(
-            e.clientX - 20 + Math.random() * 40,
-            e.clientY - 20,
+            clientX - 20 + Math.random() * 40,
+            clientY - 20,
             '+' + formatNumber(value),
             cls
           );
@@ -1001,7 +1018,18 @@
           break;
         }
       }
+    }
+
+    canvas.addEventListener('click', (e) => {
+      handleBrickClick(e.clientX, e.clientY);
     });
+
+    canvas.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      for (const touch of e.changedTouches) {
+        handleBrickClick(touch.clientX, touch.clientY);
+      }
+    }, { passive: false });
 
     // ─── Number Formatting ────────────────────────────────
     function formatNumber(n) {
@@ -1127,7 +1155,7 @@
       const dt = lastTime ? Math.min(timestamp - lastTime, 50) : 16;
       lastTime = timestamp;
 
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 
       if (game.started) {
         // Combo timer

@@ -6,6 +6,7 @@ import { Button } from './ui/button';
 import { Search, SlidersHorizontal } from 'lucide-react';
 import { Skeleton } from './ui/skeleton';
 import { FilterSidebar, Filters } from './filter-sidebar';
+import { fetchListings as fetchListingsApi } from '@/lib/api';
 
 interface ListingsViewProps {
   type: 'housing' | 'marketplace';
@@ -43,11 +44,8 @@ export function ListingsView({ type, onContact, onView }: ListingsViewProps) {
   const fetchListings = async () => {
     setLoading(true);
     try {
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      // No listings - empty state
-      setListings([]);
+      const data = await fetchListingsApi(type);
+      setListings(data as Listing[]);
     } catch (error) {
       console.error('Failed to fetch listings:', error);
     } finally {
@@ -83,25 +81,25 @@ export function ListingsView({ type, onContact, onView }: ListingsViewProps) {
     // Move-in date filter
     if (filters.moveInDate && type === 'housing') {
       filtered = filtered.filter(listing => {
-        if (!listing.moveInDate) return false;
-        return new Date(listing.moveInDate) >= new Date(filters.moveInDate);
+        if (!listing.available_from) return false;
+        return new Date(listing.available_from) >= new Date(filters.moveInDate);
       });
     }
 
     // Move-out date filter
     if (filters.moveOutDate && type === 'housing') {
       filtered = filtered.filter(listing => {
-        if (!listing.moveOutDate) return false;
-        return new Date(listing.moveOutDate) <= new Date(filters.moveOutDate);
+        if (!listing.available_to) return false;
+        return new Date(listing.available_to) <= new Date(filters.moveOutDate);
       });
     }
 
     // Distance from campus filter
     if (filters.distanceFromCampus && type === 'housing') {
       filtered = filtered.filter(listing => {
-        if (!listing.distanceFromCampus) return true;
-        const distance = listing.distanceFromCampus;
-        
+        if (!listing.distance_from_campus) return true;
+        const distance = listing.distance_from_campus;
+
         switch (filters.distanceFromCampus) {
           case 'walking':
             return distance <= 0.5;
@@ -120,23 +118,23 @@ export function ListingsView({ type, onContact, onView }: ListingsViewProps) {
     // Roommate gender filter
     if (filters.roommateGender && type === 'housing') {
       filtered = filtered.filter(listing => {
-        if (!listing.roommateGender) return true;
-        return listing.roommateGender === filters.roommateGender;
+        if (!listing.gender_pref) return true;
+        return listing.gender_pref === filters.roommateGender;
       });
     }
 
     // Housing type filter
     if (filters.housingTypes.length > 0 && type === 'housing') {
       filtered = filtered.filter(listing => {
-        if (!listing.housingType) return false;
-        return filters.housingTypes.includes(listing.housingType);
+        if (!listing.housing_type) return false;
+        return filters.housingTypes.includes(listing.housing_type);
       });
     }
 
     // Bedrooms filter
     if (filters.bedrooms && type === 'housing') {
       filtered = filtered.filter(listing => {
-        if (!listing.bedrooms) return false;
+        if (listing.bedrooms == null) return false;
         if (filters.bedrooms === 'studio') return listing.bedrooms === 0;
         if (filters.bedrooms === '3+') return listing.bedrooms >= 3;
         return listing.bedrooms === parseInt(filters.bedrooms);
@@ -152,14 +150,14 @@ export function ListingsView({ type, onContact, onView }: ListingsViewProps) {
         filtered.sort((a, b) => b.price - a.price);
         break;
       case 'newest':
-        filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        filtered.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
         break;
       case 'move-in':
         if (type === 'housing') {
           filtered.sort((a, b) => {
-            if (!a.moveInDate) return 1;
-            if (!b.moveInDate) return -1;
-            return new Date(a.moveInDate).getTime() - new Date(b.moveInDate).getTime();
+            if (!a.available_from) return 1;
+            if (!b.available_from) return -1;
+            return new Date(a.available_from).getTime() - new Date(b.available_from).getTime();
           });
         }
         break;

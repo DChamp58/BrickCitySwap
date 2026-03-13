@@ -4,34 +4,40 @@ import { Badge } from './ui/badge';
 import { Button } from './ui/button';
 import { MapPin, DollarSign, Calendar, User, MessageCircle } from 'lucide-react';
 
+export interface ListingImage {
+  id: string;
+  listing_id: string;
+  url: string;
+  position: number;
+}
+
 export interface Listing {
   id: string;
   type: 'housing' | 'marketplace';
   title: string;
   description: string;
   price: number;
-  userId: string;
-  createdAt: string;
+  user_id: string;
+  school_id?: string | null;
+  created_at: string;
+  updated_at?: string;
   status: 'available' | 'pending' | 'sold';
-  soldDate?: string;
-  
+  listing_images?: ListingImage[];
+  profiles?: { full_name: string; avatar_url: string | null };
+
   // Housing specific
-  location?: string;
-  bedrooms?: number;
-  bathrooms?: number;
-  availableFrom?: string;
-  availableTo?: string;
-  gender?: 'any' | 'male' | 'female';
-  moveInDate?: string;
-  moveOutDate?: string;
-  distanceFromCampus?: number;
-  roommateGender?: string;
-  housingType?: string;
-  
+  location?: string | null;
+  bedrooms?: number | null;
+  bathrooms?: number | null;
+  available_from?: string | null;
+  available_to?: string | null;
+  gender_pref?: string | null;
+  housing_type?: string | null;
+  distance_from_campus?: number | null;
+
   // Marketplace specific
-  category?: string;
-  condition?: string;
-  imageUrl?: string;
+  category?: string | null;
+  condition?: string | null;
 }
 
 interface ListingCardProps {
@@ -45,6 +51,7 @@ interface ListingCardProps {
 export function ListingCard({ listing, onContact, onView, showActions = true, showStatus = false }: ListingCardProps) {
   const isHousing = listing.type === 'housing';
   const isSold = listing.status === 'sold';
+  const thumbUrl = listing.listing_images?.[0]?.url;
 
   const getStatusBadge = () => {
     switch (listing.status) {
@@ -60,12 +67,19 @@ export function ListingCard({ listing, onContact, onView, showActions = true, sh
   };
 
   return (
-    <Card 
-      className={`hover:shadow-lg transition-shadow cursor-pointer relative ${
+    <Card
+      className={`hover:shadow-lg transition-shadow cursor-pointer relative overflow-hidden ${
         isSold ? 'opacity-50' : ''
       }`}
       onClick={() => onView?.(listing)}
     >
+      {/* Thumbnail */}
+      {thumbUrl && (
+        <div className="h-40 overflow-hidden">
+          <img src={thumbUrl} alt={listing.title} className="w-full h-full object-cover" />
+        </div>
+      )}
+
       {/* Sold Watermark */}
       {isSold && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
@@ -86,15 +100,15 @@ export function ListingCard({ listing, onContact, onView, showActions = true, sh
           </div>
         </div>
       </CardHeader>
-      
+
       <CardContent className="space-y-3">
         <p className="text-sm text-muted-foreground line-clamp-2">{listing.description}</p>
-        
+
         <div className="flex items-center gap-2 text-lg font-bold text-[#F76902]">
           <DollarSign className="w-5 h-5" />
           {listing.price}{isHousing ? '/month' : ''}
         </div>
-        
+
         {isHousing && (
           <div className="space-y-2">
             {listing.location && (
@@ -103,36 +117,36 @@ export function ListingCard({ listing, onContact, onView, showActions = true, sh
                 {listing.location}
               </div>
             )}
-            {listing.bedrooms !== undefined && (
+            {listing.bedrooms != null && (
               <div className="flex items-center gap-2 text-sm">
                 <User className="w-4 h-4" />
                 {listing.bedrooms} bed, {listing.bathrooms} bath
               </div>
             )}
-            {listing.availableFrom && (
+            {listing.available_from && (
               <div className="flex items-center gap-2 text-sm">
                 <Calendar className="w-4 h-4" />
-                {new Date(listing.availableFrom).toLocaleDateString()} - {listing.availableTo ? new Date(listing.availableTo).toLocaleDateString() : 'Ongoing'}
+                {new Date(listing.available_from).toLocaleDateString()} - {listing.available_to ? new Date(listing.available_to).toLocaleDateString() : 'Ongoing'}
               </div>
             )}
-            {listing.gender && listing.gender !== 'any' && (
-              <Badge variant="outline" className="capitalize">{listing.gender} preferred</Badge>
+            {listing.gender_pref && listing.gender_pref !== 'any' && (
+              <Badge variant="outline" className="capitalize">{listing.gender_pref} preferred</Badge>
             )}
           </div>
         )}
-        
+
         {!isHousing && listing.condition && (
           <Badge variant="outline" className="capitalize">{listing.condition}</Badge>
         )}
-        
+
         <div className="text-xs text-muted-foreground">
-          Posted {new Date(listing.createdAt).toLocaleDateString()}
+          Posted {new Date(listing.created_at).toLocaleDateString()}
         </div>
       </CardContent>
-      
+
       {showActions && onContact && (
         <CardFooter>
-          <Button 
+          <Button
             onClick={(e) => {
               e.stopPropagation();
               onContact(listing);

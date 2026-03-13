@@ -23,14 +23,22 @@ BrickCitySwap/
     ├── index.html             # HTML entry point
     ├── package.json           # Dependencies & scripts
     ├── vite.config.ts         # Vite + Tailwind + path alias config
+    ├── .env                   # Supabase credentials (gitignored)
+    ├── .env.example           # Template for .env
     ├── postcss.config.mjs     # PostCSS (empty; Tailwind v4 uses Vite plugin)
     ├── ATTRIBUTIONS.md        # Third-party licenses
+    ├── supabase/
+    │   └── migration.sql      # Database schema, RLS, triggers, seed data
     └── src/
         ├── main.tsx           # React root render
+        ├── lib/
+        │   ├── supabase.ts        # Supabase client singleton
+        │   ├── database.types.ts  # TypeScript types for all DB tables
+        │   └── api.ts             # Data access functions (CRUD for listings, images, etc.)
         ├── app/
         │   ├── App.tsx        # Root component, view routing, global dialogs
         │   └── components/
-        │       ├── auth-context.tsx          # Auth React Context provider
+        │       ├── auth-context.tsx          # Auth Context (Supabase Auth)
         │       ├── auth-view.tsx             # Sign in / sign up UI
         │       ├── header.tsx                # Top nav bar
         │       ├── footer.tsx                # Footer
@@ -39,13 +47,15 @@ BrickCitySwap/
         │       ├── listings-view.tsx         # Housing & marketplace browse page
         │       ├── my-listings-view.tsx      # User's own listings management
         │       ├── listing-card.tsx          # Listing card + shared Listing type
-        │       ├── listing-detail-dialog.tsx # Full listing detail modal
-        │       ├── create-listing-dialog.tsx # Create new listing form/modal
+        │       ├── listing-detail-dialog.tsx # Full listing detail modal (w/ image gallery)
+        │       ├── create-listing-dialog.tsx # Create listing form (w/ image upload)
         │       ├── contact-dialog.tsx        # Message seller modal
         │       ├── filter-sidebar.tsx        # Filter panel for listings
+        │       ├── messaging-context.tsx     # In-memory messaging (Phase 2: Supabase Realtime)
+        │       ├── messages-view.tsx         # Chat UI
         │       ├── pricing-view.tsx          # Subscription tier page
         │       ├── email-verification-view.tsx # Email verification UI
-        │       ├── sample-data.tsx           # In-memory mock data (dev only)
+        │       ├── sample-data.tsx           # Legacy mock data (reference only)
         │       └── ui/                       # shadcn/ui component library (48+ files)
         ├── assets/            # Static assets (images, etc.)
         └── styles/
@@ -79,6 +89,10 @@ npm run build     # Production build (outputs to dist/)
 | Framework | React 18 |
 | Language | TypeScript |
 | Build tool | Vite 6 |
+| **Backend** | **Supabase** (managed Postgres + Auth + Storage + Realtime) |
+| **Auth** | **Supabase Auth** (email/password, JWT sessions) |
+| **Database** | **Supabase PostgreSQL** with Row Level Security |
+| **Storage** | **Supabase Storage** (public bucket for listing images) |
 | Styling | Tailwind CSS v4 (via `@tailwindcss/vite` plugin) |
 | UI primitives | Radix UI (48+ `@radix-ui/react-*` packages) |
 | Component library | shadcn/ui (in `src/app/components/ui/`) |
@@ -116,6 +130,25 @@ To add a new page/view:
 - **UI state:** Local `useState` in each component
 - **No global state library** (Redux, Zustand, Jotai, etc.)
 
+### Supabase Backend
+
+The app uses **Supabase** as a managed backend. All data access goes through `src/lib/api.ts` which uses the Supabase JS client (`src/lib/supabase.ts`).
+
+**Environment variables** (set in `.env`):
+```
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key
+```
+
+**Database schema** is in `supabase/migration.sql`. Tables:
+- `schools` — college communities (RIT seeded)
+- `profiles` — user profiles (auto-created on signup via DB trigger)
+- `listings` — housing + marketplace (unified table with type discriminator)
+- `listing_images` — images per listing (stored in Supabase Storage)
+- `saved_listings` — user favorites
+
+All tables have **Row Level Security** enabled. Listings are publicly readable; writes require auth and ownership.
+
 ### Auth Context API
 
 ```ts
@@ -128,19 +161,24 @@ interface User {
   id: string;
   email: string;
   name: string;
-  subscriptionTier: string; // 'free' | 'poster' | ...
+  subscriptionTier: string; // 'free' | 'poster' | 'premium'
+  schoolId: string | null;
+  avatarUrl: string | null;
 }
 ```
 
-> **Important:** Auth is currently a stub. `signIn`/`signUp` only set in-memory state. No real backend calls are made. `accessToken` is always `null`.
+Auth is powered by **Supabase Auth**. `signIn`/`signUp` call Supabase directly. On signup, a database trigger auto-creates a profile row and matches the user's email domain to a school.
 
-### Listings & Mock Data
+### Data Access Layer
 
-The shared `Listing` type is defined in `listing-card.tsx`. All mock data lives in `sample-data.tsx`:
-- 10 housing listings (subleases/rentals, $550–$900/month)
-- 6 marketplace listings (electronics, textbooks, furniture, clothing)
+All database operations go through `src/lib/api.ts`:
+```ts
+import { fetchListings, createListing, uploadListingImage, ... } from '@/lib/api';
+```
 
-`ListingsView` accepts a `type` prop (`'housing' | 'marketplace'`) to filter and display the appropriate listings.
+### Listings
+
+The shared `Listing` type is defined in `listing-card.tsx` using **snake_case** field names matching the DB schema. `ListingsView` accepts a `type` prop (`'housing' | 'marketplace'`) and fetches from Supabase.
 
 ### Dialogs
 
@@ -224,20 +262,28 @@ if (!user) { setCurrentView('profile'); return; }
 
 ---
 
-## Known TODOs / Placeholder Implementations
+## What's Implemented vs. TODO
 
-The following are stubs that need real backend integration:
+### Implemented (Phase 1)
+- Supabase Auth (sign up / sign in / sign out with real persistence)
+- Profile auto-creation on signup (DB trigger matches email to school)
+- Listing CRUD (create, read, update status, delete) via Supabase
+- Image upload to Supabase Storage during listing creation
+- Image gallery in listing detail dialog
+- Browse listings fetched from real database
+- My Listings page with real data
+- Database schema with RLS policies
+- Multi-school support (schools table)
 
-| File | TODO |
-|------|------|
-| `auth-context.tsx` | Real auth (JWT/session, RIT email verification) |
-| `create-listing-dialog.tsx` | Real listing creation API call |
-| `contact-dialog.tsx` | Real messaging system |
-| `pricing-view.tsx` | Real payment/subscription processing |
-| `my-listings-view.tsx` | Real user listings fetch from backend |
-| `sample-data.tsx` | Replace with real API data fetching |
+### TODO (Phase 2+)
 
-When implementing backend calls, use the `accessToken` from `useAuth()` for authenticated requests.
+| Feature | Notes |
+|---------|-------|
+| In-app messaging | Schema is commented out in `migration.sql`. Use Supabase Realtime for live delivery. |
+| Payment/subscriptions | `pricing-view.tsx` is UI only — integrate Stripe |
+| RIT email enforcement | Validate `@rit.edu` domain on signup (currently accepts any email) |
+| Saved/favorited listings | API functions exist in `api.ts`, UI needs to be wired |
+| Admin/reporting | Add admin role to profiles, build admin views |
 
 ---
 

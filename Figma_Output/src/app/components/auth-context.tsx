@@ -1,10 +1,15 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { supabase } from '@/lib/supabase';
+import type { Session } from '@supabase/supabase-js';
+import type { Profile } from '@/lib/database.types';
 
-interface User {
+export interface User {
   id: string;
   email: string;
   name: string;
   subscriptionTier: string;
+  schoolId: string | null;
+  avatarUrl: string | null;
 }
 
 interface AuthContextType {
@@ -19,23 +24,86 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+function profileToUser(profile: Profile): User {
+  return {
+    id: profile.id,
+    email: profile.email,
+    name: profile.full_name,
+    subscriptionTier: profile.subscription_tier,
+    schoolId: profile.school_id,
+    avatarUrl: profile.avatar_url,
+  };
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [accessToken] = useState<string | null>(null);
-  const loading = false;
+  const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const signUp = async (email: string, _password: string, name: string) => {
-    // TODO: implement real auth
-    setUser({ id: '1', email, name, subscriptionTier: 'free' });
+  const loadProfile = async (session: Session | null) => {
+    if (!session?.user) {
+      setUser(null);
+      setAccessToken(null);
+      return;
+    }
+
+    setAccessToken(session.access_token);
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', session.user.id)
+      .single();
+
+    if (!profile) {
+      // Profile may not exist yet if trigger hasn't fired — use auth metadata
+      setUser({
+        id: session.user.id,
+        email: session.user.email ?? '',
+        name: session.user.user_metadata?.full_name ?? session.user.email?.split('@')[0] ?? '',
+        subscriptionTier: 'free',
+        schoolId: null,
+        avatarUrl: null,
+      });
+      return;
+    }
+
+    setUser(profileToUser(profile));
   };
 
-  const signIn = async (email: string, _password: string) => {
-    // TODO: implement real auth
-    setUser({ id: '1', email, name: email.split('@')[0], subscriptionTier: 'free' });
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      loadProfile(session).finally(() => setLoading(false));
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        loadProfile(session);
+      }
+    );
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const signUp = async (email: string, password: string, name: string) => {
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { data: { full_name: name } },
+    });
+    if (error) throw error;
+  };
+
+  const signIn = async (email: string, password: string) => {
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) throw error;
   };
 
   const signOut = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) throw error;
     setUser(null);
+    setAccessToken(null);
   };
 
   const updateProfile = (profile: User) => {

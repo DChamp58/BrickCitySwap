@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -13,6 +13,9 @@ import { Textarea } from './ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { toast } from 'sonner';
+import { useAuth } from './auth-context';
+import { createListing, uploadListingImage } from '@/lib/api';
+import { ImagePlus, X } from 'lucide-react';
 
 interface CreateListingDialogProps {
   open: boolean;
@@ -22,8 +25,10 @@ interface CreateListingDialogProps {
 }
 
 export function CreateListingDialog({ open, onClose, onListingCreated }: CreateListingDialogProps) {
+  const { user } = useAuth();
   const [type, setType] = useState<'housing' | 'marketplace'>('housing');
   const [loading, setLoading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -36,19 +41,64 @@ export function CreateListingDialog({ open, onClose, onListingCreated }: CreateL
   const [gender, setGender] = useState('any');
   const [category, setCategory] = useState('');
   const [condition, setCondition] = useState('');
+  const [images, setImages] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
 
   const resetForm = () => {
     setTitle(''); setDescription(''); setPrice(''); setLocation('');
     setBedrooms(''); setBathrooms(''); setAvailableFrom(''); setAvailableTo('');
     setGender('any'); setCategory(''); setCondition('');
+    setImages([]); setImagePreviews([]);
+  };
+
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (images.length + files.length > 5) {
+      toast.error('Maximum 5 images allowed');
+      return;
+    }
+    const newImages = [...images, ...files];
+    setImages(newImages);
+    const newPreviews = files.map(f => URL.createObjectURL(f));
+    setImagePreviews(prev => [...prev, ...newPreviews]);
+  };
+
+  const removeImage = (index: number) => {
+    URL.revokeObjectURL(imagePreviews[index]);
+    setImages(prev => prev.filter((_, i) => i !== index));
+    setImagePreviews(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user) return;
     setLoading(true);
     try {
-      // TODO: implement real listing creation
-      await new Promise(resolve => setTimeout(resolve, 500));
+      const listing = await createListing({
+        user_id: user.id,
+        school_id: user.schoolId,
+        type,
+        title,
+        description,
+        price: parseFloat(price),
+        ...(type === 'housing' ? {
+          location,
+          bedrooms: parseInt(bedrooms),
+          bathrooms: parseFloat(bathrooms),
+          available_from: availableFrom || null,
+          available_to: availableTo || null,
+          gender_pref: gender,
+        } : {
+          category,
+          condition,
+        }),
+      });
+
+      // Upload images
+      for (let i = 0; i < images.length; i++) {
+        await uploadListingImage(images[i], listing.id, i);
+      }
+
       toast.success('Listing created successfully!');
       resetForm();
       onClose();
@@ -170,6 +220,42 @@ export function CreateListingDialog({ open, onClose, onListingCreated }: CreateL
                 </div>
               </div>
             </TabsContent>
+
+            {/* Image Upload */}
+            <div className="space-y-2 mt-4">
+              <Label>Photos (up to 5)</Label>
+              <div className="flex gap-2 flex-wrap">
+                {imagePreviews.map((src, i) => (
+                  <div key={i} className="relative w-20 h-20 rounded border overflow-hidden">
+                    <img src={src} alt="" className="w-full h-full object-cover" />
+                    <button
+                      type="button"
+                      onClick={() => removeImage(i)}
+                      className="absolute top-0 right-0 bg-black/60 text-white rounded-bl p-0.5"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                ))}
+                {images.length < 5 && (
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="w-20 h-20 rounded border-2 border-dashed border-muted-foreground/30 flex items-center justify-center hover:border-[#F76902] transition-colors"
+                  >
+                    <ImagePlus className="w-6 h-6 text-muted-foreground" />
+                  </button>
+                )}
+              </div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                multiple
+                className="hidden"
+                onChange={handleImageSelect}
+              />
+            </div>
 
             <div className="flex justify-end gap-2 mt-6">
               <Button type="button" variant="outline" onClick={onClose} disabled={loading}>Cancel</Button>

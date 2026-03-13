@@ -7,6 +7,8 @@ import { toast } from 'sonner';
 import { Skeleton } from './ui/skeleton';
 import { Switch } from './ui/switch';
 import { Label } from './ui/label';
+import { useAuth } from './auth-context';
+import { fetchMyListings as fetchMyListingsApi, updateListing, deleteListing } from '@/lib/api';
 
 interface MyListingsViewProps {
   accessToken: string | null;
@@ -14,24 +16,25 @@ interface MyListingsViewProps {
 }
 
 export function MyListingsView({ accessToken, onView }: MyListingsViewProps) {
+  const { user } = useAuth();
   const [listings, setListings] = useState<Listing[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAllListings, setShowAllListings] = useState(false);
 
   useEffect(() => {
-    if (accessToken) {
+    if (user) {
       fetchMyListings();
+    } else {
+      setLoading(false);
     }
-  }, [accessToken]);
+  }, [user]);
 
   const fetchMyListings = async () => {
+    if (!user) return;
     setLoading(true);
     try {
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      // No listings - empty state
-      setListings([]);
+      const data = await fetchMyListingsApi(user.id);
+      setListings(data as Listing[]);
     } catch (error) {
       console.error('Failed to fetch my listings:', error);
     } finally {
@@ -45,10 +48,7 @@ export function MyListingsView({ accessToken, onView }: MyListingsViewProps) {
     }
 
     try {
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 300));
-      
-      // Update local state
+      await deleteListing(listingId);
       toast.success('Listing deleted successfully');
       setListings(listings.filter(l => l.id !== listingId));
     } catch (error) {
@@ -58,24 +58,16 @@ export function MyListingsView({ accessToken, onView }: MyListingsViewProps) {
 
   const handleUpdateStatus = async (listing: Listing, newStatus: 'available' | 'pending' | 'sold') => {
     try {
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 300));
-      
-      // Update local state
-      const updatedListings = listings.map(l => 
-        l.id === listing.id 
-          ? { 
-              ...l, 
-              status: newStatus,
-              soldDate: newStatus === 'sold' ? new Date().toISOString() : undefined
-            }
-          : l
+      await updateListing(listing.id, { status: newStatus });
+
+      const updatedListings = listings.map(l =>
+        l.id === listing.id ? { ...l, status: newStatus } : l
       );
-      
+
       setListings(updatedListings);
-      
-      const message = newStatus === 'sold' 
-        ? 'Listing marked as sold' 
+
+      const message = newStatus === 'sold'
+        ? 'Listing marked as sold'
         : newStatus === 'available'
         ? 'Listing relisted successfully'
         : 'Listing status updated';
@@ -189,9 +181,9 @@ export function MyListingsView({ accessToken, onView }: MyListingsViewProps) {
                   <Trash2 className="w-4 h-4" />
                 </Button>
               </div>
-              {listing.soldDate && (
+              {listing.status === 'sold' && listing.updated_at && (
                 <div className="absolute bottom-4 left-4 text-xs text-gray-500 bg-white px-2 py-1 rounded">
-                  Sold on {new Date(listing.soldDate).toLocaleDateString()}
+                  Sold on {new Date(listing.updated_at).toLocaleDateString()}
                 </div>
               )}
             </div>

@@ -1,0 +1,5 @@
+{
+  "buildCommand": "cd Figma_Output && npm install && npm run build",
+  "outputDirectory": "Figma_Output/dist",
+  "framework": "vite"
+}

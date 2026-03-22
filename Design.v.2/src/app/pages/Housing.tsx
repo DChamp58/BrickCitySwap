@@ -84,11 +84,38 @@ export function Housing() {
   });
 
   const handleHousingTypeChange = (type: keyof typeof housingTypes) => {
-    setHousingTypes(prev => ({
-      ...prev,
-      [type]: !prev[type]
-    }));
+    setHousingTypes(prev => ({ ...prev, [type]: !prev[type] }));
   };
+
+  const anyTypeChecked = housingTypes.house || housingTypes.apartment;
+
+  const filteredListings = housingListings
+    .filter((listing) => {
+      // Search query
+      if (searchQuery) {
+        const q = searchQuery.toLowerCase();
+        if (
+          !listing.title.toLowerCase().includes(q) &&
+          !listing.location.toLowerCase().includes(q) &&
+          !listing.type.toLowerCase().includes(q)
+        ) return false;
+      }
+      // Max price
+      if (maxPrice < 2500 && listing.price > maxPrice) return false;
+      // Housing type checkboxes
+      if (anyTypeChecked) {
+        const typeMatch =
+          (housingTypes.house && listing.type === 'Shared') ||
+          (housingTypes.apartment && (listing.type === 'Apartment' || listing.type === 'Studio'));
+        if (!typeMatch) return false;
+      }
+      return true;
+    })
+    .sort((a, b) => {
+      if (sortBy === 'price-low') return a.price - b.price;
+      if (sortBy === 'price-high') return b.price - a.price;
+      return b.id - a.id; // newest first by default
+    });
 
   return (
     <div className="w-full" style={{ backgroundColor: '#FFFFFF' }}>
@@ -414,14 +441,36 @@ export function Housing() {
 
           {/* Right Content - Listings Grid */}
           <div className="flex-1">
-            <div 
+            {/* Results count */}
+            <p style={{ fontSize: '14px', color: '#6B7280', marginBottom: '16px', fontWeight: 500 }}>
+              {filteredListings.length} listing{filteredListings.length !== 1 ? 's' : ''} found
+            </p>
+            {filteredListings.length === 0 && (
+              <div
+                style={{
+                  textAlign: 'center',
+                  padding: '64px 24px',
+                  backgroundColor: '#F9FAFB',
+                  borderRadius: '12px',
+                  border: '1px solid #E5E7EB',
+                }}
+              >
+                <p style={{ fontSize: '18px', fontWeight: 600, color: '#111827', marginBottom: '8px' }}>
+                  No listings match your filters
+                </p>
+                <p style={{ fontSize: '14px', color: '#6B7280' }}>
+                  Try adjusting your search or clearing filters.
+                </p>
+              </div>
+            )}
+            <div
               className="grid"
-              style={{ 
-                gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
+              style={{
+                gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
                 gap: '24px'
               }}
             >
-              {housingListings.map((listing) => (
+              {filteredListings.map((listing) => (
                 <div
                   key={listing.id}
                   className="bg-white cursor-pointer group"

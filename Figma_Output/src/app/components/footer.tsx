@@ -1,48 +1,79 @@
-import React from 'react';
-import { Heart } from 'lucide-react';
-
 export function Footer() {
   return (
-    <footer className="bg-muted/50 border-t mt-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid md:grid-cols-3 gap-8">
-          <div>
-            <div className="flex items-center gap-2 mb-4">
-              <span className="text-2xl">🐯</span>
-              <span className="font-bold text-lg">BrickCitySwap</span>
-            </div>
-            <p className="text-sm text-muted-foreground">
-              The safe, student-exclusive marketplace for RIT students.
-            </p>
-          </div>
+    <footer
+      className="w-full"
+      style={{
+        backgroundColor: '#111827',
+        color: '#FFFFFF',
+        padding: '48px'
+      }}
+    >
+      <div
+        className="max-w-[1400px] mx-auto"
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          flexWrap: 'wrap',
+          gap: '48px'
+        }}
+      >
+        {/* Logo & Tagline */}
+        <div style={{ maxWidth: '300px' }}>
+          <h2 className="font-bold" style={{ fontSize: '24px', marginBottom: '12px' }}>
+            <span style={{ color: '#FFFFFF' }}>BrickCity</span>
+            <span style={{ color: '#F76902' }}>Swap</span>
+          </h2>
+          <p className="font-normal" style={{ fontSize: '14px', color: '#9CA3AF', lineHeight: '1.6' }}>
+            The safe, student-exclusive marketplace for RIT students. Find housing, sell items, and connect.
+          </p>
+        </div>
 
-          <div>
-            <h3 className="font-semibold mb-4">About</h3>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li>Built by RIT students, for RIT students</li>
-              <li>Verified @rit.edu email required</li>
-              <li>Campus-focused marketplace</li>
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="font-semibold mb-4">Community</h3>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li>Housing & Subletting</li>
-              <li>Marketplace Items</li>
-              <li>Safe Student Transactions</li>
-            </ul>
+        {/* About */}
+        <div>
+          <h3 className="font-semibold" style={{ fontSize: '14px', color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '16px' }}>
+            About
+          </h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <p className="font-normal" style={{ fontSize: '14px', color: '#D1D5DB' }}>Built for RIT Students</p>
+            <p className="font-normal" style={{ fontSize: '14px', color: '#D1D5DB' }}>Verified Email Access</p>
+            <p className="font-normal" style={{ fontSize: '14px', color: '#D1D5DB' }}>Campus-Focused Community</p>
           </div>
         </div>
 
-        <div className="border-t mt-8 pt-6 text-center text-sm text-muted-foreground">
-          <div className="flex items-center justify-center gap-1">
-            Made with <Heart className="w-4 h-4 text-[#F76902] fill-current" /> for the RIT community
-          </div>
-          <div className="mt-2">
-            © 2026 BrickCitySwap. For RIT Students Only.
+        {/* Community */}
+        <div>
+          <h3 className="font-semibold" style={{ fontSize: '14px', color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '16px' }}>
+            Community
+          </h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <p className="font-normal" style={{ fontSize: '14px', color: '#D1D5DB' }}>Housing & Subletting</p>
+            <p className="font-normal" style={{ fontSize: '14px', color: '#D1D5DB' }}>Student Marketplace</p>
+            <p className="font-normal" style={{ fontSize: '14px', color: '#D1D5DB' }}>Safe Transactions</p>
           </div>
         </div>
+      </div>
+
+      {/* Bottom Bar */}
+      <div
+        className="max-w-[1400px] mx-auto"
+        style={{
+          marginTop: '48px',
+          paddingTop: '24px',
+          borderTop: '1px solid #374151',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: '16px'
+        }}
+      >
+        <p className="font-normal" style={{ fontSize: '13px', color: '#6B7280' }}>
+          &copy; {new Date().getFullYear()} BrickCitySwap. For RIT Students Only.
+        </p>
+        <p className="font-normal" style={{ fontSize: '13px', color: '#6B7280' }}>
+          Made with care by RIT students.
+        </p>
       </div>
     </footer>
   );

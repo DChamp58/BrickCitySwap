@@ -1,311 +1,247 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from './auth-context';
 import { useMessaging, Conversation } from './messaging-context';
-import { Button } from './ui/button';
-import { Input } from './ui/input';
-import { Badge } from './ui/badge';
-import { Send, MessageSquare, Home, Package, ArrowLeft } from 'lucide-react';
-import { cn } from './ui/utils';
+import { Send, Search, MessageSquare, ArrowLeft } from 'lucide-react';
 
 function formatTime(iso: string) {
   const d = new Date(iso);
   const now = new Date();
-  const isToday =
-    d.getDate() === now.getDate() &&
-    d.getMonth() === now.getMonth() &&
-    d.getFullYear() === now.getFullYear();
-
-  if (isToday) {
-    return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  }
-  return d.toLocaleDateString([], { month: 'short', day: 'numeric' }) +
-    ' ' +
-    d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-}
-
-interface ConversationListProps {
-  conversations: Conversation[];
-  selectedId: string | null;
-  currentUserId: string;
-  onSelect: (id: string) => void;
-}
-
-function ConversationList({ conversations, selectedId, currentUserId, onSelect }: ConversationListProps) {
-  if (conversations.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center h-full text-center px-6 py-12">
-        <MessageSquare className="w-12 h-12 text-muted-foreground mb-3" />
-        <p className="font-semibold text-lg">No messages yet</p>
-        <p className="text-sm text-muted-foreground mt-1">
-          Browse listings and click "Contact Seller" to start a conversation.
-        </p>
-      </div>
-    );
-  }
-
-  return (
-    <div className="divide-y">
-      {conversations.map(convo => {
-        const unread = convo.messages.filter(m => m.senderId !== currentUserId && !m.read).length;
-        const lastMsg = convo.messages[convo.messages.length - 1];
-        const otherName = convo.sellerId === currentUserId ? convo.buyerName : convo.sellerName;
-
-        return (
-          <button
-            key={convo.id}
-            onClick={() => onSelect(convo.id)}
-            className={cn(
-              'w-full text-left px-4 py-3 hover:bg-muted/60 transition-colors flex items-start gap-3',
-              selectedId === convo.id && 'bg-muted'
-            )}
-          >
-            {/* Avatar */}
-            <div className="w-10 h-10 rounded-full bg-[#F76902] text-white flex items-center justify-center font-bold flex-shrink-0 text-sm">
-              {otherName.charAt(0).toUpperCase()}
-            </div>
-
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center justify-between gap-2">
-                <span className="font-semibold text-sm truncate">{otherName}</span>
-                <span className="text-xs text-muted-foreground flex-shrink-0">
-                  {formatTime(convo.lastMessageAt)}
-                </span>
-              </div>
-              <div className="flex items-center gap-1 mt-0.5">
-                {convo.listingType === 'housing'
-                  ? <Home className="w-3 h-3 text-muted-foreground flex-shrink-0" />
-                  : <Package className="w-3 h-3 text-muted-foreground flex-shrink-0" />
-                }
-                <p className="text-xs text-muted-foreground truncate">{convo.listingTitle}</p>
-              </div>
-              {lastMsg && (
-                <p className={cn(
-                  'text-xs truncate mt-0.5',
-                  unread > 0 ? 'font-semibold text-foreground' : 'text-muted-foreground'
-                )}>
-                  {lastMsg.senderId === currentUserId ? 'You: ' : ''}{lastMsg.content}
-                </p>
-              )}
-            </div>
-
-            {unread > 0 && (
-              <Badge className="bg-[#F76902] text-white text-xs px-1.5 py-0.5 rounded-full flex-shrink-0">
-                {unread}
-              </Badge>
-            )}
-          </button>
-        );
-      })}
-    </div>
-  );
-}
-
-interface ChatPanelProps {
-  conversation: Conversation;
-  currentUserId: string;
-  currentUserName: string;
-  onBack: () => void;
-}
-
-function ChatPanel({ conversation, currentUserId, currentUserName, onBack }: ChatPanelProps) {
-  const { sendMessage, markConversationRead } = useMessaging();
-  const [input, setInput] = useState('');
-  const bottomRef = useRef<HTMLDivElement>(null);
-
-  const otherName = conversation.sellerId === currentUserId
-    ? conversation.buyerName
-    : conversation.sellerName;
-
-  useEffect(() => {
-    markConversationRead(conversation.id, currentUserId);
-  }, [conversation.id, conversation.messages.length, currentUserId, markConversationRead]);
-
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [conversation.messages.length]);
-
-  const handleSend = () => {
-    const trimmed = input.trim();
-    if (!trimmed) return;
-    sendMessage(conversation.id, currentUserId, currentUserName, trimmed);
-    setInput('');
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
-    }
-  };
-
-  return (
-    <div className="flex flex-col h-full">
-      {/* Chat header */}
-      <div className="flex items-center gap-3 px-4 py-3 border-b bg-background sticky top-0">
-        <button
-          onClick={onBack}
-          className="md:hidden p-1 rounded hover:bg-muted transition-colors"
-          aria-label="Back to conversations"
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </button>
-        <div className="w-9 h-9 rounded-full bg-[#F76902] text-white flex items-center justify-center font-bold text-sm flex-shrink-0">
-          {otherName.charAt(0).toUpperCase()}
-        </div>
-        <div className="min-w-0">
-          <p className="font-semibold text-sm">{otherName}</p>
-          <div className="flex items-center gap-1 text-xs text-muted-foreground">
-            {conversation.listingType === 'housing'
-              ? <Home className="w-3 h-3" />
-              : <Package className="w-3 h-3" />
-            }
-            <span className="truncate">{conversation.listingTitle}</span>
-            <span className="flex-shrink-0">
-              · ${conversation.listingPrice}{conversation.listingType === 'housing' ? '/mo' : ''}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
-        {conversation.messages.map((msg, idx) => {
-          const isMine = msg.senderId === currentUserId;
-          const prevMsg = conversation.messages[idx - 1];
-          const showName = !isMine && (idx === 0 || prevMsg?.senderId !== msg.senderId);
-
-          return (
-            <div key={msg.id} className={cn('flex flex-col', isMine ? 'items-end' : 'items-start')}>
-              {showName && (
-                <span className="text-xs text-muted-foreground mb-1 px-1">{msg.senderName}</span>
-              )}
-              <div
-                className={cn(
-                  'max-w-[75%] px-3 py-2 rounded-2xl text-sm break-words',
-                  isMine
-                    ? 'bg-[#F76902] text-white rounded-br-sm'
-                    : 'bg-muted text-foreground rounded-bl-sm'
-                )}
-              >
-                {msg.content}
-              </div>
-              <span className="text-[10px] text-muted-foreground mt-0.5 px-1">
-                {formatTime(msg.timestamp)}
-              </span>
-            </div>
-          );
-        })}
-        <div ref={bottomRef} />
-      </div>
-
-      {/* Input */}
-      <div className="flex items-center gap-2 px-4 py-3 border-t bg-background">
-        <Input
-          value={input}
-          onChange={e => setInput(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="Type a message…"
-          className="flex-1"
-          autoFocus
-        />
-        <Button
-          onClick={handleSend}
-          disabled={!input.trim()}
-          className="bg-[#F76902] hover:bg-[#D85802] flex-shrink-0"
-          size="icon"
-          aria-label="Send message"
-        >
-          <Send className="w-4 h-4" />
-        </Button>
-      </div>
-    </div>
-  );
+  const isToday = d.getDate() === now.getDate() && d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+  if (isToday) return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  return d.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
 
 interface MessagesViewProps {
-  /** If set, open this conversation immediately */
   openConversationId?: string | null;
 }
 
 export function MessagesView({ openConversationId }: MessagesViewProps) {
   const { user } = useAuth();
-  const { getConversationsForUser } = useMessaging();
+  const { getConversationsForUser, sendMessage, markConversationRead } = useMessaging();
   const [selectedId, setSelectedId] = useState<string | null>(openConversationId ?? null);
   const [mobileShowChat, setMobileShowChat] = useState(!!openConversationId);
+  const [input, setInput] = useState('');
+  const bottomRef = useRef<HTMLDivElement>(null);
+
+  const conversations = user ? getConversationsForUser(user.id) : [];
+  const selected = conversations.find(c => c.id === selectedId) ?? null;
+
+  useEffect(() => {
+    if (selected && user) {
+      markConversationRead(selected.id, user.id);
+    }
+  }, [selected?.id, selected?.messages.length]);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [selected?.messages.length]);
 
   if (!user) {
     return (
-      <div className="max-w-2xl mx-auto p-6 text-center">
-        <MessageSquare className="w-12 h-12 mx-auto text-muted-foreground mb-3" />
-        <p className="text-lg font-semibold mb-2">Sign in to view messages</p>
-        <p className="text-muted-foreground text-sm">You must be signed in to send and receive messages.</p>
+      <div className="w-full min-h-screen flex items-center justify-center" style={{ backgroundColor: '#F9FAFB' }}>
+        <div className="text-center">
+          <MessageSquare size={48} style={{ color: '#9CA3AF', margin: '0 auto 16px' }} />
+          <p style={{ fontSize: '18px', color: '#111827', fontWeight: 600 }}>Sign in to view messages</p>
+          <p style={{ fontSize: '14px', color: '#6B7280', marginTop: '8px' }}>You must be signed in to send and receive messages.</p>
+        </div>
       </div>
     );
   }
 
-  const conversations = getConversationsForUser(user.id);
-  const selected = conversations.find(c => c.id === selectedId) ?? null;
-
-  const handleSelect = (id: string) => {
-    setSelectedId(id);
-    setMobileShowChat(true);
+  const handleSend = () => {
+    const trimmed = input.trim();
+    if (!trimmed || !selected || !user) return;
+    sendMessage(selected.id, user.id, user.name, trimmed);
+    setInput('');
   };
 
-  const handleBack = () => {
-    setMobileShowChat(false);
+  const otherName = (convo: Conversation) =>
+    convo.sellerId === user.id ? convo.buyerName : convo.sellerName;
+
+  const getInitials = (name: string) => {
+    const parts = name.split(' ');
+    return parts.length > 1 ? parts[0][0] + parts[1][0] : parts[0].substring(0, 2);
   };
 
   return (
-    <div className="max-w-5xl mx-auto p-4 md:p-6">
-      <h1 className="text-2xl font-bold mb-4">Messages</h1>
-
-      <div className="border rounded-xl overflow-hidden flex" style={{ height: 'calc(100vh - 220px)', minHeight: '400px' }}>
-        {/* Conversation list — always visible on desktop, hidden on mobile when chat is open */}
-        <aside
-          className={cn(
-            'w-full md:w-80 border-r flex flex-col flex-shrink-0 bg-background',
-            mobileShowChat ? 'hidden md:flex' : 'flex'
-          )}
+    <div className="w-full" style={{ backgroundColor: '#F9FAFB', height: 'calc(100vh - 72px)' }}>
+      <div
+        className="mx-auto h-full"
+        style={{ maxWidth: '1400px', display: 'grid', gridTemplateColumns: '380px 1fr', gap: '24px', padding: '48px 24px' }}
+      >
+        {/* Conversations List */}
+        <div
+          className={`bg-white flex flex-col ${mobileShowChat ? 'hidden md:flex' : 'flex'}`}
+          style={{ borderRadius: '12px', border: '1px solid #E5E7EB', overflow: 'hidden', height: '100%' }}
         >
-          <div className="px-4 py-3 border-b">
-            <p className="font-semibold text-sm text-muted-foreground">
-              {conversations.length} conversation{conversations.length !== 1 ? 's' : ''}
-            </p>
+          <div style={{ padding: '24px', borderBottom: '1px solid #E5E7EB' }}>
+            <h2 className="font-semibold" style={{ fontSize: '20px', color: '#111827', marginBottom: '16px' }}>Messages</h2>
+            <div className="relative">
+              <Search size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF' }} />
+              <input
+                type="text" placeholder="Search messages..."
+                className="w-full outline-none"
+                style={{ padding: '10px 12px 10px 40px', borderRadius: '8px', border: '1px solid #E5E7EB', fontSize: '14px', color: '#111827' }}
+              />
+            </div>
           </div>
-          <div className="flex-1 overflow-y-auto">
-            <ConversationList
-              conversations={conversations}
-              selectedId={selectedId}
-              currentUserId={user.id}
-              onSelect={handleSelect}
-            />
-          </div>
-        </aside>
 
-        {/* Chat area */}
-        <main
-          className={cn(
-            'flex-1 flex flex-col bg-background',
-            !mobileShowChat && !selected ? 'hidden md:flex' : 'flex'
-          )}
+          <div style={{ overflowY: 'auto', flex: 1 }}>
+            {conversations.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-full text-center" style={{ padding: '48px 24px' }}>
+                <MessageSquare size={40} style={{ color: '#9CA3AF', marginBottom: '12px' }} />
+                <p style={{ fontSize: '16px', color: '#111827', fontWeight: 600 }}>No messages yet</p>
+                <p style={{ fontSize: '14px', color: '#6B7280', marginTop: '8px' }}>
+                  Browse listings and click "Contact Seller" to start a conversation.
+                </p>
+              </div>
+            ) : (
+              conversations.map((convo) => {
+                const unread = convo.messages.filter(m => m.senderId !== user.id && !m.read).length;
+                const name = otherName(convo);
+                const lastMsg = convo.messages[convo.messages.length - 1];
+                return (
+                  <button
+                    key={convo.id}
+                    onClick={() => { setSelectedId(convo.id); setMobileShowChat(true); }}
+                    className="w-full flex items-center text-left transition-colors"
+                    style={{
+                      padding: '16px 24px', borderBottom: '1px solid #E5E7EB',
+                      backgroundColor: selectedId === convo.id ? '#FEF3EC' : '#FFFFFF',
+                      cursor: 'pointer', border: 'none', gap: '12px'
+                    }}
+                  >
+                    <div
+                      className="flex items-center justify-center font-semibold flex-shrink-0"
+                      style={{
+                        width: '48px', height: '48px', borderRadius: '50%',
+                        backgroundColor: unread > 0 ? '#FEF3EC' : '#F3F4F6',
+                        color: unread > 0 ? '#F76902' : '#6B7280', fontSize: '16px'
+                      }}
+                    >
+                      {getInitials(name).toUpperCase()}
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
+                        <span className="font-semibold" style={{ fontSize: '15px', color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {name}
+                        </span>
+                        <span className="font-normal flex-shrink-0" style={{ fontSize: '12px', color: '#9CA3AF', marginLeft: '8px' }}>
+                          {formatTime(convo.lastMessageAt)}
+                        </span>
+                      </div>
+                      <p className="font-normal" style={{ fontSize: '13px', color: '#9CA3AF', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {convo.listingTitle} · ${convo.listingPrice}
+                      </p>
+                      {lastMsg && (
+                        <p style={{
+                          fontSize: '14px', color: unread > 0 ? '#111827' : '#6B7280',
+                          fontWeight: unread > 0 ? 500 : 400,
+                          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'
+                        }}>
+                          {lastMsg.content}
+                        </p>
+                      )}
+                    </div>
+                    {unread > 0 && (
+                      <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#F76902', flexShrink: 0 }} />
+                    )}
+                  </button>
+                );
+              })
+            )}
+          </div>
+        </div>
+
+        {/* Chat Window */}
+        <div
+          className={`bg-white flex flex-col ${!mobileShowChat && !selected ? 'hidden md:flex' : 'flex'}`}
+          style={{ borderRadius: '12px', border: '1px solid #E5E7EB', overflow: 'hidden', height: '100%' }}
         >
           {selected ? (
-            <ChatPanel
-              conversation={selected}
-              currentUserId={user.id}
-              currentUserName={user.name}
-              onBack={handleBack}
-            />
+            <>
+              {/* Chat Header */}
+              <div className="flex items-center" style={{ padding: '20px 24px', borderBottom: '1px solid #E5E7EB', gap: '12px' }}>
+                <button
+                  onClick={() => setMobileShowChat(false)}
+                  className="md:hidden"
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}
+                >
+                  <ArrowLeft size={20} />
+                </button>
+                <div
+                  className="flex items-center justify-center font-semibold"
+                  style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: '#FEF3EC', color: '#F76902', fontSize: '14px' }}
+                >
+                  {getInitials(otherName(selected)).toUpperCase()}
+                </div>
+                <div>
+                  <h3 className="font-semibold" style={{ fontSize: '16px', color: '#111827' }}>
+                    {otherName(selected)}
+                  </h3>
+                  <p className="font-normal" style={{ fontSize: '13px', color: '#6B7280' }}>
+                    About: {selected.listingTitle} · ${selected.listingPrice}{selected.listingType === 'housing' ? '/mo' : ''}
+                  </p>
+                </div>
+              </div>
+
+              {/* Messages */}
+              <div className="flex-1" style={{ overflowY: 'auto', padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {selected.messages.map((message) => (
+                  <div key={message.id} className="flex" style={{ justifyContent: message.senderId === user.id ? 'flex-end' : 'flex-start' }}>
+                    <div style={{
+                      maxWidth: '60%', padding: '12px 16px', borderRadius: '12px',
+                      backgroundColor: message.senderId === user.id ? '#F76902' : '#F3F4F6',
+                      color: message.senderId === user.id ? '#FFFFFF' : '#111827'
+                    }}>
+                      <p className="font-normal" style={{ fontSize: '15px', marginBottom: '4px' }}>{message.content}</p>
+                      <p className="font-normal" style={{
+                        fontSize: '12px',
+                        color: message.senderId === user.id ? 'rgba(255, 255, 255, 0.8)' : '#9CA3AF',
+                        textAlign: 'right'
+                      }}>
+                        {formatTime(message.timestamp)}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+                <div ref={bottomRef} />
+              </div>
+
+              {/* Message Input */}
+              <div style={{ padding: '20px 24px', borderTop: '1px solid #E5E7EB' }}>
+                <div className="flex items-center" style={{ gap: '12px' }}>
+                  <input
+                    type="text" placeholder="Type a message..."
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
+                    className="flex-1 outline-none"
+                    style={{ padding: '12px 16px', borderRadius: '8px', border: '1px solid #E5E7EB', fontSize: '15px', color: '#111827' }}
+                  />
+                  <button
+                    onClick={handleSend}
+                    className="flex items-center justify-center transition-all"
+                    style={{
+                      width: '48px', height: '48px', borderRadius: '8px',
+                      backgroundColor: '#F76902', border: 'none', cursor: 'pointer'
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#D55A02'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#F76902'; }}
+                  >
+                    <Send size={20} style={{ color: '#FFFFFF' }} />
+                  </button>
+                </div>
+              </div>
+            </>
           ) : (
-            <div className="flex flex-col items-center justify-center h-full text-center px-8">
-              <MessageSquare className="w-16 h-16 text-muted-foreground mb-4" />
-              <p className="text-lg font-semibold">Select a conversation</p>
-              <p className="text-sm text-muted-foreground mt-1">
-                Choose a conversation from the left to start chatting.
-              </p>
+            <div className="flex flex-col items-center justify-center h-full text-center" style={{ padding: '48px' }}>
+              <MessageSquare size={48} style={{ color: '#9CA3AF', marginBottom: '16px' }} />
+              <p style={{ fontSize: '18px', color: '#111827', fontWeight: 600 }}>Select a conversation</p>
+              <p style={{ fontSize: '14px', color: '#6B7280', marginTop: '8px' }}>Choose a conversation from the left to start chatting.</p>
             </div>
           )}
-        </main>
+        </div>
       </div>
     </div>
   );

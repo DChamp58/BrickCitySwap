@@ -293,3 +293,54 @@ create policy "Conversation participants can mark messages read"
       and (buyer_id = auth.uid() or seller_id = auth.uid())
     )
   );
+
+-- ╔══════════════════════════════════════════════════════════════════════════╗
+-- ║ 8. LISTING VIEWS TRACKING                                              ║
+-- ╚══════════════════════════════════════════════════════════════════════════╝
+
+-- Add view count to listings for fast reads
+alter table public.listings
+  add column if not exists view_count bigint not null default 0;
+
+-- Detailed view log table
+create table if not exists public.listing_views (
+  id         uuid primary key default gen_random_uuid(),
+  listing_id uuid not null references public.listings(id) on delete cascade,
+  viewer_id  uuid references public.profiles(id) on delete set null,
+  viewed_at  timestamptz not null default now()
+);
+
+create index if not exists idx_listing_views_listing on public.listing_views(listing_id);
+create index if not exists idx_listing_views_viewer on public.listing_views(viewer_id);
+
+alter table public.listing_views enable row level security;
+
+-- Anyone authenticated can log a view
+create policy "Authenticated users can log views"
+  on public.listing_views for insert
+  with check (auth.uid() = viewer_id);
+
+-- Listing owners can see who viewed their listings
+create policy "Listing owners can see views"
+  on public.listing_views for select
+  using (
+    exists (
+      select 1 from public.listings
+      where id = listing_id and user_id = auth.uid()
+    )
+  );
+
+-- Auto-increment view_count when a view is logged
+create or replace function public.increment_view_on_insert()
+returns trigger as $$
+begin
+  update public.listings
+  set view_count = view_count + 1
+  where id = NEW.listing_id;
+  return NEW;
+end;
+$$ language plpgsql security definer;
+
+create trigger trg_increment_view_count
+  after insert on public.listing_views
+  for each row execute function public.increment_view_on_insert();

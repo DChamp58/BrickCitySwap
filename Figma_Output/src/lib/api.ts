@@ -252,6 +252,17 @@ export async function markMessagesRead(conversationId: string, userId: string) {
   if (error) throw error;
 }
 
+// ── Listing Views ───────────────────────────────────────────────────────────
+
+export async function recordListingView(listingId: string, viewerId: string) {
+  const { error } = await supabase
+    .from('listing_views')
+    .insert({ listing_id: listingId, viewer_id: viewerId });
+
+  // Silently ignore errors (e.g. if table doesn't exist yet)
+  if (error) console.warn('Failed to record view:', error.message);
+}
+
 // ── Profile ─────────────────────────────────────────────────────────────────
 
 export async function fetchProfile(userId: string) {

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Edit, Trash2, Eye, Plus, RotateCcw } from 'lucide-react';
+import { Trash2, Eye, RotateCcw } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Listing } from './listing-card';
 import { useAuth } from './auth-context';
@@ -61,7 +61,7 @@ export function MyListingsView({ accessToken, onView }: MyListingsViewProps) {
 
   const filteredListings = showAllListings ? listings : listings.filter(l => l.status !== 'sold');
   const activeCount = listings.filter(l => l.status === 'available').length;
-  const totalViews = listings.length > 0 ? listings.length * 15 : 0; // Approximate
+  const totalViews = listings.reduce((sum, l) => sum + (l.view_count ?? 0), 0);
 
   return (
     <div className="w-full min-h-screen" style={{ backgroundColor: '#F9FAFB', padding: '48px 24px' }}>
@@ -91,6 +91,13 @@ export function MyListingsView({ accessToken, onView }: MyListingsViewProps) {
           <div className="bg-white" style={{ borderRadius: '12px', border: '1px solid #E5E7EB', padding: '24px' }}>
             <p className="font-normal" style={{ fontSize: '14px', color: '#6B7280', marginBottom: '8px' }}>Sold</p>
             <p className="font-bold" style={{ fontSize: '32px', color: '#111827' }}>{listings.filter(l => l.status === 'sold').length}</p>
+          </div>
+          <div className="bg-white" style={{ borderRadius: '12px', border: '1px solid #E5E7EB', padding: '24px' }}>
+            <div className="flex items-center" style={{ gap: '6px', marginBottom: '8px' }}>
+              <Eye size={16} style={{ color: '#6B7280' }} />
+              <p className="font-normal" style={{ fontSize: '14px', color: '#6B7280' }}>Total Views</p>
+            </div>
+            <p className="font-bold" style={{ fontSize: '32px', color: '#111827' }}>{totalViews}</p>
           </div>
         </div>
 
@@ -128,7 +135,7 @@ export function MyListingsView({ accessToken, onView }: MyListingsViewProps) {
             <div
               className="grid items-center"
               style={{
-                gridTemplateColumns: '2fr 1fr 1fr 1fr auto',
+                gridTemplateColumns: '2fr 1fr 1fr 0.7fr 1fr auto',
                 padding: '16px 24px', borderBottom: '1px solid #E5E7EB',
                 backgroundColor: '#F9FAFB', gap: '16px'
               }}
@@ -136,6 +143,7 @@ export function MyListingsView({ accessToken, onView }: MyListingsViewProps) {
               <span className="font-semibold" style={{ fontSize: '14px', color: '#6B7280' }}>Listing</span>
               <span className="font-semibold" style={{ fontSize: '14px', color: '#6B7280' }}>Category</span>
               <span className="font-semibold" style={{ fontSize: '14px', color: '#6B7280' }}>Price</span>
+              <span className="font-semibold" style={{ fontSize: '14px', color: '#6B7280' }}>Views</span>
               <span className="font-semibold" style={{ fontSize: '14px', color: '#6B7280' }}>Status</span>
               <span className="font-semibold" style={{ fontSize: '14px', color: '#6B7280' }}>Actions</span>
             </div>
@@ -145,7 +153,7 @@ export function MyListingsView({ accessToken, onView }: MyListingsViewProps) {
                 key={listing.id}
                 className="grid items-center hover:bg-gray-50 transition-colors cursor-pointer"
                 style={{
-                  gridTemplateColumns: '2fr 1fr 1fr 1fr auto',
+                  gridTemplateColumns: '2fr 1fr 1fr 0.7fr 1fr auto',
                   padding: '16px 24px', borderBottom: '1px solid #E5E7EB', gap: '16px'
                 }}
                 onClick={() => onView(listing)}
@@ -173,6 +181,12 @@ export function MyListingsView({ accessToken, onView }: MyListingsViewProps) {
                 <span className="font-semibold" style={{ fontSize: '15px', color: '#111827' }}>
                   ${listing.price}{listing.type === 'housing' ? '/mo' : ''}
                 </span>
+                <div className="flex items-center" style={{ gap: '4px' }}>
+                  <Eye size={14} style={{ color: '#6B7280' }} />
+                  <span className="font-medium" style={{ fontSize: '14px', color: '#374151' }}>
+                    {listing.view_count ?? 0}
+                  </span>
+                </div>
                 <span
                   className="font-medium inline-block"
                   style={{

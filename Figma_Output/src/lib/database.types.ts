@@ -154,6 +154,48 @@ export interface Database {
         };
         Update: {};
       };
+      conversations: {
+        Row: {
+          id: string;
+          listing_id: string;
+          buyer_id: string;
+          seller_id: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          listing_id: string;
+          buyer_id: string;
+          seller_id: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          updated_at?: string;
+        };
+      };
+      messages: {
+        Row: {
+          id: string;
+          conversation_id: string;
+          sender_id: string;
+          content: string;
+          read: boolean;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          conversation_id: string;
+          sender_id: string;
+          content: string;
+          read?: boolean;
+          created_at?: string;
+        };
+        Update: {
+          read?: boolean;
+        };
+      };
     };
   };
 }
@@ -164,6 +206,8 @@ export type Profile = Database['public']['Tables']['profiles']['Row'];
 export type DbListing = Database['public']['Tables']['listings']['Row'];
 export type ListingImage = Database['public']['Tables']['listing_images']['Row'];
 export type SavedListing = Database['public']['Tables']['saved_listings']['Row'];
+export type DbConversation = Database['public']['Tables']['conversations']['Row'];
+export type DbMessage = Database['public']['Tables']['messages']['Row'];
 
 // Listing with joined data for the frontend
 export interface ListingWithImages extends DbListing {

@@ -1,5 +1,5 @@
 import { supabase } from './supabase';
-import type { Database, ListingWithImages } from './database.types';
+import type { Database, ListingWithImages, DbMessage } from './database.types';
 
 type ListingInsert = Database['public']['Tables']['listings']['Insert'];
 type ListingUpdate = Database['public']['Tables']['listings']['Update'];
@@ -133,6 +133,123 @@ export async function fetchSavedListings(userId: string) {
 
   if (error) throw error;
   return data ?? [];
+}
+
+// ── Messaging ────────────────────────────────────────────────────────────────
+
+export interface ConversationWithDetails {
+  id: string;
+  listing_id: string;
+  buyer_id: string;
+  seller_id: string;
+  created_at: string;
+  updated_at: string;
+  listings: {
+    title: string;
+    type: 'housing' | 'marketplace';
+    price: number;
+  };
+  buyer: { full_name: string };
+  seller: { full_name: string };
+  messages: DbMessage[];
+}
+
+export async function fetchConversations(userId: string): Promise<ConversationWithDetails[]> {
+  const { data, error } = await supabase
+    .from('conversations')
+    .select(`
+      *,
+      listings!listing_id(title, type, price),
+      buyer:profiles!buyer_id(full_name),
+      seller:profiles!seller_id(full_name),
+      messages(*)
+    `)
+    .or(`buyer_id.eq.${userId},seller_id.eq.${userId}`)
+    .order('updated_at', { ascending: false });
+
+  if (error) throw error;
+
+  // Sort messages within each conversation by created_at
+  const convos = (data ?? []) as unknown as ConversationWithDetails[];
+  for (const c of convos) {
+    c.messages.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+  }
+  return convos;
+}
+
+export async function findConversation(
+  listingId: string,
+  buyerId: string,
+  sellerId: string
+): Promise<ConversationWithDetails | null> {
+  const { data, error } = await supabase
+    .from('conversations')
+    .select(`
+      *,
+      listings!listing_id(title, type, price),
+      buyer:profiles!buyer_id(full_name),
+      seller:profiles!seller_id(full_name),
+      messages(*)
+    `)
+    .eq('listing_id', listingId)
+    .eq('buyer_id', buyerId)
+    .eq('seller_id', sellerId)
+    .maybeSingle();
+
+  if (error) throw error;
+  if (!data) return null;
+
+  const convo = data as unknown as ConversationWithDetails;
+  convo.messages.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+  return convo;
+}
+
+export async function createConversation(
+  listingId: string,
+  buyerId: string,
+  sellerId: string
+): Promise<string> {
+  const { data, error } = await supabase
+    .from('conversations')
+    .insert({ listing_id: listingId, buyer_id: buyerId, seller_id: sellerId })
+    .select('id')
+    .single();
+
+  if (error) throw error;
+  return data.id;
+}
+
+export async function sendMessageToConversation(
+  conversationId: string,
+  senderId: string,
+  content: string
+): Promise<DbMessage> {
+  const { data, error } = await supabase
+    .from('messages')
+    .insert({ conversation_id: conversationId, sender_id: senderId, content })
+    .select()
+    .single();
+
+  if (error) throw error;
+
+  // Update conversation's updated_at
+  await supabase
+    .from('conversations')
+    .update({ updated_at: new Date().toISOString() })
+    .eq('id', conversationId);
+
+  return data;
+}
+
+export async function markMessagesRead(conversationId: string, userId: string) {
+  const { error } = await supabase
+    .from('messages')
+    .update({ read: true })
+    .eq('conversation_id', conversationId)
+    .neq('sender_id', userId)
+    .eq('read', false);
+
+  if (error) throw error;
 }
 
 // ── Profile ─────────────────────────────────────────────────────────────────

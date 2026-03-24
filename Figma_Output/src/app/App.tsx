@@ -15,6 +15,7 @@ import { Footer } from './components/footer';
 import { Listing } from './components/listing-card';
 import { Toaster } from './components/ui/sonner';
 import { Card, CardContent } from './components/ui/card';
+import { recordListingView } from '@/lib/api';
 
 type View = 'home' | 'housing' | 'marketplace' | 'profile' | 'my-listings' | 'pricing' | 'messages';
 
@@ -48,6 +49,10 @@ function AppContent() {
   const handleViewListing = (listing: Listing) => {
     setSelectedListing(listing);
     setDetailDialogOpen(true);
+    // Record the view if user is logged in and not viewing their own listing
+    if (user && listing.user_id !== user.id) {
+      recordListingView(listing.id, user.id);
+    }
   };
 
   const handleListingCreated = () => {

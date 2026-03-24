@@ -77,6 +77,7 @@ export interface Database {
           // Marketplace fields
           category: string | null;
           condition: string | null;
+          view_count: number;
         };
         Insert: {
           id?: string;
@@ -99,6 +100,7 @@ export interface Database {
           distance_from_campus?: number | null;
           category?: string | null;
           condition?: string | null;
+          view_count?: number;
         };
         Update: {
           type?: 'housing' | 'marketplace';
@@ -117,6 +119,7 @@ export interface Database {
           distance_from_campus?: number | null;
           category?: string | null;
           condition?: string | null;
+          view_count?: number;
         };
       };
       listing_images: {
@@ -174,6 +177,21 @@ export interface Database {
         Update: {
           updated_at?: string;
         };
+      };
+      listing_views: {
+        Row: {
+          id: string;
+          listing_id: string;
+          viewer_id: string | null;
+          viewed_at: string;
+        };
+        Insert: {
+          id?: string;
+          listing_id: string;
+          viewer_id?: string | null;
+          viewed_at?: string;
+        };
+        Update: {};
       };
       messages: {
         Row: {

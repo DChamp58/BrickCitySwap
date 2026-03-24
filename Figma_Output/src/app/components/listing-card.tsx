@@ -38,6 +38,9 @@ export interface Listing {
   // Marketplace specific
   category?: string | null;
   condition?: string | null;
+
+  // Analytics
+  view_count?: number;
 }
 
 interface ListingCardProps {

@@ -14,6 +14,7 @@ import { PricingView } from './components/pricing-view';
 import { Footer } from './components/footer';
 import { Listing } from './components/listing-card';
 import { Toaster } from './components/ui/sonner';
+import { Analytics } from '@vercel/analytics/react';
 import { Card, CardContent } from './components/ui/card';
 import { recordListingView } from '@/lib/api';
 
@@ -207,6 +208,7 @@ export default function App() {
     <AuthProvider>
       <MessagingProvider>
         <AppContent />
+        <Analytics />
       </MessagingProvider>
     </AuthProvider>
   );

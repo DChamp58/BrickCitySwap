@@ -66,7 +66,7 @@ export function ContactDialog({
       const sellerId = listing.user_id;
       const sellerName = listing.profiles?.full_name ?? (listing.user_id === user.id ? user.name : 'Seller');
 
-      const convo = startConversation({
+      const convo = await startConversation({
         listingId: listing.id,
         listingTitle: listing.title,
         listingType: listing.type,

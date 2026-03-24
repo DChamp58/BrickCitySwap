@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from './auth-context';
 import { useMessaging, Conversation } from './messaging-context';
-import { Send, Search, MessageSquare, ArrowLeft } from 'lucide-react';
+import { Send, Search, MessageSquare, ArrowLeft, Loader2 } from 'lucide-react';
 
 function formatTime(iso: string) {
   const d = new Date(iso);
@@ -17,7 +17,7 @@ interface MessagesViewProps {
 
 export function MessagesView({ openConversationId }: MessagesViewProps) {
   const { user } = useAuth();
-  const { getConversationsForUser, sendMessage, markConversationRead } = useMessaging();
+  const { getConversationsForUser, sendMessage, markConversationRead, loading: messagesLoading } = useMessaging();
   const [selectedId, setSelectedId] = useState<string | null>(openConversationId ?? null);
   const [mobileShowChat, setMobileShowChat] = useState(!!openConversationId);
   const [input, setInput] = useState('');
@@ -87,7 +87,12 @@ export function MessagesView({ openConversationId }: MessagesViewProps) {
           </div>
 
           <div style={{ overflowY: 'auto', flex: 1 }}>
-            {conversations.length === 0 ? (
+            {messagesLoading ? (
+              <div className="flex flex-col items-center justify-center h-full text-center" style={{ padding: '48px 24px' }}>
+                <Loader2 size={40} className="animate-spin" style={{ color: '#F76902', marginBottom: '12px' }} />
+                <p style={{ fontSize: '14px', color: '#6B7280' }}>Loading conversations...</p>
+              </div>
+            ) : conversations.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-center" style={{ padding: '48px 24px' }}>
                 <MessageSquare size={40} style={{ color: '#9CA3AF', marginBottom: '12px' }} />
                 <p style={{ fontSize: '16px', color: '#111827', fontWeight: 600 }}>No messages yet</p>

@@ -1,5 +1,5 @@
 import { ListingsPreview } from './listings-preview';
-import { SubletSection } from './sublet-section';
+
 import { FinalCTA } from './final-cta';
 import { Listing } from './listing-card';
 
@@ -45,7 +45,7 @@ export function HomeView({ onNavigate, onView }: HomeViewProps) {
 
           <div className="flex items-center" style={{ gap: '16px' }}>
             <button
-              onClick={() => onNavigate('profile')}
+              onClick={() => onNavigate('housing')}
               className="font-semibold transition-all"
               style={{
                 backgroundColor: '#F76902', color: '#FFFFFF',
@@ -62,7 +62,7 @@ export function HomeView({ onNavigate, onView }: HomeViewProps) {
                 e.currentTarget.style.transform = 'translateY(0)';
               }}
             >
-              Get Started
+              Browse Housing
             </button>
             <button
               onClick={() => onNavigate('marketplace')}
@@ -91,9 +91,6 @@ export function HomeView({ onNavigate, onView }: HomeViewProps) {
 
       {/* Latest Listings Carousel */}
       <ListingsPreview onNavigate={onNavigate} onView={handleView} />
-
-      {/* Sublet Section */}
-      <SubletSection onNavigate={onNavigate} />
 
       {/* Final CTA */}
       <FinalCTA onNavigate={onNavigate} />

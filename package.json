@@ -1,0 +1,6 @@
+{
+  "private": true,
+  "scripts": {
+    "build": "cd Figma_Output && npm install && npm run build && cd .. && rm -rf app && mkdir -p app && cp -r Figma_Output/dist/* app/"
+  }
+}

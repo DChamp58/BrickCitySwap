@@ -1,6 +1,4 @@
 {
-  "buildCommand": "cd Figma_Output && npm install && npm run build && cd .. && mkdir -p dist && cp index.html dist/index.html && mkdir -p dist/app && cp -r Figma_Output/dist/* dist/app/",
-  "outputDirectory": "dist",
   "rewrites": [
     { "source": "/app/(.*)", "destination": "/app/index.html" },
     { "source": "/app", "destination": "/app/index.html" }

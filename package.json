@@ -1,6 +1,6 @@
 {
   "private": true,
   "scripts": {
-    "build": "cd Figma_Output && npm install && npm run build && cd .. && rm -rf app && mkdir -p app && cp -r Figma_Output/dist/* app/"
+    "build": "cd Figma_Output && npm install && npm run build && cd .. && rm -rf public && mkdir -p public/app && cp index.html public/index.html && cp -r Figma_Output/dist/* public/app/ && cp vercel.json public/vercel.json"
   }
 }

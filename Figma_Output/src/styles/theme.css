@@ -187,7 +187,6 @@
     font-size: var(--text-body);
     font-weight: var(--font-weight-regular);
     line-height: 1.6;
-    color: var(--dark-text);
   }
 
   label {

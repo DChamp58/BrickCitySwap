@@ -199,14 +199,15 @@ export function MessagesView({ openConversationId }: MessagesViewProps) {
                       backgroundColor: message.senderId === user.id ? '#F76902' : '#F3F4F6',
                       color: message.senderId === user.id ? '#FFFFFF' : '#111827'
                     }}>
-                      <p className="font-normal" style={{ fontSize: '15px', marginBottom: '4px', color: message.senderId === user.id ? '#FFFFFF' : '#111827' }}>{message.content}</p>
-                      <p className="font-normal" style={{
+                      <span className="font-normal" style={{ display: 'block', fontSize: '15px', marginBottom: '4px', color: message.senderId === user.id ? '#FFFFFF' : '#111827' }}>{message.content}</span>
+                      <span className="font-normal" style={{
+                        display: 'block',
                         fontSize: '12px',
                         color: message.senderId === user.id ? 'rgba(255, 255, 255, 0.8)' : '#9CA3AF',
                         textAlign: 'right'
                       }}>
                         {formatTime(message.timestamp)}
-                      </p>
+                      </span>
                     </div>
                   </div>
                 ))}

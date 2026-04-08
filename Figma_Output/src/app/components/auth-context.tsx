@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase, supabaseConfigured } from '@/lib/supabase';
+import { trackEvent } from '@/lib/analytics';
 import type { Session } from '@supabase/supabase-js';
 import type { Profile } from '@/lib/database.types';
 
@@ -97,6 +98,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       options: { data: { full_name: name } },
     });
     if (error) throw error;
+    trackEvent('sign_up', { method: 'email' });
   };
 
   const signIn = async (email: string, password: string) => {

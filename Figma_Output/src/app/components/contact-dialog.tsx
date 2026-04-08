@@ -16,6 +16,7 @@ import { Listing } from './listing-card';
 import { MapPin } from 'lucide-react';
 import { useAuth } from './auth-context';
 import { useMessaging } from './messaging-context';
+import { trackEvent } from '@/lib/analytics';
 
 interface ContactDialogProps {
   open: boolean;
@@ -78,6 +79,7 @@ export function ContactDialog({
         initialMessage: finalMessage,
       });
 
+      trackEvent('contact_seller', { listing_id: listing.id, listing_type: listing.type, listing_title: listing.title });
       toast.success('Message sent! Opening your conversation…');
       setMessage('');
       setMeetupLocation('');

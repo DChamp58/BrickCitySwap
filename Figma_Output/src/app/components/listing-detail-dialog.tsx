@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -9,6 +9,7 @@ import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Listing } from './listing-card';
 import { MapPin, DollarSign, Calendar, User, MessageCircle, Package, ChevronLeft, ChevronRight } from 'lucide-react';
+import { trackEvent } from '@/lib/analytics';
 
 interface ListingDetailDialogProps {
   open: boolean;
@@ -26,6 +27,12 @@ export function ListingDetailDialog({
   showContactButton = true
 }: ListingDetailDialogProps) {
   const [imgIdx, setImgIdx] = useState(0);
+
+  useEffect(() => {
+    if (open && listing) {
+      trackEvent('listing_viewed', { listing_id: listing.id, listing_type: listing.type, listing_title: listing.title });
+    }
+  }, [open, listing?.id]);
 
   if (!listing) return null;
 

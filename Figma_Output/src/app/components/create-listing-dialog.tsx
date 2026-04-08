@@ -15,6 +15,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { toast } from 'sonner';
 import { useAuth } from './auth-context';
 import { createListing, uploadListingImage } from '@/lib/api';
+import { trackEvent } from '@/lib/analytics';
 import { ImagePlus, X } from 'lucide-react';
 
 interface CreateListingDialogProps {
@@ -99,6 +100,7 @@ export function CreateListingDialog({ open, onClose, onListingCreated }: CreateL
         await uploadListingImage(images[i], listing.id, i);
       }
 
+      trackEvent('listing_created', { listing_type: type, listing_title: title });
       toast.success('Listing created successfully!');
       resetForm();
       onClose();

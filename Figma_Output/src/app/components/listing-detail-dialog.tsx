@@ -35,6 +35,9 @@ export function ListingDetailDialog({
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [saved, setSaved] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [dragY, setDragY] = useState(0);
+  const [dragStartY, setDragStartY] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
@@ -42,6 +45,26 @@ export function ListingDetailDialog({
     window.addEventListener('resize', check);
     return () => window.removeEventListener('resize', check);
   }, []);
+
+  const handleDragStart = (e: React.TouchEvent) => {
+    setDragStartY(e.touches[0].clientY);
+    setIsDragging(true);
+  };
+  const handleDragMove = (e: React.TouchEvent) => {
+    if (!isDragging) return;
+    const delta = e.touches[0].clientY - dragStartY;
+    if (delta > 0) setDragY(delta);
+  };
+  const handleDragEnd = () => {
+    setIsDragging(false);
+    if (dragY > 80) {
+      setDragY(0);
+      setGalleryOpen(false);
+      onClose();
+    } else {
+      setDragY(0);
+    }
+  };
 
   useEffect(() => {
     if (open && listing) {
@@ -89,6 +112,7 @@ export function ListingDetailDialog({
 
         <Dialog open={open} onOpenChange={o => { if (!o) { setGalleryOpen(false); onClose(); } }}>
           <DialogContent
+            showCloseButton={!isMobile}
             className={isMobile
               ? 'p-0 overflow-hidden !top-auto !bottom-0 !left-0 !right-0 !translate-x-0 !translate-y-0 !max-w-full !w-full !rounded-b-none !rounded-t-2xl'
               : 'p-0 overflow-hidden'}
@@ -96,14 +120,25 @@ export function ListingDetailDialog({
               ? { maxHeight: '88vh', display: 'flex', flexDirection: 'column' }
               : { maxWidth: '820px', width: '95vw', maxHeight: '92vh', borderRadius: '16px', display: 'flex', flexDirection: 'column' }}
           >
+            {/* Outer transform wrapper — whole sheet slides together */}
+            <div style={{
+              display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden',
+              transform: isMobile ? `translateY(${dragY}px)` : 'none',
+              transition: isDragging ? 'none' : 'transform 300ms cubic-bezier(0.25,1,0.5,1)',
+            }}>
 
-            {/* Mobile: drag handle + close button */}
+            {/* Mobile: drag handle bar */}
             {isMobile && (
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '12px 16px 8px', flexShrink: 0, position: 'relative' }}>
+              <div
+                onTouchStart={handleDragStart}
+                onTouchMove={handleDragMove}
+                onTouchEnd={handleDragEnd}
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '12px 16px 8px', flexShrink: 0, position: 'relative', cursor: 'grab', touchAction: 'none' }}
+              >
                 <div style={{ width: '40px', height: '4px', borderRadius: '2px', backgroundColor: '#D1C4BC' }} />
                 <DialogClose asChild>
                   <button
-                    style={{ position: 'absolute', right: '16px', top: '50%', transform: 'translateY(-50%)', width: '32px', height: '32px', borderRadius: '50%', backgroundColor: '#F3EDEA', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    style={{ position: 'absolute', right: '16px', top: '50%', transform: 'translateY(-50%)', width: '36px', height: '36px', borderRadius: '50%', backgroundColor: '#F3EDEA', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                     aria-label="Close"
                   >
                     <X size={16} style={{ color: '#402E32' }} />
@@ -275,6 +310,7 @@ export function ListingDetailDialog({
                 </div>
               )}
             </div>
+            </div>{/* end outer transform wrapper */}
           </DialogContent>
         </Dialog>
       </>
@@ -317,6 +353,7 @@ export function ListingDetailDialog({
 
       <Dialog open={open} onOpenChange={o => { if (!o) { setGalleryOpen(false); onClose(); } }}>
         <DialogContent
+          showCloseButton={!isMobile}
           className={isMobile
             ? 'p-0 overflow-hidden !top-auto !bottom-0 !left-0 !right-0 !translate-x-0 !translate-y-0 !max-w-full !w-full !rounded-b-none !rounded-t-2xl'
             : 'p-0 overflow-hidden'}
@@ -324,13 +361,25 @@ export function ListingDetailDialog({
             ? { maxHeight: '88vh', display: 'flex', flexDirection: 'column' }
             : { maxWidth: '900px', width: '95vw', maxHeight: '92vh', borderRadius: '16px', display: 'flex', flexDirection: 'column' }}
         >
-          {/* Mobile: drag handle + close button */}
+          {/* Outer transform wrapper — whole sheet slides together */}
+          <div style={{
+            display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden',
+            transform: isMobile ? `translateY(${dragY}px)` : 'none',
+            transition: isDragging ? 'none' : 'transform 300ms cubic-bezier(0.25,1,0.5,1)',
+          }}>
+
+          {/* Mobile: drag handle bar */}
           {isMobile && (
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '12px 16px 8px', flexShrink: 0, position: 'relative' }}>
+            <div
+              onTouchStart={handleDragStart}
+              onTouchMove={handleDragMove}
+              onTouchEnd={handleDragEnd}
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '12px 16px 8px', flexShrink: 0, position: 'relative', cursor: 'grab', touchAction: 'none' }}
+            >
               <div style={{ width: '40px', height: '4px', borderRadius: '2px', backgroundColor: '#D1C4BC' }} />
               <DialogClose asChild>
                 <button
-                  style={{ position: 'absolute', right: '16px', top: '50%', transform: 'translateY(-50%)', width: '32px', height: '32px', borderRadius: '50%', backgroundColor: '#F3EDEA', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                  style={{ position: 'absolute', right: '16px', top: '50%', transform: 'translateY(-50%)', width: '36px', height: '36px', borderRadius: '50%', backgroundColor: '#F3EDEA', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                   aria-label="Close"
                 >
                   <X size={16} style={{ color: '#402E32' }} />
@@ -547,6 +596,7 @@ export function ListingDetailDialog({
               )}
             </div>
           </div>
+          </div>{/* end outer transform wrapper */}
         </DialogContent>
       </Dialog>
     </>

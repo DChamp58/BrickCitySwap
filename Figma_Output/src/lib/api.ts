@@ -25,7 +25,24 @@ export async function fetchMyListings(userId: string) {
     .order('created_at', { ascending: false });
 
   if (error) throw error;
-  return (data ?? []) as ListingWithImages[];
+  const listings = (data ?? []) as ListingWithImages[];
+
+  // Count views directly from listing_views (reliable, no trigger dependency)
+  if (listings.length > 0) {
+    const ids = listings.map(l => l.id);
+    const { data: viewRows } = await supabase
+      .from('listing_views')
+      .select('listing_id')
+      .in('listing_id', ids);
+
+    const counts: Record<string, number> = {};
+    (viewRows ?? []).forEach(v => {
+      counts[v.listing_id] = (counts[v.listing_id] ?? 0) + 1;
+    });
+    return listings.map(l => ({ ...l, view_count: counts[l.id] ?? 0 }));
+  }
+
+  return listings;
 }
 
 export async function fetchListingById(id: string) {
@@ -274,12 +291,11 @@ export async function markMessagesRead(conversationId: string, userId: string) {
 
 // ── Listing Views ───────────────────────────────────────────────────────────
 
-export async function recordListingView(listingId: string, viewerId: string) {
+export async function recordListingView(listingId: string, viewerId: string | null) {
   const { error } = await supabase
     .from('listing_views')
     .insert({ listing_id: listingId, viewer_id: viewerId });
 
-  // Silently ignore errors (e.g. if table doesn't exist yet)
   if (error) console.warn('Failed to record view:', error.message);
 }
 

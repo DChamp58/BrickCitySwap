@@ -53,9 +53,9 @@ function AppContent() {
   const handleViewListing = (listing: Listing) => {
     setSelectedListing(listing);
     setDetailDialogOpen(true);
-    // Record the view if user is logged in and not viewing their own listing
-    if (user && listing.user_id !== user.id) {
-      recordListingView(listing.id, user.id);
+    // Record view for anyone who isn't the listing owner
+    if (!user || listing.user_id !== user.id) {
+      recordListingView(listing.id, user?.id ?? null);
     }
   };
 

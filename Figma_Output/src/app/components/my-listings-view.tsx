@@ -138,16 +138,16 @@ export function MyListingsView({ accessToken, onView }: MyListingsViewProps) {
               className="grid items-center"
               style={{
                 gridTemplateColumns: '2fr 1fr 1fr 0.7fr 1fr auto',
-                padding: '16px 24px', borderBottom: '1px solid #E8D5C4',
+                padding: '12px 24px', borderBottom: '1px solid #E8D5C4',
                 backgroundColor: '#FFF6EE', gap: '16px'
               }}
             >
-              <span className="font-semibold" style={{ fontSize: '14px', color: '#B5866E' }}>Listing</span>
-              <span className="font-semibold" style={{ fontSize: '14px', color: '#B5866E' }}>Category</span>
-              <span className="font-semibold" style={{ fontSize: '14px', color: '#B5866E' }}>Price</span>
-              <span className="font-semibold" style={{ fontSize: '14px', color: '#B5866E' }}>Views</span>
-              <span className="font-semibold" style={{ fontSize: '14px', color: '#B5866E' }}>Status</span>
-              <span className="font-semibold" style={{ fontSize: '14px', color: '#B5866E' }}>Actions</span>
+              <span className="font-semibold" style={{ fontSize: '12px', color: '#B5866E', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Listing</span>
+              <span className="font-semibold" style={{ fontSize: '12px', color: '#B5866E', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Category</span>
+              <span className="font-semibold" style={{ fontSize: '12px', color: '#B5866E', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Price</span>
+              <span className="font-semibold" style={{ fontSize: '12px', color: '#B5866E', textTransform: 'uppercase', letterSpacing: '0.06em', textAlign: 'center' }}>Views</span>
+              <span className="font-semibold" style={{ fontSize: '12px', color: '#B5866E', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Status</span>
+              <span className="font-semibold" style={{ fontSize: '12px', color: '#B5866E', textTransform: 'uppercase', letterSpacing: '0.06em', textAlign: 'right' }}>Actions</span>
             </div>
 
             {filteredListings.map((listing) => (
@@ -183,8 +183,8 @@ export function MyListingsView({ accessToken, onView }: MyListingsViewProps) {
                 <span className="font-semibold" style={{ fontSize: '15px', color: '#402E32' }}>
                   ${listing.price}{listing.type === 'housing' ? '/mo' : ''}
                 </span>
-                <div className="flex items-center" style={{ gap: '4px' }}>
-                  <Eye size={14} style={{ color: '#B5866E' }} />
+                <div className="flex items-center justify-center" style={{ gap: '4px' }}>
+                  <Eye size={13} style={{ color: '#B5866E' }} />
                   <span className="font-medium" style={{ fontSize: '14px', color: '#5A4A44' }}>
                     {listing.view_count ?? 0}
                   </span>
@@ -201,7 +201,7 @@ export function MyListingsView({ accessToken, onView }: MyListingsViewProps) {
                 >
                   {listing.status}
                 </span>
-                <div className="flex items-center" style={{ gap: '8px' }}>
+                <div className="flex items-center justify-end" style={{ gap: '8px' }}>
                   {listing.status === 'available' && (
                     <button
                       onClick={(e) => { e.stopPropagation(); handleUpdateStatus(listing, 'sold'); }}

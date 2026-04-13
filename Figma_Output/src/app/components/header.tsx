@@ -16,6 +16,7 @@ export function Header({ currentView, onViewChange, onCreateListing }: HeaderPro
   const { getUnreadCount } = useMessaging();
   const unreadCount = user ? getUnreadCount(user.id) : 0;
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+  const [hoveredNav, setHoveredNav] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const isActive = (view: View) => currentView === view;
@@ -32,6 +33,45 @@ export function Header({ currentView, onViewChange, onCreateListing }: HeaderPro
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isProfileDropdownOpen]);
 
+  // Nav link with pill + lift + center-grow underline
+  const NavLink = ({ id, label, views }: { id: string; label: string; views: View[] }) => {
+    const active = views.some(v => isActive(v));
+    const hovered = hoveredNav === id;
+    const lit = active || hovered;
+    return (
+      <button
+        onClick={() => onViewChange(views[0])}
+        onMouseEnter={() => setHoveredNav(id)}
+        onMouseLeave={() => setHoveredNav(null)}
+        style={{
+          position: 'relative', fontSize: '16px', fontWeight: 500,
+          color: lit ? '#F76902' : '#402E32',
+          background: lit ? 'rgba(247, 105, 2, 0.07)' : 'transparent',
+          border: 'none', cursor: 'pointer',
+          padding: '7px 14px', borderRadius: '8px',
+          transform: hovered && !active ? 'translateY(-1px)' : 'translateY(0)',
+          transition: 'color 180ms ease, background 180ms ease, transform 180ms ease',
+        }}
+      >
+        {label}
+        {/* Center-grow underline */}
+        <span style={{
+          position: 'absolute', bottom: '2px', left: '14px',
+          right: '14px', height: '2px',
+          backgroundColor: '#F76902',
+          borderRadius: '1px',
+          transform: lit ? 'scaleX(1)' : 'scaleX(0)',
+          transformOrigin: 'center',
+          transition: 'transform 220ms cubic-bezier(0.34, 1.56, 0.64, 1)',
+        }} />
+      </button>
+    );
+  };
+
+  const profileActive = isActive('profile') || isActive('my-listings') || isActive('messages');
+  const nameHovered = hoveredNav === 'name';
+  const avatarHovered = hoveredNav === 'avatar';
+
   return (
     <nav
       className="bg-white border-b w-full sticky top-0 z-50"
@@ -42,10 +82,9 @@ export function Header({ currentView, onViewChange, onCreateListing }: HeaderPro
         <div className="flex-1 flex items-center">
           <button
             onClick={() => onViewChange('home')}
-            className="no-underline"
             style={{ background: 'none', border: 'none', cursor: 'pointer' }}
           >
-            <h1 className="text-[24px] font-bold leading-none" style={{ fontSize: '24px' }}>
+            <h1 className="font-bold leading-none" style={{ fontSize: '24px' }}>
               <span style={{ color: '#402E32' }}>BrickCity</span>
               <span style={{ color: '#F76902' }}>Swap</span>
             </h1>
@@ -53,100 +92,63 @@ export function Header({ currentView, onViewChange, onCreateListing }: HeaderPro
         </div>
 
         {/* Navigation Links */}
-        <div className="flex items-center gap-[32px]">
-          <button
-            onClick={() => onViewChange('housing')}
-            className="text-[16px] font-normal relative group transition-colors"
-            style={{
-              color: isActive('housing') ? '#F76902' : '#402E32',
-              background: 'none', border: 'none', cursor: 'pointer',
-              padding: '4px 0'
-            }}
-          >
-            Housing
-            <span
-              className="absolute left-0 bottom-[-4px] h-[2px] group-hover:w-full transition-all"
-              style={{
-                backgroundColor: isActive('housing') ? '#F76902' : '#402E32',
-                width: isActive('housing') ? '100%' : '0',
-                transitionDuration: '200ms'
-              }}
-            />
-          </button>
-          <button
-            onClick={() => onViewChange('marketplace')}
-            className="text-[16px] font-normal relative group transition-colors"
-            style={{
-              color: isActive('marketplace') ? '#F76902' : '#402E32',
-              background: 'none', border: 'none', cursor: 'pointer',
-              padding: '4px 0'
-            }}
-          >
-            Marketplace
-            <span
-              className="absolute left-0 bottom-[-4px] h-[2px] group-hover:w-full transition-all"
-              style={{
-                backgroundColor: isActive('marketplace') ? '#F76902' : '#402E32',
-                width: isActive('marketplace') ? '100%' : '0',
-                transitionDuration: '200ms'
-              }}
-            />
-          </button>
-          <button
-            onClick={() => onViewChange('pricing')}
-            className="text-[16px] font-normal relative group transition-colors"
-            style={{
-              color: isActive('pricing') ? '#F76902' : '#402E32',
-              background: 'none', border: 'none', cursor: 'pointer',
-              padding: '4px 0'
-            }}
-          >
-            Pricing
-            <span
-              className="absolute left-0 bottom-[-4px] h-[2px] group-hover:w-full transition-all"
-              style={{
-                backgroundColor: isActive('pricing') ? '#F76902' : '#402E32',
-                width: isActive('pricing') ? '100%' : '0',
-                transitionDuration: '200ms'
-              }}
-            />
-          </button>
+        <div className="flex items-center" style={{ gap: '4px' }}>
+          <NavLink id="housing"     label="Housing"     views={['housing']} />
+          <NavLink id="marketplace" label="Marketplace" views={['marketplace']} />
+          <NavLink id="pricing"     label="Pricing"     views={['pricing']} />
         </div>
 
-        {/* Profile Dropdown */}
+        {/* Profile area */}
         <div className="flex-1 flex items-center justify-end">
-          <div className="relative flex items-center gap-2" ref={dropdownRef}>
-            {/* Name / Sign In — toggles dropdown */}
+          <div className="relative flex items-center" style={{ gap: '4px' }} ref={dropdownRef}>
+
+            {/* Name / Sign In button */}
             <button
               onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
-              className="text-[16px] font-normal hover:opacity-70 transition-opacity"
+              onMouseEnter={() => setHoveredNav('name')}
+              onMouseLeave={() => setHoveredNav(null)}
               style={{
-                color: isActive('profile') || isActive('my-listings') || isActive('messages') ? '#F76902' : '#402E32',
-                padding: '8px 4px', background: 'none', border: 'none', cursor: 'pointer'
+                position: 'relative', fontSize: '16px', fontWeight: 500,
+                color: profileActive || nameHovered ? '#F76902' : '#402E32',
+                background: profileActive || nameHovered ? 'rgba(247, 105, 2, 0.07)' : 'transparent',
+                border: 'none', cursor: 'pointer',
+                padding: '7px 14px', borderRadius: '8px',
+                transform: nameHovered && !profileActive ? 'translateY(-1px)' : 'translateY(0)',
+                transition: 'color 180ms ease, background 180ms ease, transform 180ms ease',
               }}
             >
               {user ? user.name.split(' ')[0] : 'Sign In'}
+              <span style={{
+                position: 'absolute', bottom: '2px', left: '14px', right: '14px',
+                height: '2px', backgroundColor: '#F76902', borderRadius: '1px',
+                transform: profileActive || nameHovered ? 'scaleX(1)' : 'scaleX(0)',
+                transformOrigin: 'center',
+                transition: 'transform 220ms cubic-bezier(0.34, 1.56, 0.64, 1)',
+              }} />
             </button>
 
-            {/* Avatar — navigates directly to profile, no dropdown */}
+            {/* Avatar — navigates directly to profile */}
             {user && (
               <button
                 onClick={() => { setIsProfileDropdownOpen(false); onViewChange('profile'); }}
+                onMouseEnter={() => setHoveredNav('avatar')}
+                onMouseLeave={() => setHoveredNav(null)}
                 title="Go to profile"
                 style={{
                   width: '36px', height: '36px', borderRadius: '50%',
-                  backgroundColor: '#FFF6EE', border: '2px solid #F76902',
-                  cursor: 'pointer', overflow: 'hidden',
+                  backgroundColor: '#FFF6EE',
+                  border: 'none', cursor: 'pointer', overflow: 'hidden',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  flexShrink: 0, padding: 0
+                  flexShrink: 0, padding: 0,
+                  transform: avatarHovered ? 'scale(1.1)' : 'scale(1)',
+                  boxShadow: avatarHovered
+                    ? '0 0 0 3px rgba(247, 105, 2, 0.35)'
+                    : '0 0 0 2px #F76902',
+                  transition: 'transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 200ms ease',
                 }}
               >
                 {user.avatarUrl ? (
-                  <img
-                    src={user.avatarUrl}
-                    alt={user.name}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                  />
+                  <img src={user.avatarUrl} alt={user.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 ) : (
                   <span style={{ fontSize: '14px', fontWeight: 700, color: '#F76902' }}>
                     {user.name ? user.name.charAt(0).toUpperCase() : '?'}
@@ -155,6 +157,7 @@ export function Header({ currentView, onViewChange, onCreateListing }: HeaderPro
               </button>
             )}
 
+            {/* Dropdown */}
             {isProfileDropdownOpen && (
               <div
                 className="absolute bg-white"
@@ -167,19 +170,12 @@ export function Header({ currentView, onViewChange, onCreateListing }: HeaderPro
               >
                 {user && (
                   <>
-                    {/* Post - Featured Action */}
                     <button
                       onClick={() => { setIsProfileDropdownOpen(false); onCreateListing(); }}
                       className="flex items-center w-full text-left transition-all"
-                      style={{
-                        padding: '12px 16px', borderRadius: '8px', gap: '12px',
-                        backgroundColor: '#FFF6EE', border: 'none', cursor: 'pointer'
-                      }}
+                      style={{ padding: '12px 16px', borderRadius: '8px', gap: '12px', backgroundColor: '#FFF6EE', border: 'none', cursor: 'pointer' }}
                     >
-                      <div
-                        className="flex items-center justify-center"
-                        style={{ width: '32px', height: '32px', borderRadius: '6px', backgroundColor: '#F76902' }}
-                      >
+                      <div className="flex items-center justify-center" style={{ width: '32px', height: '32px', borderRadius: '6px', backgroundColor: '#F76902' }}>
                         <Plus size={18} style={{ color: '#FFFFFF' }} />
                       </div>
                       <span className="font-semibold" style={{ fontSize: '15px', color: '#F76902' }}>Post</span>
@@ -190,7 +186,6 @@ export function Header({ currentView, onViewChange, onCreateListing }: HeaderPro
 
                 {user && (
                   <>
-                    {/* My Listings */}
                     <button
                       onClick={() => { setIsProfileDropdownOpen(false); onViewChange('my-listings'); }}
                       className="flex items-center w-full text-left hover:bg-gray-50 transition-colors"
@@ -199,8 +194,6 @@ export function Header({ currentView, onViewChange, onCreateListing }: HeaderPro
                       <Package size={18} style={{ color: '#B5866E' }} />
                       <span className="font-normal" style={{ fontSize: '15px', color: '#402E32' }}>My Listings</span>
                     </button>
-
-                    {/* Messages */}
                     <button
                       onClick={() => { setIsProfileDropdownOpen(false); onViewChange('messages'); }}
                       className="flex items-center w-full text-left hover:bg-gray-50 transition-colors"
@@ -210,12 +203,7 @@ export function Header({ currentView, onViewChange, onCreateListing }: HeaderPro
                       <span className="font-normal" style={{ fontSize: '15px', color: '#402E32' }}>
                         Messages
                         {unreadCount > 0 && (
-                          <span
-                            style={{
-                              marginLeft: '8px', backgroundColor: '#F76902', color: '#FFFFFF',
-                              fontSize: '11px', padding: '2px 6px', borderRadius: '10px', fontWeight: 600
-                            }}
-                          >
+                          <span style={{ marginLeft: '8px', backgroundColor: '#F76902', color: '#FFFFFF', fontSize: '11px', padding: '2px 6px', borderRadius: '10px', fontWeight: 600 }}>
                             {unreadCount > 9 ? '9+' : unreadCount}
                           </span>
                         )}
@@ -224,16 +212,13 @@ export function Header({ currentView, onViewChange, onCreateListing }: HeaderPro
                   </>
                 )}
 
-                {/* Profile / Sign In */}
                 <button
                   onClick={() => { setIsProfileDropdownOpen(false); onViewChange('profile'); }}
                   className="flex items-center w-full text-left hover:bg-gray-50 transition-colors"
                   style={{ padding: '10px 16px', borderRadius: '8px', gap: '12px', border: 'none', backgroundColor: 'transparent', cursor: 'pointer' }}
                 >
                   <User size={18} style={{ color: '#B5866E' }} />
-                  <span className="font-normal" style={{ fontSize: '15px', color: '#402E32' }}>
-                    {user ? 'Profile' : 'Sign In'}
-                  </span>
+                  <span className="font-normal" style={{ fontSize: '15px', color: '#402E32' }}>{user ? 'Profile' : 'Sign In'}</span>
                 </button>
 
                 {user && (

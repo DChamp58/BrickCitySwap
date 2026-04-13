@@ -215,42 +215,12 @@ export function ListingDetailDialog({
 
             <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', flex: 1, overflow: 'hidden' }}>
 
-              {/* ── On mobile: sidebar floats to top ─────────────────────── */}
+              {/* ── Mobile: image at top (fixed, not scrollable) like housing ─── */}
               {isMobile && (
-                <div style={{ padding: '20px 20px 0', flexShrink: 0 }}>
-                  {/* Price + seller + CTA */}
-                  <div style={{ padding: '18px', borderRadius: '14px', border: '1.5px solid #E8D5C4', backgroundColor: '#FFFFFF', boxShadow: '0 4px 16px rgba(64,46,50,0.07)', display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
-                    <span style={{ fontSize: '32px', fontWeight: 800, color: '#F76902' }}>${listing.price}</span>
-                    {listing.profiles?.full_name && (
-                      <div className="flex items-center" style={{ gap: '10px', flex: 1 }}>
-                        <div style={{ width: '36px', height: '36px', borderRadius: '50%', backgroundColor: '#FFF6EE', border: '2px solid #F76902', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, overflow: 'hidden' }}>
-                          {listing.profiles.avatar_url
-                            ? <img src={listing.profiles.avatar_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                            : <span style={{ fontSize: '14px', fontWeight: 700, color: '#F76902' }}>{listing.profiles.full_name.charAt(0)}</span>
-                          }
-                        </div>
-                        <div>
-                          <p style={{ fontSize: '13px', fontWeight: 600, color: '#402E32' }}>{listing.profiles.full_name}</p>
-                          <p style={{ fontSize: '11px', color: '#B5866E' }}>Seller · {new Date(listing.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
-                        </div>
-                      </div>
-                    )}
-                    {showContactButton && (
-                      <button onClick={() => { onContact(listing); onClose(); }} className="flex items-center justify-center font-semibold w-full"
-                        style={{ padding: '12px', borderRadius: '10px', fontSize: '15px', gap: '8px', border: 'none', backgroundColor: '#F76902', color: '#FFFFFF', cursor: 'pointer', marginTop: '12px' }}>
-                        <MessageCircle size={16} /> Contact Seller
-                      </button>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* ── Left: photo + details ─────────────────────────────── */}
-              <div ref={isMobile ? scrollRef : undefined} style={{ overflowY: 'auto', flex: 1, borderRight: isMobile ? 'none' : '1px solid #E8D5C4' }}>
-
-                {/* Main photo */}
-                <div style={{ position: 'relative', height: isMobile ? '240px' : '360px', backgroundColor: '#F3F4F6', flexShrink: 0, cursor: images.length > 0 ? 'pointer' : 'default' }}
-                  onClick={() => images.length > 0 && setGalleryOpen(true)}>
+                <div
+                  style={{ position: 'relative', height: '220px', backgroundColor: '#F3F4F6', flexShrink: 0, cursor: images.length > 0 ? 'pointer' : 'default' }}
+                  onClick={() => images.length > 0 && setGalleryOpen(true)}
+                >
                   {images.length > 0
                     ? <ImageWithFallback src={images[imgIdx]?.url || ''} alt={listing.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     : <div className="flex items-center justify-center h-full" style={{ color: '#B5866E', fontSize: '14px' }}>No photos</div>
@@ -264,16 +234,42 @@ export function ListingDetailDialog({
                       style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', width: '36px', height: '36px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.92)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.15)' }}>
                       <ChevronRight size={18} style={{ color: '#402E32' }} />
                     </button>
-                  </>}
-                  {images.length > 1 && (
                     <div style={{ position: 'absolute', bottom: '12px', right: '12px', backgroundColor: 'rgba(0,0,0,0.55)', color: '#fff', fontSize: '12px', fontWeight: 600, padding: '4px 10px', borderRadius: '20px' }}>
                       {imgIdx + 1} / {images.length}
                     </div>
-                  )}
+                  </>}
                 </div>
+              )}
 
-                {/* Thumbnail strip */}
-                {images.length > 1 && (
+              {/* ── Left: photo (desktop) + scrollable details ───────────────── */}
+              <div ref={isMobile ? scrollRef : undefined} style={{ overflowY: 'auto', flex: 1, borderRight: isMobile ? 'none' : '1px solid #E8D5C4' }}>
+
+                {/* Desktop: main photo */}
+                {!isMobile && (
+                  <div style={{ position: 'relative', height: '360px', backgroundColor: '#F3F4F6', flexShrink: 0, cursor: images.length > 0 ? 'pointer' : 'default' }}
+                    onClick={() => images.length > 0 && setGalleryOpen(true)}>
+                    {images.length > 0
+                      ? <ImageWithFallback src={images[imgIdx]?.url || ''} alt={listing.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      : <div className="flex items-center justify-center h-full" style={{ color: '#B5866E', fontSize: '14px' }}>No photos</div>
+                    }
+                    {images.length > 1 && <>
+                      <button onClick={e => { e.stopPropagation(); setImgIdx((imgIdx - 1 + images.length) % images.length); }}
+                        style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', width: '36px', height: '36px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.92)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.15)' }}>
+                        <ChevronLeft size={18} style={{ color: '#402E32' }} />
+                      </button>
+                      <button onClick={e => { e.stopPropagation(); setImgIdx((imgIdx + 1) % images.length); }}
+                        style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', width: '36px', height: '36px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.92)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.15)' }}>
+                        <ChevronRight size={18} style={{ color: '#402E32' }} />
+                      </button>
+                      <div style={{ position: 'absolute', bottom: '12px', right: '12px', backgroundColor: 'rgba(0,0,0,0.55)', color: '#fff', fontSize: '12px', fontWeight: 600, padding: '4px 10px', borderRadius: '20px' }}>
+                        {imgIdx + 1} / {images.length}
+                      </div>
+                    </>}
+                  </div>
+                )}
+
+                {/* Desktop: thumbnail strip */}
+                {!isMobile && images.length > 1 && (
                   <div className="flex" style={{ gap: '8px', padding: '12px 16px', backgroundColor: '#FAFAFA', borderBottom: '1px solid #E8D5C4', overflowX: 'auto' }}>
                     {images.map((img, i) => (
                       <button key={img.id} onClick={() => setImgIdx(i)}
@@ -281,6 +277,37 @@ export function ListingDetailDialog({
                         <img src={img.url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                       </button>
                     ))}
+                  </div>
+                )}
+
+                {/* Mobile: price card (below image, matching housing style) */}
+                {isMobile && (
+                  <div style={{ padding: '20px 20px 0', flexShrink: 0 }}>
+                    <div style={{ padding: '18px', borderRadius: '14px', border: '1.5px solid #E8D5C4', backgroundColor: '#FFFFFF', boxShadow: '0 4px 16px rgba(64,46,50,0.07)' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '14px' }}>
+                        <span style={{ fontSize: '28px', fontWeight: 800, color: '#F76902' }}>${listing.price}</span>
+                        {listing.profiles?.full_name && (
+                          <div className="flex items-center" style={{ gap: '8px', flex: 1 }}>
+                            <div style={{ width: '34px', height: '34px', borderRadius: '50%', backgroundColor: '#FFF6EE', border: '2px solid #F76902', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, overflow: 'hidden' }}>
+                              {listing.profiles.avatar_url
+                                ? <img src={listing.profiles.avatar_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                : <span style={{ fontSize: '13px', fontWeight: 700, color: '#F76902' }}>{listing.profiles.full_name.charAt(0)}</span>
+                              }
+                            </div>
+                            <div>
+                              <p style={{ fontSize: '13px', fontWeight: 600, color: '#402E32' }}>{listing.profiles.full_name}</p>
+                              <p style={{ fontSize: '11px', color: '#B5866E' }}>Seller</p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                      {showContactButton && (
+                        <button onClick={() => { onContact(listing); onClose(); }} className="flex items-center justify-center font-semibold w-full"
+                          style={{ padding: '12px', borderRadius: '10px', fontSize: '15px', gap: '8px', border: 'none', backgroundColor: '#F76902', color: '#FFFFFF', cursor: 'pointer', boxShadow: '0 4px 14px rgba(247,105,2,0.3)' }}>
+                          <MessageCircle size={16} /> Contact Seller
+                        </button>
+                      )}
+                    </div>
                   </div>
                 )}
 
@@ -318,7 +345,6 @@ export function ListingDetailDialog({
                     <p style={{ fontSize: '15px', color: '#5A4A44', lineHeight: '1.7' }}>{listing.description}</p>
                   </div>
 
-                  {/* Safety tip — mobile only, shown at bottom */}
                   {isMobile && (
                     <div style={{ padding: '16px', borderRadius: '12px', backgroundColor: '#FFF6EE', border: '1px solid #E8D5C4', marginTop: '20px' }}>
                       <div className="flex items-center" style={{ gap: '8px', marginBottom: '6px' }}>

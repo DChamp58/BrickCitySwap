@@ -44,12 +44,15 @@ export function ListingsPreview({ onNavigate, onView }: ListingsPreviewProps) {
   }, []);
 
   const scroll = (direction: 'left' | 'right') => {
-    if (scrollContainerRef.current) {
-      const scrollAmount = 360;
-      scrollContainerRef.current.scrollBy({
-        left: direction === 'left' ? -scrollAmount : scrollAmount,
-        behavior: 'smooth'
-      });
+    const el = scrollContainerRef.current;
+    if (!el) return;
+
+    if (direction === 'right') {
+      const atEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 10;
+      el.scrollTo({ left: atEnd ? 0 : el.scrollLeft + 360, behavior: 'smooth' });
+    } else {
+      const atStart = el.scrollLeft <= 10;
+      el.scrollTo({ left: atStart ? el.scrollWidth : el.scrollLeft - 360, behavior: 'smooth' });
     }
   };
 

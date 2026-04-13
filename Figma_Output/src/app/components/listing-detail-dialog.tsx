@@ -144,15 +144,17 @@ export function ListingDetailDialog({
     imgSwipe.current.startY = e.touches[0].clientY;
   };
   const onImgTouchEnd = (e: React.TouchEvent) => {
-    if (images.length <= 1) return;
     const dx = e.changedTouches[0].clientX - imgSwipe.current.startX;
     const dy = e.changedTouches[0].clientY - imgSwipe.current.startY;
-    // Only swipe if horizontal movement is dominant and crosses the 40px threshold
-    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40) {
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40 && images.length > 1) {
+      // Horizontal swipe → navigate images
       setImgIdx(prev => dx < 0
         ? (prev + 1) % images.length
         : (prev - 1 + images.length) % images.length
       );
+    } else if (dy > 80 && Math.abs(dy) > Math.abs(dx) && galleryOpen) {
+      // Swipe down → close gallery
+      setGalleryOpen(false);
     }
   };
 
@@ -164,26 +166,55 @@ export function ListingDetailDialog({
       <>
         {/* Fullscreen gallery */}
         {galleryOpen && images.length > 0 && (
-          <div className="fixed inset-0 z-[60] flex items-center justify-center"
-            style={{ backgroundColor: 'rgba(0,0,0,0.92)' }}
-            onClick={() => setGalleryOpen(false)}>
-            <button onClick={() => setGalleryOpen(false)}
-              style={{ position: 'absolute', top: '24px', right: '24px', width: '40px', height: '40px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.15)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <X size={20} style={{ color: '#fff' }} />
-            </button>
-            {images.length > 1 && <>
-              <button onClick={e => { e.stopPropagation(); setImgIdx((imgIdx - 1 + images.length) % images.length); }}
-                style={{ position: 'absolute', left: '24px', top: '50%', transform: 'translateY(-50%)', width: '48px', height: '48px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.15)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <ChevronLeft size={28} style={{ color: '#fff' }} />
+          <div className="fixed inset-0 z-[60] flex flex-col" style={{ backgroundColor: 'rgba(0,0,0,0.96)' }}>
+            {/* Header: counter + close (safe-area aware) */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', paddingTop: 'max(env(safe-area-inset-top), 16px)', flexShrink: 0 }}>
+              <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: '14px', fontWeight: 500 }}>
+                {images.length > 1 ? `${imgIdx + 1} of ${images.length}` : ''}
+              </span>
+              <button onClick={() => setGalleryOpen(false)} aria-label="Close gallery"
+                style={{ width: '44px', height: '44px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.15)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <X size={20} style={{ color: '#fff' }} />
               </button>
-              <button onClick={e => { e.stopPropagation(); setImgIdx((imgIdx + 1) % images.length); }}
-                style={{ position: 'absolute', right: '24px', top: '50%', transform: 'translateY(-50%)', width: '48px', height: '48px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.15)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <ChevronRight size={28} style={{ color: '#fff' }} />
-              </button>
-            </>}
-            <img src={images[imgIdx]?.url} alt={listing.title} style={{ maxWidth: '90vw', maxHeight: '85vh', objectFit: 'contain', borderRadius: '8px' }} onClick={e => e.stopPropagation()} />
-            <div style={{ position: 'absolute', bottom: '24px', left: '50%', transform: 'translateX(-50%)', color: '#fff', fontSize: '14px', opacity: 0.7 }}>
-              {imgIdx + 1} / {images.length}
+            </div>
+
+            {/* Image area — swipe horizontally to navigate, swipe down to close */}
+            <div
+              onTouchStart={onImgTouchStart}
+              onTouchEnd={onImgTouchEnd}
+              style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}
+            >
+              <img
+                src={images[imgIdx]?.url}
+                alt={listing.title}
+                style={{ maxWidth: '92vw', maxHeight: '100%', objectFit: 'contain', borderRadius: '8px', userSelect: 'none', pointerEvents: 'none' }}
+                draggable={false}
+              />
+              {/* Desktop arrows only */}
+              {images.length > 1 && !isMobile && (
+                <>
+                  <button onClick={() => setImgIdx((imgIdx - 1 + images.length) % images.length)}
+                    style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', width: '48px', height: '48px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.15)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <ChevronLeft size={28} style={{ color: '#fff' }} />
+                  </button>
+                  <button onClick={() => setImgIdx((imgIdx + 1) % images.length)}
+                    style={{ position: 'absolute', right: '16px', top: '50%', transform: 'translateY(-50%)', width: '48px', height: '48px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.15)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <ChevronRight size={28} style={{ color: '#fff' }} />
+                  </button>
+                </>
+              )}
+            </div>
+
+            {/* Bottom: pill dots (multi-image) or close hint (single) */}
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', padding: '20px', paddingBottom: 'max(env(safe-area-inset-bottom), 20px)', flexShrink: 0, minHeight: '64px' }}>
+              {images.length > 1
+                ? images.map((_, i) => (
+                    <button key={i} onClick={() => setImgIdx(i)}
+                      style={{ width: i === imgIdx ? '24px' : '8px', height: '8px', borderRadius: '4px', backgroundColor: i === imgIdx ? '#F76902' : 'rgba(255,255,255,0.35)', border: 'none', cursor: 'pointer', padding: 0, transition: 'all 200ms ease' }}
+                    />
+                  ))
+                : <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '12px', margin: 0 }}>Swipe down to close</p>
+              }
             </div>
           </div>
         )}
@@ -440,26 +471,56 @@ export function ListingDetailDialog({
   return (
     <>
       {/* Full-screen gallery overlay */}
-      {galleryOpen && (
-        <div
-          className="fixed inset-0 z-[60] flex items-center justify-center"
-          style={{ backgroundColor: 'rgba(0,0,0,0.92)' }}
-          onClick={() => setGalleryOpen(false)}
-        >
-          <button onClick={() => setGalleryOpen(false)} style={{ position: 'absolute', top: '24px', right: '24px', width: '40px', height: '40px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.15)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <X size={20} style={{ color: '#FFFFFF' }} />
-          </button>
-          <button onClick={e => { e.stopPropagation(); setImgIdx((imgIdx - 1 + images.length) % images.length); }}
-            style={{ position: 'absolute', left: '24px', top: '50%', transform: 'translateY(-50%)', width: '48px', height: '48px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.15)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <ChevronLeft size={28} style={{ color: '#FFFFFF' }} />
-          </button>
-          <img src={images[imgIdx]?.url} alt={listing.title} style={{ maxWidth: '90vw', maxHeight: '85vh', objectFit: 'contain', borderRadius: '8px' }} onClick={e => e.stopPropagation()} />
-          <button onClick={e => { e.stopPropagation(); setImgIdx((imgIdx + 1) % images.length); }}
-            style={{ position: 'absolute', right: '24px', top: '50%', transform: 'translateY(-50%)', width: '48px', height: '48px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.15)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <ChevronRight size={28} style={{ color: '#FFFFFF' }} />
-          </button>
-          <div style={{ position: 'absolute', bottom: '24px', left: '50%', transform: 'translateX(-50%)', color: '#FFFFFF', fontSize: '14px', opacity: 0.7 }}>
-            {imgIdx + 1} / {images.length}
+      {galleryOpen && images.length > 0 && (
+        <div className="fixed inset-0 z-[60] flex flex-col" style={{ backgroundColor: 'rgba(0,0,0,0.96)' }}>
+          {/* Header: counter + close (safe-area aware) */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', paddingTop: 'max(env(safe-area-inset-top), 16px)', flexShrink: 0 }}>
+            <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: '14px', fontWeight: 500 }}>
+              {images.length > 1 ? `${imgIdx + 1} of ${images.length}` : ''}
+            </span>
+            <button onClick={() => setGalleryOpen(false)} aria-label="Close gallery"
+              style={{ width: '44px', height: '44px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.15)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <X size={20} style={{ color: '#fff' }} />
+            </button>
+          </div>
+
+          {/* Image area — swipe horizontally to navigate, swipe down to close */}
+          <div
+            onTouchStart={onImgTouchStart}
+            onTouchEnd={onImgTouchEnd}
+            style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}
+          >
+            <img
+              src={images[imgIdx]?.url}
+              alt={listing.title}
+              style={{ maxWidth: '92vw', maxHeight: '100%', objectFit: 'contain', borderRadius: '8px', userSelect: 'none', pointerEvents: 'none' }}
+              draggable={false}
+            />
+            {/* Desktop arrows only */}
+            {images.length > 1 && !isMobile && (
+              <>
+                <button onClick={() => setImgIdx((imgIdx - 1 + images.length) % images.length)}
+                  style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', width: '48px', height: '48px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.15)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <ChevronLeft size={28} style={{ color: '#fff' }} />
+                </button>
+                <button onClick={() => setImgIdx((imgIdx + 1) % images.length)}
+                  style={{ position: 'absolute', right: '16px', top: '50%', transform: 'translateY(-50%)', width: '48px', height: '48px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.15)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <ChevronRight size={28} style={{ color: '#fff' }} />
+                </button>
+              </>
+            )}
+          </div>
+
+          {/* Bottom: pill dots (multi-image) or close hint (single) */}
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', padding: '20px', paddingBottom: 'max(env(safe-area-inset-bottom), 20px)', flexShrink: 0, minHeight: '64px' }}>
+            {images.length > 1
+              ? images.map((_, i) => (
+                  <button key={i} onClick={() => setImgIdx(i)}
+                    style={{ width: i === imgIdx ? '24px' : '8px', height: '8px', borderRadius: '4px', backgroundColor: i === imgIdx ? '#F76902' : 'rgba(255,255,255,0.35)', border: 'none', cursor: 'pointer', padding: 0, transition: 'all 200ms ease' }}
+                  />
+                ))
+              : <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '12px', margin: 0 }}>Swipe down to close</p>
+            }
           </div>
         </div>
       )}

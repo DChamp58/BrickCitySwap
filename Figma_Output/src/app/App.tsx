@@ -12,6 +12,7 @@ import { ListingDetailDialog } from './components/listing-detail-dialog';
 import { HomeView } from './components/home-view';
 import { PricingView } from './components/pricing-view';
 import { PaymentView } from './components/payment-view';
+import { ProfileView } from './components/profile-view';
 import { Footer } from './components/footer';
 import { Listing } from './components/listing-card';
 import { Toaster } from './components/ui/sonner';
@@ -100,7 +101,11 @@ function AppContent() {
       />
 
       <main>
-        {currentView === 'profile' && <AuthView />}
+        {currentView === 'profile' && (
+          user
+            ? <ProfileView onNavigate={setCurrentView} onCreateListing={handleCreateListing} />
+            : <AuthView />
+        )}
 
         {currentView === 'home' && (
           <div key={`home-${refreshKey}`}>

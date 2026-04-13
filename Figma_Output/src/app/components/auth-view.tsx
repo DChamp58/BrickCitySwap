@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { Mail, Lock, Camera, User as UserIcon } from 'lucide-react';
+import { Mail, Lock, User as UserIcon } from 'lucide-react';
 import { useAuth } from './auth-context';
 import { toast } from 'sonner';
 
 export function AuthView() {
-  const { user, signIn, signUp, signOut, updateProfile } = useAuth();
+  const { signIn, signUp } = useAuth();
   const [activeTab, setActiveTab] = useState<'signin' | 'signup'>('signin');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -42,95 +42,7 @@ export function AuthView() {
     }
   };
 
-  // Logged-in: Profile view
-  if (user) {
-    return (
-      <div className="w-full min-h-screen" style={{ backgroundColor: '#FFF6EE', padding: '48px 24px' }}>
-        <div className="mx-auto" style={{ maxWidth: '800px', display: 'flex', flexDirection: 'column', gap: '32px' }}>
-          <div>
-            <h1 className="font-bold" style={{ fontSize: '56px', color: '#402E32', marginBottom: '8px', lineHeight: '1.1' }}>Profile</h1>
-            <p className="font-normal" style={{ fontSize: '16px', color: '#B5866E', lineHeight: '1.6' }}>Manage your account information</p>
-          </div>
-
-          <div className="bg-white" style={{ borderRadius: '12px', border: '1px solid #E8D5C4', padding: '32px' }}>
-            {/* Avatar and User Info */}
-            <div className="flex items-center" style={{ gap: '16px', marginBottom: '32px' }}>
-              <div className="relative flex-shrink-0" style={{ width: '64px', height: '64px' }}>
-                <div
-                  className="flex items-center justify-center font-semibold"
-                  style={{
-                    width: '64px', height: '64px', borderRadius: '50%',
-                    backgroundColor: '#FFF6EE', color: '#F76902', fontSize: '24px',
-                    border: '2px solid #FFFFFF', boxShadow: '0 2px 8px rgba(64, 46, 50, 0.08)'
-                  }}
-                >
-                  {user.name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)}
-                </div>
-                <button
-                  className="absolute flex items-center justify-center hover:opacity-80 transition-opacity"
-                  style={{
-                    bottom: '0', right: '0', width: '24px', height: '24px',
-                    borderRadius: '50%', backgroundColor: '#F76902',
-                    border: '2px solid #FFFFFF', cursor: 'pointer'
-                  }}
-                >
-                  <Camera size={12} style={{ color: '#FFFFFF' }} />
-                </button>
-              </div>
-              <div style={{ flex: 1 }}>
-                <h2 className="font-semibold" style={{ fontSize: '20px', color: '#402E32', marginBottom: '4px' }}>{user.name}</h2>
-                <p className="font-normal" style={{ fontSize: '14px', color: '#B5866E' }}>{user.email}</p>
-              </div>
-              <span
-                className="font-medium"
-                style={{
-                  fontSize: '13px', color: '#F76902', backgroundColor: '#FFF6EE',
-                  padding: '4px 12px', borderRadius: '12px', textTransform: 'capitalize'
-                }}
-              >
-                {user.subscriptionTier} plan
-              </span>
-            </div>
-
-            <div style={{ height: '1px', backgroundColor: '#E8D5C4', marginBottom: '32px' }} />
-
-            {/* Profile Details */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-              <div>
-                <label className="font-semibold" style={{ fontSize: '14px', color: '#402E32', display: 'block', marginBottom: '8px' }}>Full Name</label>
-                <input type="text" value={user.name} readOnly className="w-full outline-none"
-                  style={{ padding: '12px 16px', borderRadius: '8px', border: '1px solid #E8D5C4', fontSize: '16px', color: '#402E32', backgroundColor: '#FFF6EE' }}
-                />
-              </div>
-              <div>
-                <label className="font-semibold" style={{ fontSize: '14px', color: '#402E32', display: 'block', marginBottom: '8px' }}>Email Address</label>
-                <input type="email" value={user.email} readOnly className="w-full outline-none"
-                  style={{ padding: '12px 16px', borderRadius: '8px', border: '1px solid #E8D5C4', fontSize: '16px', color: '#402E32', backgroundColor: '#FFF6EE' }}
-                />
-              </div>
-            </div>
-
-            <div style={{ marginTop: '32px', display: 'flex', gap: '12px' }}>
-              <button
-                onClick={signOut}
-                className="font-semibold transition-all"
-                style={{
-                  backgroundColor: '#FFFFFF', color: '#DC2626', padding: '12px 24px',
-                  borderRadius: '8px', fontSize: '16px', border: '1px solid #E8D5C4', cursor: 'pointer'
-                }}
-                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#FEF2F2'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#FFFFFF'; }}
-              >
-                Sign Out
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Logged-out: Sign In / Sign Up view
+  // Sign In / Sign Up view
   return (
     <div className="w-full min-h-screen flex" style={{ backgroundColor: '#FFFFFF' }}>
       {/* Left Panel - Branding */}

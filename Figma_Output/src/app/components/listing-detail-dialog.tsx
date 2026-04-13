@@ -36,8 +36,10 @@ export function ListingDetailDialog({
   const [saved, setSaved] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [dragY, setDragY] = useState(0);
-  const [dragStartY, setDragStartY] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
+  const scrollRef = React.useRef<HTMLDivElement>(null);
+  // Use a ref to track drag state inside the non-passive listener (avoids stale closure)
+  const drag = React.useRef({ startY: 0, active: false, y: 0 });
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
@@ -46,23 +48,70 @@ export function ListingDetailDialog({
     return () => window.removeEventListener('resize', check);
   }, []);
 
+  // Non-passive touch listeners on the scrollable content — enables drag-to-close
+  // from anywhere in the sheet when content is scrolled to the top.
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el || !isMobile) return;
+
+    const onStart = (e: TouchEvent) => {
+      drag.current.startY = e.touches[0].clientY;
+      drag.current.active = el.scrollTop === 0;
+      drag.current.y = 0;
+    };
+    const onMove = (e: TouchEvent) => {
+      if (!drag.current.active) return;
+      const delta = e.touches[0].clientY - drag.current.startY;
+      if (delta > 5) {
+        e.preventDefault(); // stop scroll — requires non-passive
+        drag.current.y = delta - 5;
+        setDragY(drag.current.y);
+        setIsDragging(true);
+      }
+    };
+    const onEnd = () => {
+      if (!drag.current.active) return;
+      drag.current.active = false;
+      setIsDragging(false);
+      if (drag.current.y > 80) {
+        setDragY(0);
+        drag.current.y = 0;
+        setGalleryOpen(false);
+        onClose();
+      } else {
+        drag.current.y = 0;
+        setDragY(0);
+      }
+    };
+
+    el.addEventListener('touchstart', onStart, { passive: true });
+    el.addEventListener('touchmove', onMove, { passive: false });
+    el.addEventListener('touchend', onEnd, { passive: true });
+    return () => {
+      el.removeEventListener('touchstart', onStart);
+      el.removeEventListener('touchmove', onMove);
+      el.removeEventListener('touchend', onEnd);
+    };
+  }, [isMobile, open]); // re-attach when dialog opens or screen size changes
+
+  // Handle-bar drag (still used for the top handle pill)
   const handleDragStart = (e: React.TouchEvent) => {
-    setDragStartY(e.touches[0].clientY);
-    setIsDragging(true);
+    drag.current.startY = e.touches[0].clientY;
+    drag.current.active = true;
+    drag.current.y = 0;
   };
   const handleDragMove = (e: React.TouchEvent) => {
-    if (!isDragging) return;
-    const delta = e.touches[0].clientY - dragStartY;
-    if (delta > 0) setDragY(delta);
+    if (!drag.current.active) return;
+    const delta = e.touches[0].clientY - drag.current.startY;
+    if (delta > 0) { drag.current.y = delta; setDragY(delta); setIsDragging(true); }
   };
   const handleDragEnd = () => {
+    drag.current.active = false;
     setIsDragging(false);
-    if (dragY > 80) {
-      setDragY(0);
-      setGalleryOpen(false);
-      onClose();
+    if (drag.current.y > 80) {
+      drag.current.y = 0; setDragY(0); setGalleryOpen(false); onClose();
     } else {
-      setDragY(0);
+      drag.current.y = 0; setDragY(0);
     }
   };
 
@@ -180,7 +229,7 @@ export function ListingDetailDialog({
               )}
 
               {/* ── Left: photo + details ─────────────────────────────── */}
-              <div style={{ overflowY: 'auto', flex: 1, borderRight: isMobile ? 'none' : '1px solid #E8D5C4' }}>
+              <div ref={isMobile ? scrollRef : undefined} style={{ overflowY: 'auto', flex: 1, borderRight: isMobile ? 'none' : '1px solid #E8D5C4' }}>
 
                 {/* Main photo */}
                 <div style={{ position: 'relative', height: isMobile ? '240px' : '360px', backgroundColor: '#F3F4F6', flexShrink: 0, cursor: images.length > 0 ? 'pointer' : 'default' }}
@@ -374,17 +423,20 @@ export function ListingDetailDialog({
               onTouchStart={handleDragStart}
               onTouchMove={handleDragMove}
               onTouchEnd={handleDragEnd}
-              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '12px 16px 8px', flexShrink: 0, position: 'relative', cursor: 'grab', touchAction: 'none' }}
+              style={{ display: 'flex', alignItems: 'center', padding: '14px 16px 10px', flexShrink: 0, cursor: 'grab', touchAction: 'none' }}
             >
+              <div style={{ flex: 1 }} />
               <div style={{ width: '40px', height: '4px', borderRadius: '2px', backgroundColor: '#D1C4BC' }} />
-              <DialogClose asChild>
-                <button
-                  style={{ position: 'absolute', right: '16px', top: '50%', transform: 'translateY(-50%)', width: '36px', height: '36px', borderRadius: '50%', backgroundColor: '#F3EDEA', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                  aria-label="Close"
-                >
-                  <X size={16} style={{ color: '#402E32' }} />
-                </button>
-              </DialogClose>
+              <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
+                <DialogClose asChild>
+                  <button
+                    style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: '#F3EDEA', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    aria-label="Close"
+                  >
+                    <X size={15} style={{ color: '#402E32' }} />
+                  </button>
+                </DialogClose>
+              </div>
             </div>
           )}
 
@@ -438,7 +490,7 @@ export function ListingDetailDialog({
           )}
 
           {/* ── Scrollable body ─────────────────────────────────────── */}
-          <div style={{ overflowY: 'auto', flex: 1 }}>
+          <div ref={isMobile ? scrollRef : undefined} style={{ overflowY: 'auto', flex: 1 }}>
             <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', minHeight: '100%' }}>
 
               {/* Mobile: price card at top */}

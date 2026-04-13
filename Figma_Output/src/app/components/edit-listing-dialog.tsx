@@ -14,7 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { toast } from 'sonner';
 import { updateListing, uploadListingImage, deleteListingImage, updateImagePositions } from '@/lib/api';
 import { Listing, ListingImage } from './listing-card';
-import { X, ChevronLeft, ChevronRight, ImagePlus } from 'lucide-react';
+import { X, ImagePlus } from 'lucide-react';
 
 interface EditListingDialogProps {
   open: boolean;
@@ -48,6 +48,8 @@ export function EditListingDialog({ open, onClose, listing, onListingUpdated }: 
   // Image state
   const [slots, setSlots] = useState<ImageSlot[]>([]);
   const [deletedIds, setDeletedIds] = useState<string[]>([]);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+  const draggedIndex = useRef<number | null>(null);
 
   // Populate fields & images when the listing changes
   useEffect(() => {
@@ -76,24 +78,34 @@ export function EditListingDialog({ open, onClose, listing, onListingUpdated }: 
     }
   }, [open]);
 
-  // ── Image helpers ──────────────────────────────────────────────────────────
+  // ── Drag-and-drop helpers ──────────────────────────────────────────────────
 
-  const moveLeft = (i: number) => {
-    if (i === 0) return;
-    setSlots(prev => {
-      const next = [...prev];
-      [next[i - 1], next[i]] = [next[i], next[i - 1]];
-      return next;
-    });
+  const handleDragStart = (i: number) => {
+    draggedIndex.current = i;
   };
 
-  const moveRight = (i: number) => {
+  const handleDragOver = (e: React.DragEvent, i: number) => {
+    e.preventDefault();
+    setDragOverIndex(i);
+  };
+
+  const handleDrop = (e: React.DragEvent, i: number) => {
+    e.preventDefault();
+    const from = draggedIndex.current;
+    if (from === null || from === i) { setDragOverIndex(null); return; }
     setSlots(prev => {
-      if (i === prev.length - 1) return prev;
       const next = [...prev];
-      [next[i], next[i + 1]] = [next[i + 1], next[i]];
+      const [moved] = next.splice(from, 1);
+      next.splice(i, 0, moved);
       return next;
     });
+    draggedIndex.current = null;
+    setDragOverIndex(null);
+  };
+
+  const handleDragEnd = () => {
+    draggedIndex.current = null;
+    setDragOverIndex(null);
   };
 
   const removeSlot = (i: number) => {
@@ -197,75 +209,71 @@ export function EditListingDialog({ open, onClose, listing, onListingUpdated }: 
         <form onSubmit={handleSubmit} className="space-y-4 mt-2">
           {/* ── Photos ───────────────────────────────────────────────────── */}
           <div className="space-y-2">
-            <Label>Photos <span style={{ color: '#B5866E', fontWeight: 400 }}>(up to 5 — drag arrows to reorder)</span></Label>
-            <div className="flex flex-wrap gap-2">
+            <Label>
+              Photos{' '}
+              <span style={{ color: '#B5866E', fontWeight: 400 }}>
+                (up to 5 — drag to reorder)
+              </span>
+            </Label>
+            <div className="flex flex-wrap gap-3">
               {slots.map((slot, i) => {
                 const src = slot.kind === 'existing' ? slot.image.url : slot.preview;
+                const isDragTarget = dragOverIndex === i;
                 return (
                   <div
                     key={i}
+                    draggable
+                    onDragStart={() => handleDragStart(i)}
+                    onDragOver={e => handleDragOver(e, i)}
+                    onDrop={e => handleDrop(e, i)}
+                    onDragEnd={handleDragEnd}
                     className="relative group"
-                    style={{ width: '88px', height: '88px', flexShrink: 0 }}
+                    style={{
+                      width: '128px',
+                      height: '128px',
+                      flexShrink: 0,
+                      cursor: 'grab',
+                      opacity: draggedIndex.current === i ? 0.4 : 1,
+                      outline: isDragTarget ? '2px solid #F76902' : 'none',
+                      outlineOffset: '2px',
+                      borderRadius: '10px',
+                      transition: 'opacity 150ms, outline 100ms',
+                    }}
                   >
                     <img
                       src={src}
                       alt=""
-                      style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px', border: '1px solid #E8D5C4' }}
+                      draggable={false}
+                      style={{
+                        width: '100%', height: '100%', objectFit: 'cover',
+                        borderRadius: '10px', border: '1px solid #E8D5C4',
+                        pointerEvents: 'none',
+                      }}
                     />
 
                     {/* Remove button */}
                     <button
                       type="button"
                       onClick={() => removeSlot(i)}
-                      className="absolute top-1 right-1 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="absolute top-1.5 right-1.5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                       style={{
-                        width: '20px', height: '20px', borderRadius: '50%',
-                        backgroundColor: 'rgba(0,0,0,0.6)', border: 'none', cursor: 'pointer',
+                        width: '22px', height: '22px', borderRadius: '50%',
+                        backgroundColor: 'rgba(0,0,0,0.65)', border: 'none', cursor: 'pointer',
                       }}
                     >
-                      <X size={12} style={{ color: '#fff' }} />
+                      <X size={13} style={{ color: '#fff' }} />
                     </button>
-
-                    {/* Move left */}
-                    {i > 0 && (
-                      <button
-                        type="button"
-                        onClick={() => moveLeft(i)}
-                        className="absolute left-1 bottom-1 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                        style={{
-                          width: '20px', height: '20px', borderRadius: '50%',
-                          backgroundColor: 'rgba(0,0,0,0.6)', border: 'none', cursor: 'pointer',
-                        }}
-                      >
-                        <ChevronLeft size={12} style={{ color: '#fff' }} />
-                      </button>
-                    )}
-
-                    {/* Move right */}
-                    {i < slots.length - 1 && (
-                      <button
-                        type="button"
-                        onClick={() => moveRight(i)}
-                        className="absolute right-1 bottom-1 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                        style={{
-                          width: '20px', height: '20px', borderRadius: '50%',
-                          backgroundColor: 'rgba(0,0,0,0.6)', border: 'none', cursor: 'pointer',
-                        }}
-                      >
-                        <ChevronRight size={12} style={{ color: '#fff' }} />
-                      </button>
-                    )}
 
                     {/* Cover badge */}
                     {i === 0 && (
                       <span
-                        className="absolute bottom-1 left-1/2"
+                        className="absolute bottom-1.5 left-1/2"
                         style={{
                           transform: 'translateX(-50%)',
                           fontSize: '10px', fontWeight: 600,
                           backgroundColor: '#F76902', color: '#fff',
-                          padding: '1px 6px', borderRadius: '4px',
-                          pointerEvents: 'none',
+                          padding: '2px 8px', borderRadius: '4px',
+                          pointerEvents: 'none', whiteSpace: 'nowrap',
                         }}
                       >
                         Cover
@@ -282,13 +290,13 @@ export function EditListingDialog({ open, onClose, listing, onListingUpdated }: 
                   onClick={() => fileInputRef.current?.click()}
                   className="flex flex-col items-center justify-center hover:border-[#F76902] transition-colors"
                   style={{
-                    width: '88px', height: '88px', borderRadius: '8px',
+                    width: '128px', height: '128px', borderRadius: '10px',
                     border: '2px dashed #E8D5C4', backgroundColor: '#FFF6EE',
-                    cursor: 'pointer', gap: '4px',
+                    cursor: 'pointer', gap: '6px',
                   }}
                 >
-                  <ImagePlus size={20} style={{ color: '#B5866E' }} />
-                  <span style={{ fontSize: '11px', color: '#B5866E' }}>Add photo</span>
+                  <ImagePlus size={24} style={{ color: '#B5866E' }} />
+                  <span style={{ fontSize: '12px', color: '#B5866E' }}>Add photo</span>
                 </button>
               )}
             </div>

@@ -173,7 +173,7 @@ export function ListingDetailDialog({
           <DialogContent
             showCloseButton={!isMobile}
             className={isMobile
-              ? 'p-0 overflow-hidden !top-auto !bottom-0 !left-0 !right-0 !translate-x-0 !translate-y-0 !max-w-full !w-full !rounded-b-none !rounded-t-2xl'
+              ? 'p-0 overflow-hidden !top-auto !bottom-0 !left-0 !right-0 !translate-x-0 !translate-y-0 !max-w-full !w-full !rounded-none !bg-transparent !border-0 !shadow-none'
               : 'p-0 overflow-hidden'}
             style={isMobile
               ? { maxHeight: '88vh', display: 'flex', flexDirection: 'column' }
@@ -182,6 +182,12 @@ export function ListingDetailDialog({
             {/* Outer transform wrapper — whole sheet slides together (DOM-driven for 60fps) */}
             <div ref={isMobile ? sheetRef : undefined} style={{
               display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden',
+              ...(isMobile ? {
+                backgroundColor: '#FFFFFF',
+                borderRadius: '16px 16px 0 0',
+                boxShadow: '0 -4px 24px rgba(64,46,50,0.12)',
+                willChange: 'transform',
+              } : {}),
             }}>
 
             {/* Mobile: drag handle bar */}
@@ -415,7 +421,7 @@ export function ListingDetailDialog({
         <DialogContent
           showCloseButton={!isMobile}
           className={isMobile
-            ? 'p-0 overflow-hidden !top-auto !bottom-0 !left-0 !right-0 !translate-x-0 !translate-y-0 !max-w-full !w-full !rounded-b-none !rounded-t-2xl'
+            ? 'p-0 overflow-hidden !top-auto !bottom-0 !left-0 !right-0 !translate-x-0 !translate-y-0 !max-w-full !w-full !rounded-none !bg-transparent !border-0 !shadow-none'
             : 'p-0 overflow-hidden'}
           style={isMobile
             ? { maxHeight: '88vh', display: 'flex', flexDirection: 'column' }
@@ -424,6 +430,12 @@ export function ListingDetailDialog({
           {/* Outer transform wrapper — whole sheet slides together (DOM-driven for 60fps) */}
           <div ref={isMobile ? sheetRef : undefined} style={{
             display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden',
+            ...(isMobile ? {
+              backgroundColor: '#FFFFFF',
+              borderRadius: '16px 16px 0 0',
+              boxShadow: '0 -4px 24px rgba(64,46,50,0.12)',
+              willChange: 'transform',
+            } : {}),
           }}>
 
           {/* Mobile: drag handle bar */}

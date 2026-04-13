@@ -33,11 +33,10 @@ export function Header({ currentView, onViewChange, onCreateListing }: HeaderPro
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isProfileDropdownOpen]);
 
-  // Nav link with pill + lift + center-grow underline
+  // Nav link with color-on-hover + underline-when-active only
   const NavLink = ({ id, label, views }: { id: string; label: string; views: View[] }) => {
     const active = views.some(v => isActive(v));
     const hovered = hoveredNav === id;
-    const lit = active || hovered;
     return (
       <button
         onClick={() => onViewChange(views[0])}
@@ -45,22 +44,19 @@ export function Header({ currentView, onViewChange, onCreateListing }: HeaderPro
         onMouseLeave={() => setHoveredNav(null)}
         style={{
           position: 'relative', fontSize: '16px', fontWeight: 500,
-          color: lit ? '#F76902' : '#402E32',
-          background: lit ? 'rgba(247, 105, 2, 0.07)' : 'transparent',
-          border: 'none', cursor: 'pointer',
+          color: active || hovered ? '#F76902' : '#402E32',
+          background: 'transparent', border: 'none', cursor: 'pointer',
           padding: '7px 14px', borderRadius: '8px',
-          transform: hovered && !active ? 'translateY(-1px)' : 'translateY(0)',
-          transition: 'color 180ms ease, background 180ms ease, transform 180ms ease',
+          transition: 'color 180ms ease',
         }}
       >
         {label}
-        {/* Center-grow underline */}
+        {/* Underline only when active */}
         <span style={{
           position: 'absolute', bottom: '2px', left: '14px',
           right: '14px', height: '2px',
-          backgroundColor: '#F76902',
-          borderRadius: '1px',
-          transform: lit ? 'scaleX(1)' : 'scaleX(0)',
+          backgroundColor: '#F76902', borderRadius: '1px',
+          transform: active ? 'scaleX(1)' : 'scaleX(0)',
           transformOrigin: 'center',
           transition: 'transform 220ms cubic-bezier(0.34, 1.56, 0.64, 1)',
         }} />
@@ -110,18 +106,17 @@ export function Header({ currentView, onViewChange, onCreateListing }: HeaderPro
               style={{
                 position: 'relative', fontSize: '16px', fontWeight: 500,
                 color: profileActive || nameHovered ? '#F76902' : '#402E32',
-                background: profileActive || nameHovered ? 'rgba(247, 105, 2, 0.07)' : 'transparent',
-                border: 'none', cursor: 'pointer',
+                background: 'transparent', border: 'none', cursor: 'pointer',
                 padding: '7px 14px', borderRadius: '8px',
-                transform: nameHovered && !profileActive ? 'translateY(-1px)' : 'translateY(0)',
-                transition: 'color 180ms ease, background 180ms ease, transform 180ms ease',
+                transition: 'color 180ms ease',
               }}
             >
               {user ? user.name.split(' ')[0] : 'Sign In'}
+              {/* Underline only when active */}
               <span style={{
                 position: 'absolute', bottom: '2px', left: '14px', right: '14px',
                 height: '2px', backgroundColor: '#F76902', borderRadius: '1px',
-                transform: profileActive || nameHovered ? 'scaleX(1)' : 'scaleX(0)',
+                transform: profileActive ? 'scaleX(1)' : 'scaleX(0)',
                 transformOrigin: 'center',
                 transition: 'transform 220ms cubic-bezier(0.34, 1.56, 0.64, 1)',
               }} />
@@ -137,14 +132,12 @@ export function Header({ currentView, onViewChange, onCreateListing }: HeaderPro
                 style={{
                   width: '36px', height: '36px', borderRadius: '50%',
                   backgroundColor: '#FFF6EE',
-                  border: 'none', cursor: 'pointer', overflow: 'hidden',
+                  border: '2px solid #F76902',
+                  cursor: 'pointer', overflow: 'hidden',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   flexShrink: 0, padding: 0,
-                  transform: avatarHovered ? 'scale(1.1)' : 'scale(1)',
-                  boxShadow: avatarHovered
-                    ? '0 0 0 3px rgba(247, 105, 2, 0.35)'
-                    : '0 0 0 2px #F76902',
-                  transition: 'transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 200ms ease',
+                  opacity: avatarHovered ? 0.8 : 1,
+                  transition: 'opacity 180ms ease',
                 }}
               >
                 {user.avatarUrl ? (

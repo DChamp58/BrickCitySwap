@@ -5,8 +5,8 @@ import {
 import { Listing } from './listing-card';
 import {
   MapPin, Calendar, Bath, BedDouble, Home, MessageCircle,
-  ChevronLeft, ChevronRight, X, Share2, Heart, User,
-  Package, Tag,
+  ChevronLeft, ChevronRight, X, Share2, Heart,
+  Tag, ShieldCheck,
 } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { trackEvent } from '@/lib/analytics';
@@ -18,6 +18,15 @@ interface ListingDetailDialogProps {
   onContact: (listing: Listing) => void;
   showContactButton?: boolean;
 }
+
+// Condition badge colours
+const conditionStyle: Record<string, { bg: string; color: string; label: string }> = {
+  'new':       { bg: '#DCFCE7', color: '#16A34A', label: 'New' },
+  'like-new':  { bg: '#D1FAE5', color: '#059669', label: 'Like New' },
+  'good':      { bg: '#FEF9C3', color: '#CA8A04', label: 'Good' },
+  'fair':      { bg: '#FEE2E2', color: '#DC2626', label: 'Fair' },
+  'poor':      { bg: '#F3F4F6', color: '#6B7280', label: 'Poor' },
+};
 
 export function ListingDetailDialog({
   open, onClose, listing, onContact, showContactButton = true,
@@ -38,64 +47,185 @@ export function ListingDetailDialog({
   const isHousing = listing.type === 'housing';
   const images = listing.listing_images ?? [];
 
-  // ── Marketplace: simple dialog ──────────────────────────────────────────
+  // ── Marketplace ────────────────────────────────────────────────────────────
   if (!isHousing) {
+    const cond = listing.condition ? conditionStyle[listing.condition.toLowerCase()] ?? null : null;
+
     return (
-      <Dialog open={open} onOpenChange={o => { if (!o) onClose(); }}>
-        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto p-0" style={{ borderRadius: '16px' }}>
-          {/* Image */}
-          {images.length > 0 && (
-            <div className="relative" style={{ height: '280px', overflow: 'hidden', borderRadius: '16px 16px 0 0', backgroundColor: '#F3F4F6' }}>
-              <ImageWithFallback src={images[imgIdx]?.url || ''} alt={listing.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-              {images.length > 1 && (
-                <>
-                  <button onClick={() => setImgIdx((imgIdx - 1 + images.length) % images.length)}
-                    style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', width: '36px', height: '36px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.9)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <ChevronLeft size={20} style={{ color: '#402E32' }} />
-                  </button>
-                  <button onClick={() => setImgIdx((imgIdx + 1) % images.length)}
-                    style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', width: '36px', height: '36px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.9)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <ChevronRight size={20} style={{ color: '#402E32' }} />
-                  </button>
-                </>
-              )}
+      <>
+        {/* Fullscreen gallery */}
+        {galleryOpen && images.length > 0 && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center"
+            style={{ backgroundColor: 'rgba(0,0,0,0.92)' }}
+            onClick={() => setGalleryOpen(false)}>
+            <button onClick={() => setGalleryOpen(false)}
+              style={{ position: 'absolute', top: '24px', right: '24px', width: '40px', height: '40px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.15)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <X size={20} style={{ color: '#fff' }} />
+            </button>
+            {images.length > 1 && <>
+              <button onClick={e => { e.stopPropagation(); setImgIdx((imgIdx - 1 + images.length) % images.length); }}
+                style={{ position: 'absolute', left: '24px', top: '50%', transform: 'translateY(-50%)', width: '48px', height: '48px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.15)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <ChevronLeft size={28} style={{ color: '#fff' }} />
+              </button>
+              <button onClick={e => { e.stopPropagation(); setImgIdx((imgIdx + 1) % images.length); }}
+                style={{ position: 'absolute', right: '24px', top: '50%', transform: 'translateY(-50%)', width: '48px', height: '48px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.15)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <ChevronRight size={28} style={{ color: '#fff' }} />
+              </button>
+            </>}
+            <img src={images[imgIdx]?.url} alt={listing.title} style={{ maxWidth: '90vw', maxHeight: '85vh', objectFit: 'contain', borderRadius: '8px' }} onClick={e => e.stopPropagation()} />
+            <div style={{ position: 'absolute', bottom: '24px', left: '50%', transform: 'translateX(-50%)', color: '#fff', fontSize: '14px', opacity: 0.7 }}>
+              {imgIdx + 1} / {images.length}
             </div>
-          )}
-          <div style={{ padding: '24px' }}>
-            <div className="flex items-start justify-between" style={{ gap: '12px', marginBottom: '8px' }}>
-              <h2 className="font-bold" style={{ fontSize: '22px', color: '#402E32', lineHeight: '1.3' }}>{listing.title}</h2>
-              <span style={{ fontSize: '22px', fontWeight: 700, color: '#F76902', flexShrink: 0 }}>${listing.price}</span>
-            </div>
-            <div className="flex items-center" style={{ gap: '16px', marginBottom: '16px' }}>
-              {listing.category && <span style={{ fontSize: '13px', color: '#B5866E', display: 'flex', alignItems: 'center', gap: '4px' }}><Tag size={13} />{listing.category}</span>}
-              {listing.condition && <span style={{ fontSize: '13px', color: '#B5866E', display: 'flex', alignItems: 'center', gap: '4px' }}><Package size={13} />{listing.condition}</span>}
-            </div>
-            <p style={{ fontSize: '15px', color: '#5A4A44', lineHeight: '1.65', marginBottom: '20px' }}>{listing.description}</p>
-            {listing.profiles?.full_name && (
-              <div className="flex items-center" style={{ gap: '10px', marginBottom: '20px', padding: '14px 16px', borderRadius: '10px', backgroundColor: '#FFF6EE', border: '1px solid #E8D5C4' }}>
-                <div style={{ width: '36px', height: '36px', borderRadius: '50%', backgroundColor: '#F76902', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <span style={{ fontSize: '14px', fontWeight: 700, color: '#FFFFFF' }}>{listing.profiles.full_name.charAt(0)}</span>
+          </div>
+        )}
+
+        <Dialog open={open} onOpenChange={o => { if (!o) { setGalleryOpen(false); onClose(); } }}>
+          <DialogContent className="p-0 overflow-hidden"
+            style={{ maxWidth: '820px', width: '95vw', maxHeight: '92vh', borderRadius: '16px', display: 'flex', flexDirection: 'column' }}>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', flex: 1, overflow: 'hidden' }}>
+
+              {/* ── Left: photo + details ─────────────────────────────── */}
+              <div style={{ overflowY: 'auto', borderRight: '1px solid #E8D5C4' }}>
+
+                {/* Main photo */}
+                <div style={{ position: 'relative', height: '360px', backgroundColor: '#F3F4F6', flexShrink: 0, cursor: images.length > 0 ? 'pointer' : 'default' }}
+                  onClick={() => images.length > 0 && setGalleryOpen(true)}>
+                  {images.length > 0
+                    ? <ImageWithFallback src={images[imgIdx]?.url || ''} alt={listing.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    : <div className="flex items-center justify-center h-full" style={{ color: '#B5866E', fontSize: '14px' }}>No photos</div>
+                  }
+                  {/* Nav arrows */}
+                  {images.length > 1 && <>
+                    <button onClick={e => { e.stopPropagation(); setImgIdx((imgIdx - 1 + images.length) % images.length); }}
+                      style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', width: '36px', height: '36px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.92)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.15)' }}>
+                      <ChevronLeft size={18} style={{ color: '#402E32' }} />
+                    </button>
+                    <button onClick={e => { e.stopPropagation(); setImgIdx((imgIdx + 1) % images.length); }}
+                      style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', width: '36px', height: '36px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.92)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.15)' }}>
+                      <ChevronRight size={18} style={{ color: '#402E32' }} />
+                    </button>
+                  </>}
+                  {/* Photo counter pill */}
+                  {images.length > 1 && (
+                    <div style={{ position: 'absolute', bottom: '12px', right: '12px', backgroundColor: 'rgba(0,0,0,0.55)', color: '#fff', fontSize: '12px', fontWeight: 600, padding: '4px 10px', borderRadius: '20px' }}>
+                      {imgIdx + 1} / {images.length}
+                    </div>
+                  )}
                 </div>
-                <div>
-                  <p style={{ fontSize: '14px', fontWeight: 600, color: '#402E32' }}>{listing.profiles.full_name}</p>
-                  <p style={{ fontSize: '12px', color: '#B5866E' }}>Seller · Posted {new Date(listing.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
+
+                {/* Thumbnail strip */}
+                {images.length > 1 && (
+                  <div className="flex" style={{ gap: '8px', padding: '12px 16px', backgroundColor: '#FAFAFA', borderBottom: '1px solid #E8D5C4', overflowX: 'auto' }}>
+                    {images.map((img, i) => (
+                      <button key={img.id} onClick={() => setImgIdx(i)}
+                        style={{ flexShrink: 0, width: '64px', height: '64px', borderRadius: '8px', overflow: 'hidden', border: i === imgIdx ? '2px solid #F76902' : '2px solid transparent', cursor: 'pointer', padding: 0, transition: 'border-color 150ms ease' }}>
+                        <img src={img.url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {/* Details */}
+                <div style={{ padding: '28px 28px' }}>
+                  {/* Title row */}
+                  <div className="flex items-start justify-between" style={{ gap: '12px', marginBottom: '14px' }}>
+                    <h2 className="font-bold" style={{ fontSize: '24px', color: '#402E32', lineHeight: '1.25', flex: 1 }}>{listing.title}</h2>
+                    <div className="flex" style={{ gap: '8px', flexShrink: 0 }}>
+                      <button style={{ width: '34px', height: '34px', borderRadius: '50%', border: '1px solid #E8D5C4', backgroundColor: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <Share2 size={14} style={{ color: '#B5866E' }} />
+                      </button>
+                      <button onClick={() => setSaved(s => !s)}
+                        style={{ width: '34px', height: '34px', borderRadius: '50%', border: '1px solid #E8D5C4', backgroundColor: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <Heart size={14} style={{ color: saved ? '#F76902' : '#B5866E', fill: saved ? '#F76902' : 'none' }} />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Category + condition badges */}
+                  <div className="flex items-center flex-wrap" style={{ gap: '8px', marginBottom: '20px' }}>
+                    {listing.category && (
+                      <span className="flex items-center" style={{ gap: '5px', padding: '5px 12px', borderRadius: '20px', backgroundColor: '#FFF6EE', border: '1px solid #E8D5C4', fontSize: '13px', color: '#B5866E', fontWeight: 500 }}>
+                        <Tag size={12} style={{ color: '#F76902' }} />
+                        {listing.category.charAt(0).toUpperCase() + listing.category.slice(1)}
+                      </span>
+                    )}
+                    {cond && (
+                      <span style={{ padding: '5px 12px', borderRadius: '20px', backgroundColor: cond.bg, fontSize: '13px', color: cond.color, fontWeight: 600 }}>
+                        {cond.label}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Description */}
+                  <div style={{ paddingTop: '20px', borderTop: '1px solid #E8D5C4' }}>
+                    <h3 className="font-semibold" style={{ fontSize: '16px', color: '#402E32', marginBottom: '10px' }}>Description</h3>
+                    <p style={{ fontSize: '15px', color: '#5A4A44', lineHeight: '1.7' }}>{listing.description}</p>
+                  </div>
                 </div>
               </div>
-            )}
-            {showContactButton && (
-              <button
-                onClick={() => { onContact(listing); onClose(); }}
-                className="w-full flex items-center justify-center font-semibold"
-                style={{ padding: '14px', borderRadius: '10px', fontSize: '16px', gap: '8px', border: 'none', backgroundColor: '#F76902', color: '#FFFFFF', cursor: 'pointer', boxShadow: '0 4px 14px rgba(247,105,2,0.35)' }}
-                onMouseEnter={e => { e.currentTarget.style.backgroundColor = '#D85802'; }}
-                onMouseLeave={e => { e.currentTarget.style.backgroundColor = '#F76902'; }}
-              >
-                <MessageCircle size={18} /> Contact Seller
-              </button>
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
+
+              {/* ── Right: sticky sidebar ──────────────────────────────── */}
+              <div style={{ padding: '28px 24px', overflowY: 'auto' }}>
+                <div style={{ position: 'sticky', top: '0', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+
+                  {/* Price card */}
+                  <div style={{ padding: '22px', borderRadius: '14px', border: '1.5px solid #E8D5C4', backgroundColor: '#FFFFFF', boxShadow: '0 4px 16px rgba(64,46,50,0.07)' }}>
+                    <div style={{ marginBottom: '20px', paddingBottom: '20px', borderBottom: '1px solid #E8D5C4' }}>
+                      <span style={{ fontSize: '36px', fontWeight: 800, color: '#F76902' }}>${listing.price}</span>
+                    </div>
+
+                    {/* Seller */}
+                    {listing.profiles?.full_name && (
+                      <div className="flex items-center" style={{ gap: '12px', marginBottom: '20px' }}>
+                        <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: '#FFF6EE', border: '2px solid #F76902', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, overflow: 'hidden' }}>
+                          {listing.profiles.avatar_url
+                            ? <img src={listing.profiles.avatar_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            : <span style={{ fontSize: '15px', fontWeight: 700, color: '#F76902' }}>{listing.profiles.full_name.charAt(0)}</span>
+                          }
+                        </div>
+                        <div>
+                          <p style={{ fontSize: '14px', fontWeight: 600, color: '#402E32' }}>{listing.profiles.full_name}</p>
+                          <p style={{ fontSize: '12px', color: '#B5866E' }}>
+                            Seller · {new Date(listing.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    {showContactButton && (
+                      <button
+                        onClick={() => { onContact(listing); onClose(); }}
+                        className="w-full flex items-center justify-center font-semibold"
+                        style={{ padding: '13px', borderRadius: '10px', fontSize: '15px', gap: '8px', border: 'none', backgroundColor: '#F76902', color: '#FFFFFF', cursor: 'pointer', boxShadow: '0 4px 14px rgba(247,105,2,0.3)', transition: 'background 180ms ease' }}
+                        onMouseEnter={e => { e.currentTarget.style.backgroundColor = '#D85802'; }}
+                        onMouseLeave={e => { e.currentTarget.style.backgroundColor = '#F76902'; }}
+                      >
+                        <MessageCircle size={16} /> Contact Seller
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Safety tip */}
+                  <div style={{ padding: '16px', borderRadius: '12px', backgroundColor: '#FFF6EE', border: '1px solid #E8D5C4' }}>
+                    <div className="flex items-center" style={{ gap: '8px', marginBottom: '8px' }}>
+                      <ShieldCheck size={15} style={{ color: '#F76902', flexShrink: 0 }} />
+                      <span style={{ fontSize: '13px', fontWeight: 600, color: '#402E32' }}>Safety tip</span>
+                    </div>
+                    <p style={{ fontSize: '12px', color: '#B5866E', lineHeight: '1.6' }}>
+                      Meet in a public place on campus. Inspect the item before paying. Never send money in advance.
+                    </p>
+                  </div>
+
+                  <p style={{ fontSize: '12px', color: '#B5866E', textAlign: 'center' }}>
+                    Listed {new Date(listing.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </>
     );
   }
 

@@ -62,9 +62,9 @@ export function ListingsPreview({ onNavigate, onView }: ListingsPreviewProps) {
   return (
     <section
       className="w-full flex items-center justify-center"
-      style={{ padding: '64px 0', backgroundColor: '#FFFFFF' }}
+      style={{ padding: '40px 0 48px 0', backgroundColor: '#FFFFFF' }}
     >
-      <div className="w-full flex flex-col" style={{ gap: '32px' }}>
+      <div className="w-full flex flex-col" style={{ gap: '20px' }}>
         <div
           className="flex items-center justify-between"
           style={{ padding: '0 48px', maxWidth: '1400px', width: '100%', margin: '0 auto' }}

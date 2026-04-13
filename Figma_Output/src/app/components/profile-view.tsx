@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import {
   Camera, Shield, CheckCircle2, MessageCircle, Package,
-  Heart, Calendar, Plus, DollarSign, Eye, ArrowUpRight, Star, LogOut,
+  Heart, Calendar, Plus, DollarSign, Eye, ArrowUpRight, Star, LogOut, Pencil,
 } from 'lucide-react';
 import { useAuth } from './auth-context';
 import { fetchMyListings as fetchMyListingsApi } from '@/lib/api';
 import { Listing } from './listing-card';
+import { EditProfileDialog } from './edit-profile-dialog';
 
 interface ProfileViewProps {
   onNavigate: (view: string) => void;
@@ -16,6 +17,7 @@ export function ProfileView({ onNavigate, onCreateListing }: ProfileViewProps) {
   const { user, signOut } = useAuth();
   const [listings, setListings] = useState<Listing[]>([]);
   const [loadingListings, setLoadingListings] = useState(true);
+  const [editProfileOpen, setEditProfileOpen] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -119,22 +121,39 @@ export function ProfileView({ onNavigate, onCreateListing }: ProfileViewProps) {
               </div>
             </div>
 
-            {/* Sign Out */}
-            <button
-              onClick={signOut}
-              className="flex items-center font-medium flex-shrink-0"
-              style={{
-                padding: '11px 20px', borderRadius: '10px', gap: '8px',
-                border: '1px solid #E8D5C4', backgroundColor: '#FFFFFF',
-                color: '#402E32', fontSize: '14px', cursor: 'pointer',
-                boxShadow: '0 1px 3px rgba(64, 46, 50, 0.06)',
-              }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = '#FCA5A5'; e.currentTarget.style.color = '#DC2626'; }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = '#E8D5C4'; e.currentTarget.style.color = '#402E32'; }}
-            >
-              <LogOut size={15} />
-              Sign Out
-            </button>
+            {/* Action buttons */}
+            <div className="flex items-center flex-shrink-0" style={{ gap: '10px' }}>
+              <button
+                onClick={() => setEditProfileOpen(true)}
+                className="flex items-center font-medium"
+                style={{
+                  padding: '11px 20px', borderRadius: '10px', gap: '8px',
+                  border: '1px solid #E8D5C4', backgroundColor: '#FFFFFF',
+                  color: '#402E32', fontSize: '14px', cursor: 'pointer',
+                  boxShadow: '0 1px 3px rgba(64, 46, 50, 0.06)',
+                }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = '#F76902'; e.currentTarget.style.color = '#F76902'; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = '#E8D5C4'; e.currentTarget.style.color = '#402E32'; }}
+              >
+                <Pencil size={15} />
+                Edit Profile
+              </button>
+              <button
+                onClick={signOut}
+                className="flex items-center font-medium"
+                style={{
+                  padding: '11px 20px', borderRadius: '10px', gap: '8px',
+                  border: '1px solid #E8D5C4', backgroundColor: '#FFFFFF',
+                  color: '#402E32', fontSize: '14px', cursor: 'pointer',
+                  boxShadow: '0 1px 3px rgba(64, 46, 50, 0.06)',
+                }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = '#FCA5A5'; e.currentTarget.style.color = '#DC2626'; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = '#E8D5C4'; e.currentTarget.style.color = '#402E32'; }}
+              >
+                <LogOut size={15} />
+                Sign Out
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -429,6 +448,11 @@ export function ProfileView({ onNavigate, onCreateListing }: ProfileViewProps) {
         </div>
 
       </div>
+
+      <EditProfileDialog
+        open={editProfileOpen}
+        onClose={() => setEditProfileOpen(false)}
+      />
     </div>
   );
 }

@@ -39,7 +39,7 @@ export function HomeView({ onNavigate, onView }: HomeViewProps) {
               Find sublets, swap items, and connect with verified RIT students.
             </p>
             <p className="font-normal" style={{ fontSize: '16px', color: '#B5866E', lineHeight: '1.6' }}>
-              No scams. No strangers.
+              No scams. No strangers. Only Tigers!
             </p>
           </div>
 

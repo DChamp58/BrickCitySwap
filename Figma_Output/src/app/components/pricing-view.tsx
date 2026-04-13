@@ -3,26 +3,20 @@ import { Check } from 'lucide-react';
 import { useAuth } from './auth-context';
 import { toast } from 'sonner';
 
-export function PricingView() {
-  const { user, updateProfile } = useAuth();
-  const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('monthly');
-  const [loading, setLoading] = useState(false);
+interface PricingViewProps {
+  onUpgrade: (plan: string, billing: 'monthly' | 'yearly') => void;
+}
 
-  const handleUpgradeSubscription = async (tier: string) => {
+export function PricingView({ onUpgrade }: PricingViewProps) {
+  const { user } = useAuth();
+  const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('monthly');
+
+  const handleUpgradeClick = (tier: string) => {
     if (!user) {
       toast.error('Please sign in to upgrade your subscription');
       return;
     }
-    setLoading(true);
-    try {
-      await new Promise(resolve => setTimeout(resolve, 500));
-      updateProfile({ ...user, subscriptionTier: tier });
-      toast.success(`Successfully upgraded to ${tier} tier!`);
-    } catch {
-      toast.error('Failed to update subscription');
-    } finally {
-      setLoading(false);
-    }
+    onUpgrade(tier, billingPeriod);
   };
 
   const isCurrentPlan = (tier: string) => user?.subscriptionTier === tier;
@@ -139,8 +133,8 @@ export function PricingView() {
               )}
             </div>
             <button
-              onClick={() => handleUpgradeSubscription('poster')}
-              disabled={loading || isCurrentPlan('poster')}
+              onClick={() => handleUpgradeClick('poster')}
+              disabled={isCurrentPlan('poster')}
               className="w-full font-semibold transition-all"
               style={{
                 padding: '12px 24px', borderRadius: '8px', border: 'none',
@@ -179,8 +173,8 @@ export function PricingView() {
               )}
             </div>
             <button
-              onClick={() => handleUpgradeSubscription('premium')}
-              disabled={loading || isCurrentPlan('premium')}
+              onClick={() => handleUpgradeClick('premium')}
+              disabled={isCurrentPlan('premium')}
               className="w-full font-semibold transition-all"
               style={{
                 padding: '12px 24px', borderRadius: '8px',

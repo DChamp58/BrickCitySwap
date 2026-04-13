@@ -11,13 +11,14 @@ import { ContactDialog } from './components/contact-dialog';
 import { ListingDetailDialog } from './components/listing-detail-dialog';
 import { HomeView } from './components/home-view';
 import { PricingView } from './components/pricing-view';
+import { PaymentView } from './components/payment-view';
 import { Footer } from './components/footer';
 import { Listing } from './components/listing-card';
 import { Toaster } from './components/ui/sonner';
 import { Card, CardContent } from './components/ui/card';
 import { recordListingView } from '@/lib/api';
 
-type View = 'home' | 'housing' | 'marketplace' | 'profile' | 'my-listings' | 'pricing' | 'messages';
+type View = 'home' | 'housing' | 'marketplace' | 'profile' | 'my-listings' | 'pricing' | 'payment' | 'messages';
 
 function AppContent() {
   const { user, accessToken, loading } = useAuth();
@@ -28,6 +29,8 @@ function AppContent() {
   const [selectedListing, setSelectedListing] = useState<Listing | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
   const [openConversationId, setOpenConversationId] = useState<string | null>(null);
+  const [paymentPlan, setPaymentPlan] = useState<string>('poster');
+  const [paymentBilling, setPaymentBilling] = useState<'monthly' | 'yearly'>('monthly');
 
   const handleCreateListing = () => {
     if (!user) {
@@ -57,6 +60,12 @@ function AppContent() {
 
   const handleListingCreated = () => {
     setRefreshKey(prev => prev + 1);
+  };
+
+  const handleGoToPayment = (plan: string, billing: 'monthly' | 'yearly') => {
+    setPaymentPlan(plan);
+    setPaymentBilling(billing);
+    setCurrentView('payment');
   };
 
   const handleConversationStarted = (conversationId: string) => {
@@ -136,8 +145,17 @@ function AppContent() {
 
         {currentView === 'pricing' && (
           <div key={`pricing-${refreshKey}`}>
-            <PricingView />
+            <PricingView onUpgrade={handleGoToPayment} />
           </div>
+        )}
+
+        {currentView === 'payment' && (
+          <PaymentView
+            plan={paymentPlan}
+            billing={paymentBilling}
+            onBack={() => setCurrentView('pricing')}
+            onSuccess={() => setCurrentView('profile')}
+          />
         )}
 
         {currentView === 'messages' && (

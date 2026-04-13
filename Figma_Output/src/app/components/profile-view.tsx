@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import {
   Camera, Shield, CheckCircle2, MessageCircle, Package,
-  Heart, Calendar, Plus, DollarSign, Eye, ArrowUpRight, Star,
+  Heart, Calendar, Plus, DollarSign, Eye, ArrowUpRight, Star, LogOut,
 } from 'lucide-react';
 import { useAuth } from './auth-context';
 import { fetchMyListings as fetchMyListingsApi } from '@/lib/api';
@@ -46,92 +46,95 @@ export function ProfileView({ onNavigate, onCreateListing }: ProfileViewProps) {
 
       {/* ── Profile Header ──────────────────────────────────────────────── */}
       <div className="w-full" style={{ backgroundColor: '#FFFFFF', borderBottom: '1px solid #E8D5C4' }}>
-        <div className="max-w-[1200px] mx-auto" style={{ padding: '48px' }}>
-          <div className="flex items-start" style={{ gap: '32px' }}>
+        <div className="mx-auto" style={{ maxWidth: '1400px', padding: '48px' }}>
+          <div className="flex items-center" style={{ gap: '36px' }}>
 
             {/* Avatar */}
             <div className="relative flex-shrink-0">
               <div
                 className="flex items-center justify-center font-bold"
                 style={{
-                  width: '120px', height: '120px', borderRadius: '50%',
-                  backgroundColor: '#FFF6EE', color: '#F76902', fontSize: '44px',
-                  border: '4px solid #FFFFFF', boxShadow: '0 4px 16px rgba(64, 46, 50, 0.12)',
+                  width: '110px', height: '110px', borderRadius: '50%',
+                  backgroundColor: '#FFF6EE', color: '#F76902', fontSize: '40px',
                 }}
               >
-                {initials}
+                {user.avatarUrl
+                  ? <img src={user.avatarUrl} alt={user.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+                  : initials
+                }
               </div>
               <button
-                className="absolute flex items-center justify-center transition-all hover:scale-110"
+                className="absolute flex items-center justify-center"
                 style={{
-                  bottom: '4px', right: '4px', width: '38px', height: '38px',
+                  bottom: '2px', right: '2px', width: '32px', height: '32px',
                   borderRadius: '50%', backgroundColor: '#F76902',
-                  border: '3px solid #FFFFFF', cursor: 'pointer',
-                  boxShadow: '0 2px 8px rgba(247, 105, 2, 0.3)',
+                  border: '2px solid #FFFFFF', cursor: 'pointer',
+                  boxShadow: '0 2px 6px rgba(247, 105, 2, 0.35)',
                 }}
                 title="Change photo"
               >
-                <Camera size={17} style={{ color: '#FFFFFF' }} />
+                <Camera size={15} style={{ color: '#FFFFFF' }} />
               </button>
             </div>
 
             {/* User info */}
-            <div style={{ flex: 1 }}>
-              <div className="flex items-start justify-between" style={{ marginBottom: '12px' }}>
-                <div>
-                  <div className="flex items-center" style={{ gap: '12px', marginBottom: '8px' }}>
-                    <h1 className="font-bold" style={{ fontSize: '32px', color: '#402E32', lineHeight: '1.2' }}>
-                      {user.name}
-                    </h1>
-                    <div
-                      className="flex items-center justify-center"
-                      title="Verified RIT Student"
-                      style={{ width: '28px', height: '28px', borderRadius: '50%', backgroundColor: '#10B981', flexShrink: 0 }}
-                    >
-                      <CheckCircle2 size={17} style={{ color: '#FFFFFF' }} />
-                    </div>
-                  </div>
-
-                  <p className="font-normal" style={{ fontSize: '15px', color: '#B5866E', marginBottom: '10px' }}>
-                    {user.email}
-                  </p>
-
-                  <div className="flex items-center" style={{ gap: '16px' }}>
-                    <div className="flex items-center" style={{ gap: '6px' }}>
-                      <Calendar size={15} style={{ color: '#B5866E' }} />
-                      <span style={{ fontSize: '14px', color: '#B5866E' }}>RIT Student</span>
-                    </div>
-                    <div
-                      className="inline-flex items-center"
-                      style={{
-                        padding: '4px 12px', borderRadius: '100px',
-                        backgroundColor: '#FFF6EE', border: '1px solid #E8D5C4',
-                      }}
-                    >
-                      <Star size={13} style={{ color: '#F76902', fill: '#F76902', marginRight: '5px' }} />
-                      <span className="font-semibold" style={{ fontSize: '13px', color: '#F76902', textTransform: 'capitalize' }}>
-                        {user.subscriptionTier} plan
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Sign out */}
-                <button
-                  onClick={signOut}
-                  className="font-medium transition-colors"
-                  style={{
-                    padding: '10px 20px', borderRadius: '8px',
-                    border: '1px solid #E8D5C4', backgroundColor: '#FFFFFF',
-                    color: '#B5866E', fontSize: '14px', cursor: 'pointer',
-                  }}
-                  onMouseEnter={e => { e.currentTarget.style.color = '#DC2626'; e.currentTarget.style.borderColor = '#FCA5A5'; }}
-                  onMouseLeave={e => { e.currentTarget.style.color = '#B5866E'; e.currentTarget.style.borderColor = '#E8D5C4'; }}
+            <div style={{ flex: 1, minWidth: 0 }}>
+              {/* Name + verified badge */}
+              <div className="flex items-center" style={{ gap: '12px', marginBottom: '6px' }}>
+                <h1 className="font-bold" style={{ fontSize: '48px', color: '#402E32', lineHeight: '1.1', letterSpacing: '-0.02em' }}>
+                  {user.name}
+                </h1>
+                <div
+                  title="Verified RIT Student"
+                  style={{ width: '30px', height: '30px', borderRadius: '50%', backgroundColor: '#10B981', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                 >
-                  Sign Out
-                </button>
+                  <CheckCircle2 size={17} style={{ color: '#FFFFFF' }} />
+                </div>
+              </div>
+
+              {/* Email */}
+              <p style={{ fontSize: '16px', color: '#B5866E', marginBottom: '14px' }}>
+                {user.email}
+              </p>
+
+              {/* Badges row */}
+              <div className="flex items-center" style={{ gap: '14px' }}>
+                <div className="flex items-center" style={{ gap: '6px' }}>
+                  <Calendar size={15} style={{ color: '#B5866E' }} />
+                  <span style={{ fontSize: '14px', color: '#B5866E' }}>RIT Student</span>
+                </div>
+                <div
+                  className="inline-flex items-center"
+                  style={{
+                    padding: '5px 12px', borderRadius: '100px',
+                    backgroundColor: '#FFF6EE', border: '1px solid #E8D5C4',
+                    gap: '5px',
+                  }}
+                >
+                  <Star size={13} style={{ color: '#F76902', fill: '#F76902' }} />
+                  <span className="font-semibold" style={{ fontSize: '13px', color: '#F76902', textTransform: 'capitalize' }}>
+                    {user.subscriptionTier === 'free' ? 'Free Plan' : `${user.subscriptionTier} Plan`}
+                  </span>
+                </div>
               </div>
             </div>
+
+            {/* Sign Out */}
+            <button
+              onClick={signOut}
+              className="flex items-center font-medium flex-shrink-0"
+              style={{
+                padding: '11px 20px', borderRadius: '10px', gap: '8px',
+                border: '1px solid #E8D5C4', backgroundColor: '#FFFFFF',
+                color: '#402E32', fontSize: '14px', cursor: 'pointer',
+                boxShadow: '0 1px 3px rgba(64, 46, 50, 0.06)',
+              }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = '#FCA5A5'; e.currentTarget.style.color = '#DC2626'; }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = '#E8D5C4'; e.currentTarget.style.color = '#402E32'; }}
+            >
+              <LogOut size={15} />
+              Sign Out
+            </button>
           </div>
         </div>
       </div>
@@ -401,11 +404,10 @@ export function ProfileView({ onNavigate, onCreateListing }: ProfileViewProps) {
         {/* ── Account Settings ──────────────────────────────────────────── */}
         <div className="bg-white" style={{ borderRadius: '12px', border: '1px solid #E8D5C4', padding: '32px' }}>
           <h2 className="font-semibold" style={{ fontSize: '20px', color: '#402E32', marginBottom: '24px' }}>Account Settings</h2>
-          <div className="grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
+          <div className="grid" style={{ gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
             {[
               { title: 'Change Password', sub: 'Update your password', danger: false, action: () => {} },
               { title: 'Notifications', sub: 'Manage preferences', danger: false, action: () => {} },
-              { title: 'Sign Out', sub: 'Sign out of your account', danger: true, action: signOut },
             ].map(({ title, sub, danger, action }) => (
               <button
                 key={title}

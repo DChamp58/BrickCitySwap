@@ -20,12 +20,12 @@ export function HomeView({ onNavigate, onView }: HomeViewProps) {
       >
         <div className="flex flex-col items-center text-center" style={{ gap: '32px', maxWidth: '800px' }}>
           <div className="flex flex-col" style={{ gap: '8px' }}>
-            <h1
-              className="font-bold leading-tight"
-              style={{ fontSize: '56px', color: '#402E32' }}
+            <p
+              className="font-semibold tracking-wide uppercase"
+              style={{ fontSize: '18px', color: '#B5866E' }}
             >
-              RIT Students Only.
-            </h1>
+              RIT Students Only
+            </p>
             <h1
               className="font-bold leading-tight"
               style={{ fontSize: '56px', color: '#402E32' }}

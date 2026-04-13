@@ -116,6 +116,18 @@ export function Header({ currentView, onViewChange, onCreateListing }: HeaderPro
         {/* Profile Dropdown */}
         <div className="flex-1 flex items-center justify-end">
           <div className="relative flex items-center gap-2" ref={dropdownRef}>
+            {/* Name / Sign In — toggles dropdown */}
+            <button
+              onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
+              className="text-[16px] font-normal hover:opacity-70 transition-opacity"
+              style={{
+                color: isActive('profile') || isActive('my-listings') || isActive('messages') ? '#F76902' : '#402E32',
+                padding: '8px 4px', background: 'none', border: 'none', cursor: 'pointer'
+              }}
+            >
+              {user ? user.name.split(' ')[0] : 'Sign In'}
+            </button>
+
             {/* Avatar — navigates directly to profile, no dropdown */}
             {user && (
               <button
@@ -142,18 +154,6 @@ export function Header({ currentView, onViewChange, onCreateListing }: HeaderPro
                 )}
               </button>
             )}
-
-            {/* Name / Sign In — toggles dropdown */}
-            <button
-              onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
-              className="text-[16px] font-normal hover:opacity-70 transition-opacity"
-              style={{
-                color: isActive('profile') || isActive('my-listings') || isActive('messages') ? '#F76902' : '#402E32',
-                padding: '8px 4px', background: 'none', border: 'none', cursor: 'pointer'
-              }}
-            >
-              {user ? user.name.split(' ')[0] : 'Sign In'}
-            </button>
 
             {isProfileDropdownOpen && (
               <div

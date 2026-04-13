@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Check } from 'lucide-react';
 import { useAuth } from './auth-context';
-import { toast } from 'sonner';
 
 interface PricingViewProps {
   onUpgrade: (plan: string, billing: 'monthly' | 'yearly') => void;
@@ -12,10 +11,6 @@ export function PricingView({ onUpgrade }: PricingViewProps) {
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('monthly');
 
   const handleUpgradeClick = (tier: string) => {
-    if (!user) {
-      toast.error('Please sign in to upgrade your subscription');
-      return;
-    }
     onUpgrade(tier, billingPeriod);
   };
 

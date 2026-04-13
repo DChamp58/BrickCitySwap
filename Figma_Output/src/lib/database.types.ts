@@ -31,6 +31,9 @@ export interface Database {
           school_id: string | null;
           avatar_url: string | null;
           subscription_tier: string;
+          year: string | null;
+          major: string | null;
+          bio: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -41,6 +44,9 @@ export interface Database {
           school_id?: string | null;
           avatar_url?: string | null;
           subscription_tier?: string;
+          year?: string | null;
+          major?: string | null;
+          bio?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -50,6 +56,9 @@ export interface Database {
           school_id?: string | null;
           avatar_url?: string | null;
           subscription_tier?: string;
+          year?: string | null;
+          major?: string | null;
+          bio?: string | null;
           updated_at?: string;
         };
       };

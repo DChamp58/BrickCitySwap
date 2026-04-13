@@ -16,10 +16,10 @@ export function HomeView({ onNavigate, onView }: HomeViewProps) {
       {/* Hero Section */}
       <section
         className="w-full flex items-center justify-center"
-        style={{ padding: '64px 48px', backgroundColor: '#FFF6EE' }}
+        style={{ padding: '40px 48px', backgroundColor: '#FFF6EE' }}
       >
-        <div className="flex flex-col items-center text-center" style={{ gap: '32px', maxWidth: '800px' }}>
-          <div className="flex flex-col" style={{ gap: '8px' }}>
+        <div className="flex flex-col items-center text-center" style={{ gap: '20px', maxWidth: '800px' }}>
+          <div className="flex flex-col" style={{ gap: '6px' }}>
             <p
               className="font-semibold tracking-wide uppercase"
               style={{ fontSize: '18px', color: '#B5866E' }}
@@ -34,7 +34,7 @@ export function HomeView({ onNavigate, onView }: HomeViewProps) {
             </h1>
           </div>
 
-          <div className="flex flex-col" style={{ gap: '8px' }}>
+          <div className="flex flex-col" style={{ gap: '4px' }}>
             <p className="font-normal" style={{ fontSize: '16px', color: '#B5866E', lineHeight: '1.6' }}>
               Find sublets, swap items, and connect with verified RIT students.
             </p>

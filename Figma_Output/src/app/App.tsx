@@ -12,6 +12,7 @@ import { ListingDetailDialog } from './components/listing-detail-dialog';
 import { HomeView } from './components/home-view';
 import { PricingView } from './components/pricing-view';
 import { PaymentView } from './components/payment-view';
+import { ProfileView } from './components/profile-view';
 import { Footer } from './components/footer';
 import { Listing } from './components/listing-card';
 import { Toaster } from './components/ui/sonner';
@@ -52,9 +53,9 @@ function AppContent() {
   const handleViewListing = (listing: Listing) => {
     setSelectedListing(listing);
     setDetailDialogOpen(true);
-    // Record the view if user is logged in and not viewing their own listing
-    if (user && listing.user_id !== user.id) {
-      recordListingView(listing.id, user.id);
+    // Record view for anyone who isn't the listing owner
+    if (!user || listing.user_id !== user.id) {
+      recordListingView(listing.id, user?.id ?? null);
     }
   };
 
@@ -63,6 +64,10 @@ function AppContent() {
   };
 
   const handleGoToPayment = (plan: string, billing: 'monthly' | 'yearly') => {
+    if (!user) {
+      setCurrentView('profile');
+      return;
+    }
     setPaymentPlan(plan);
     setPaymentBilling(billing);
     setCurrentView('payment');
@@ -96,7 +101,11 @@ function AppContent() {
       />
 
       <main>
-        {currentView === 'profile' && <AuthView />}
+        {currentView === 'profile' && (
+          user
+            ? <ProfileView onNavigate={setCurrentView} onCreateListing={handleCreateListing} />
+            : <AuthView />
+        )}
 
         {currentView === 'home' && (
           <div key={`home-${refreshKey}`}>

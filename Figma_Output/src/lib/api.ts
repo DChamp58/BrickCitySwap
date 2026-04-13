@@ -25,7 +25,16 @@ export async function fetchMyListings(userId: string) {
     .order('created_at', { ascending: false });
 
   if (error) throw error;
-  return (data ?? []) as ListingWithImages[];
+  const listings = (data ?? []) as ListingWithImages[];
+
+  // Count views directly from listing_views
+  if (listings.length > 0) {
+    const ids = listings.map(l => l.id);
+    const counts = await fetchMyListingsViewCounts(ids);
+    return listings.map(l => ({ ...l, view_count: counts[l.id] ?? 0 }));
+  }
+
+  return listings;
 }
 
 export async function fetchListingById(id: string) {
@@ -103,6 +112,26 @@ export async function uploadListingImage(
   if (dbError) throw dbError;
 
   return urlData.publicUrl;
+}
+
+export async function deleteListingImage(imageId: string) {
+  const { error } = await supabase
+    .from('listing_images')
+    .delete()
+    .eq('id', imageId);
+
+  if (error) throw error;
+}
+
+export async function updateImagePositions(updates: { id: string; position: number }[]) {
+  for (const { id, position } of updates) {
+    const { error } = await supabase
+      .from('listing_images')
+      .update({ position })
+      .eq('id', id);
+
+    if (error) throw error;
+  }
 }
 
 // ── Saved Listings ──────────────────────────────────────────────────────────
@@ -254,13 +283,28 @@ export async function markMessagesRead(conversationId: string, userId: string) {
 
 // ── Listing Views ───────────────────────────────────────────────────────────
 
-export async function recordListingView(listingId: string, viewerId: string) {
-  const { error } = await supabase
-    .from('listing_views')
-    .insert({ listing_id: listingId, viewer_id: viewerId });
-
-  // Silently ignore errors (e.g. if table doesn't exist yet)
+export async function recordListingView(listingId: string, viewerId: string | null) {
+  const { error } = await supabase.rpc('record_listing_view', {
+    p_listing_id: listingId,
+    p_viewer_id: viewerId ?? undefined,
+  });
   if (error) console.warn('Failed to record view:', error.message);
+}
+
+export async function fetchMyListingsViewCounts(listingIds: string[]): Promise<Record<string, number>> {
+  if (listingIds.length === 0) return {};
+  const { data, error } = await supabase
+    .from('listing_views')
+    .select('listing_id')
+    .in('listing_id', listingIds);
+
+  if (error) return {};
+
+  const counts: Record<string, number> = {};
+  (data ?? []).forEach(v => {
+    counts[v.listing_id] = (counts[v.listing_id] ?? 0) + 1;
+  });
+  return counts;
 }
 
 // ── Profile ─────────────────────────────────────────────────────────────────
@@ -278,7 +322,7 @@ export async function fetchProfile(userId: string) {
 
 export async function updateProfile(
   userId: string,
-  updates: { full_name?: string; avatar_url?: string }
+  updates: { full_name?: string; avatar_url?: string; year?: string | null; major?: string | null; bio?: string | null }
 ) {
   const { data, error } = await supabase
     .from('profiles')

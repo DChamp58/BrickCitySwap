@@ -53,7 +53,7 @@ export function ListingsPreview({ onNavigate, onView }: ListingsPreviewProps) {
           className="flex items-center justify-between"
           style={{ padding: '0 48px', maxWidth: '1400px', width: '100%', margin: '0 auto' }}
         >
-          <h2 className="font-semibold" style={{ fontSize: '32px', color: '#0F172A' }}>
+          <h2 className="font-semibold" style={{ fontSize: '32px', color: '#402E32' }}>
             Latest Listings
           </h2>
           <button
@@ -71,22 +71,22 @@ export function ListingsPreview({ onNavigate, onView }: ListingsPreviewProps) {
             className="absolute left-4 top-1/2 -translate-y-1/2 z-10 flex items-center justify-center hover:opacity-80 transition-opacity"
             style={{
               width: '48px', height: '48px', backgroundColor: '#FFFFFF',
-              border: '1px solid #E5E7EB', borderRadius: '50%',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.1)', cursor: 'pointer'
+              border: '1px solid #E8D5C4', borderRadius: '50%',
+              boxShadow: '0 2px 8px rgba(64, 46, 50, 0.1)', cursor: 'pointer'
             }}
           >
-            <ChevronLeft size={24} style={{ color: '#111827' }} />
+            <ChevronLeft size={24} style={{ color: '#402E32' }} />
           </button>
           <button
             onClick={() => scroll('right')}
             className="absolute right-4 top-1/2 -translate-y-1/2 z-10 flex items-center justify-center hover:opacity-80 transition-opacity"
             style={{
               width: '48px', height: '48px', backgroundColor: '#FFFFFF',
-              border: '1px solid #E5E7EB', borderRadius: '50%',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.1)', cursor: 'pointer'
+              border: '1px solid #E8D5C4', borderRadius: '50%',
+              boxShadow: '0 2px 8px rgba(64, 46, 50, 0.1)', cursor: 'pointer'
             }}
           >
-            <ChevronRight size={24} style={{ color: '#111827' }} />
+            <ChevronRight size={24} style={{ color: '#402E32' }} />
           </button>
 
           <div
@@ -101,8 +101,8 @@ export function ListingsPreview({ onNavigate, onView }: ListingsPreviewProps) {
                 className="flex-shrink-0 flex flex-col overflow-hidden hover:shadow-2xl hover:-translate-y-1 transition-all cursor-pointer"
                 style={{
                   width: '320px', backgroundColor: '#FFFFFF',
-                  border: '1px solid #E5E7EB', borderRadius: '12px',
-                  boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+                  border: '1px solid #E8D5C4', borderRadius: '12px',
+                  boxShadow: '0 1px 3px rgba(64, 46, 50, 0.1)'
                 }}
               >
                 <div className="w-full overflow-hidden" style={{ height: '240px' }}>
@@ -115,7 +115,7 @@ export function ListingsPreview({ onNavigate, onView }: ListingsPreviewProps) {
                 <div className="flex flex-col" style={{ padding: '24px', gap: '8px' }}>
                   <h3
                     className="font-medium"
-                    style={{ fontSize: '20px', color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+                    style={{ fontSize: '20px', color: '#402E32', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
                   >
                     {listing.title}
                   </h3>
@@ -123,7 +123,7 @@ export function ListingsPreview({ onNavigate, onView }: ListingsPreviewProps) {
                     <p className="font-semibold" style={{ fontSize: '20px', color: '#F76902' }}>
                       ${listing.price}{listing.type === 'housing' ? '/mo' : ''}
                     </p>
-                    <span className="font-normal" style={{ fontSize: '14px', color: '#6B7280' }}>
+                    <span className="font-normal" style={{ fontSize: '14px', color: '#B5866E' }}>
                       {listing.type === 'housing' ? 'Housing' : listing.category || 'Marketplace'}
                     </span>
                   </div>

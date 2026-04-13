@@ -66,20 +66,20 @@ function AppContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#F9FAFB' }}>
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#FFF6EE' }}>
         <div className="text-center">
           <div style={{ fontSize: '48px', marginBottom: '16px' }}>
-            <span style={{ color: '#111827', fontWeight: 700 }}>BrickCity</span>
+            <span style={{ color: '#402E32', fontWeight: 700 }}>BrickCity</span>
             <span style={{ color: '#F76902', fontWeight: 700 }}>Swap</span>
           </div>
-          <div style={{ fontSize: '16px', color: '#6B7280' }}>Loading...</div>
+          <div style={{ fontSize: '16px', color: '#B5866E' }}>Loading...</div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#F9FAFB' }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#FFF6EE' }}>
       <Header
         currentView={currentView}
         onViewChange={setCurrentView}
@@ -152,7 +152,7 @@ function AppContent() {
         <div
           className="fixed bottom-0 left-0 right-0 text-white text-center text-sm"
           style={{
-            background: 'linear-gradient(135deg, #F76902, #D55A02)',
+            background: 'linear-gradient(135deg, #F76902, #D85802)',
             padding: '12px 24px',
             boxShadow: '0 -2px 8px rgba(0,0,0,0.1)',
             zIndex: 40
@@ -162,7 +162,7 @@ function AppContent() {
           <button
             onClick={() => setCurrentView('pricing')}
             style={{
-              backgroundColor: '#FFFFFF', color: '#F76902',
+              backgroundColor: '#FFF6EE', color: '#F76902',
               padding: '6px 16px', borderRadius: '6px',
               fontWeight: 600, border: 'none', cursor: 'pointer',
               fontSize: '14px'

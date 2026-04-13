@@ -122,12 +122,12 @@ export function ListingsView({ type, onContact, onView }: ListingsViewProps) {
   return (
     <div className="w-full" style={{ backgroundColor: '#FFFFFF' }}>
       {/* Page Header */}
-      <div className="w-full" style={{ backgroundColor: '#F9FAFB', borderBottom: '1px solid #E5E7EB' }}>
+      <div className="w-full" style={{ backgroundColor: '#FFF6EE', borderBottom: '1px solid #E8D5C4' }}>
         <div className="max-w-[1400px] mx-auto" style={{ padding: '48px 48px 32px 48px' }}>
-          <h1 className="font-bold" style={{ fontSize: '56px', color: '#0F172A', marginBottom: '16px', lineHeight: '1.1' }}>
+          <h1 className="font-bold" style={{ fontSize: '56px', color: '#402E32', marginBottom: '16px', lineHeight: '1.1' }}>
             {type === 'housing' ? 'Housing' : 'Marketplace'}
           </h1>
-          <p className="font-normal" style={{ fontSize: '16px', color: '#64748B', lineHeight: '1.6' }}>
+          <p className="font-normal" style={{ fontSize: '16px', color: '#B5866E', lineHeight: '1.6' }}>
             {type === 'housing'
               ? 'Find verified housing from RIT students. No scams, no strangers.'
               : 'Furniture, electronics, and student deals at RIT'}
@@ -137,27 +137,27 @@ export function ListingsView({ type, onContact, onView }: ListingsViewProps) {
           <div className="flex items-center" style={{ gap: '16px', marginTop: '32px' }}>
             <div
               className="flex-1 flex items-center bg-white"
-              style={{ padding: '12px 16px', borderRadius: '8px', border: '1px solid #E5E7EB', gap: '8px' }}
+              style={{ padding: '12px 16px', borderRadius: '8px', border: '1px solid #E8D5C4', gap: '8px' }}
             >
-              <Search size={20} style={{ color: '#6B7280' }} />
+              <Search size={20} style={{ color: '#B5866E' }} />
               <input
                 type="text"
                 placeholder={type === 'housing' ? 'Search by location, type, or keywords...' : 'Search items...'}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="flex-1 outline-none"
-                style={{ fontSize: '16px', color: '#111827', backgroundColor: 'transparent', border: 'none' }}
+                style={{ fontSize: '16px', color: '#402E32', backgroundColor: 'transparent', border: 'none' }}
               />
             </div>
             <div className="flex items-center" style={{ gap: '8px' }}>
-              <SlidersHorizontal size={20} style={{ color: '#6B7280' }} />
+              <SlidersHorizontal size={20} style={{ color: '#B5866E' }} />
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
                 className="outline-none"
                 style={{
-                  fontSize: '16px', color: '#111827', padding: '12px 16px',
-                  borderRadius: '8px', border: '1px solid #E5E7EB',
+                  fontSize: '16px', color: '#402E32', padding: '12px 16px',
+                  borderRadius: '8px', border: '1px solid #E8D5C4',
                   backgroundColor: '#FFFFFF', cursor: 'pointer'
                 }}
               >
@@ -178,16 +178,16 @@ export function ListingsView({ type, onContact, onView }: ListingsViewProps) {
           <div className="flex-shrink-0 hidden md:block" style={{ width: type === 'housing' ? '280px' : '240px' }}>
             <div
               className="bg-white sticky"
-              style={{ top: '96px', padding: '24px', borderRadius: '12px', border: '1px solid #E5E7EB' }}
+              style={{ top: '96px', padding: '24px', borderRadius: '12px', border: '1px solid #E8D5C4' }}
             >
-              <h3 className="font-semibold" style={{ fontSize: '20px', color: '#111827', marginBottom: '24px' }}>
+              <h3 className="font-semibold" style={{ fontSize: '20px', color: '#402E32', marginBottom: '24px' }}>
                 Filters
               </h3>
 
               {/* Max Price */}
               <div style={{ marginBottom: '24px' }}>
                 <div className="flex items-center justify-between" style={{ marginBottom: '12px' }}>
-                  <label className="font-bold" style={{ fontSize: '14px', color: '#111827' }}>Max Price</label>
+                  <label className="font-bold" style={{ fontSize: '14px', color: '#402E32' }}>Max Price</label>
                   <span className="font-semibold" style={{ fontSize: '16px', color: '#F76902' }}>
                     ${maxPrice >= (type === 'housing' ? 2500 : 1000) ? `${type === 'housing' ? '2500' : '1000'}+` : maxPrice}
                     {type === 'housing' ? '/month' : ''}
@@ -206,36 +206,36 @@ export function ListingsView({ type, onContact, onView }: ListingsViewProps) {
                 <>
                   {/* Move-in Date */}
                   <div style={{ marginBottom: '24px' }}>
-                    <label className="font-bold" style={{ fontSize: '14px', color: '#111827', display: 'block', marginBottom: '8px' }}>
+                    <label className="font-bold" style={{ fontSize: '14px', color: '#402E32', display: 'block', marginBottom: '8px' }}>
                       Move-in Date
                     </label>
                     <div className="relative">
-                      <Calendar size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF', pointerEvents: 'none' }} />
+                      <Calendar size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#C4A88E', pointerEvents: 'none' }} />
                       <input type="date" value={moveInDate} onChange={(e) => setMoveInDate(e.target.value)}
                         className="w-full outline-none"
-                        style={{ fontSize: '15px', color: '#111827', padding: '10px 12px 10px 38px', borderRadius: '8px', border: '1px solid #E5E7EB', backgroundColor: '#F9FAFB' }}
+                        style={{ fontSize: '15px', color: '#402E32', padding: '10px 12px 10px 38px', borderRadius: '8px', border: '1px solid #E8D5C4', backgroundColor: '#FFF6EE' }}
                       />
                     </div>
                   </div>
                   {/* Move-out Date */}
                   <div style={{ marginBottom: '24px' }}>
-                    <label className="font-bold" style={{ fontSize: '14px', color: '#111827', display: 'block', marginBottom: '8px' }}>
+                    <label className="font-bold" style={{ fontSize: '14px', color: '#402E32', display: 'block', marginBottom: '8px' }}>
                       Move-out Date
                     </label>
                     <div className="relative">
-                      <Calendar size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF', pointerEvents: 'none' }} />
+                      <Calendar size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#C4A88E', pointerEvents: 'none' }} />
                       <input type="date" value={moveOutDate} onChange={(e) => setMoveOutDate(e.target.value)}
                         className="w-full outline-none"
-                        style={{ fontSize: '15px', color: '#111827', padding: '10px 12px 10px 38px', borderRadius: '8px', border: '1px solid #E5E7EB', backgroundColor: '#F9FAFB' }}
+                        style={{ fontSize: '15px', color: '#402E32', padding: '10px 12px 10px 38px', borderRadius: '8px', border: '1px solid #E8D5C4', backgroundColor: '#FFF6EE' }}
                       />
                     </div>
                   </div>
                   {/* Housing Type */}
                   <div style={{ marginBottom: '24px' }}>
-                    <label className="font-bold" style={{ fontSize: '14px', color: '#111827', display: 'block', marginBottom: '10px' }}>Housing Type</label>
+                    <label className="font-bold" style={{ fontSize: '14px', color: '#402E32', display: 'block', marginBottom: '10px' }}>Housing Type</label>
                     <div className="flex flex-col" style={{ gap: '10px' }}>
                       {Object.entries(housingTypes).map(([key, checked]) => (
-                        <label key={key} className="flex items-center cursor-pointer" style={{ fontSize: '15px', color: '#374151' }}>
+                        <label key={key} className="flex items-center cursor-pointer" style={{ fontSize: '15px', color: '#5A4A44' }}>
                           <input type="checkbox" checked={checked}
                             onChange={() => setHousingTypes(prev => ({ ...prev, [key]: !prev[key as keyof typeof prev] }))}
                             className="cursor-pointer"
@@ -253,10 +253,10 @@ export function ListingsView({ type, onContact, onView }: ListingsViewProps) {
                 <>
                   {/* Category */}
                   <div style={{ marginBottom: '24px' }}>
-                    <label className="font-bold" style={{ fontSize: '14px', color: '#111827', display: 'block', marginBottom: '10px' }}>Category</label>
+                    <label className="font-bold" style={{ fontSize: '14px', color: '#402E32', display: 'block', marginBottom: '10px' }}>Category</label>
                     <div className="flex flex-col" style={{ gap: '10px' }}>
                       {Object.entries(categories).map(([key, checked]) => (
-                        <label key={key} className="flex items-center cursor-pointer" style={{ fontSize: '15px', color: '#374151' }}>
+                        <label key={key} className="flex items-center cursor-pointer" style={{ fontSize: '15px', color: '#5A4A44' }}>
                           <input type="checkbox" checked={checked}
                             onChange={() => setCategories(prev => ({ ...prev, [key]: !prev[key as keyof typeof prev] }))}
                             className="cursor-pointer"
@@ -269,10 +269,10 @@ export function ListingsView({ type, onContact, onView }: ListingsViewProps) {
                   </div>
                   {/* Condition */}
                   <div style={{ marginBottom: '24px' }}>
-                    <label className="font-bold" style={{ fontSize: '14px', color: '#111827', display: 'block', marginBottom: '10px' }}>Condition</label>
+                    <label className="font-bold" style={{ fontSize: '14px', color: '#402E32', display: 'block', marginBottom: '10px' }}>Condition</label>
                     <div className="flex flex-col" style={{ gap: '10px' }}>
                       {Object.entries(conditions).map(([key, checked]) => (
-                        <label key={key} className="flex items-center cursor-pointer" style={{ fontSize: '15px', color: '#374151' }}>
+                        <label key={key} className="flex items-center cursor-pointer" style={{ fontSize: '15px', color: '#5A4A44' }}>
                           <input type="checkbox" checked={checked}
                             onChange={() => setConditions(prev => ({ ...prev, [key]: !prev[key as keyof typeof prev] }))}
                             className="cursor-pointer"
@@ -289,8 +289,8 @@ export function ListingsView({ type, onContact, onView }: ListingsViewProps) {
               <button
                 className="w-full font-medium hover:opacity-70 transition-opacity"
                 style={{
-                  padding: '10px 12px', fontSize: '14px', color: '#6B7280',
-                  backgroundColor: '#F9FAFB', border: '1px solid #E5E7EB', borderRadius: '8px', cursor: 'pointer'
+                  padding: '10px 12px', fontSize: '14px', color: '#B5866E',
+                  backgroundColor: '#FFF6EE', border: '1px solid #E8D5C4', borderRadius: '8px', cursor: 'pointer'
                 }}
                 onClick={clearFilters}
               >
@@ -303,16 +303,16 @@ export function ListingsView({ type, onContact, onView }: ListingsViewProps) {
           <div className="flex-1">
             {loading ? (
               <div className="text-center" style={{ padding: '48px' }}>
-                <p style={{ fontSize: '16px', color: '#6B7280' }}>Loading listings...</p>
+                <p style={{ fontSize: '16px', color: '#B5866E' }}>Loading listings...</p>
               </div>
             ) : filteredListings.length === 0 ? (
               <div className="text-center" style={{ padding: '48px' }}>
-                <p style={{ fontSize: '16px', color: '#6B7280', marginBottom: '16px' }}>No listings found matching your criteria</p>
+                <p style={{ fontSize: '16px', color: '#B5866E', marginBottom: '16px' }}>No listings found matching your criteria</p>
                 <button
                   onClick={clearFilters}
                   style={{
                     padding: '10px 20px', fontSize: '14px', color: '#F76902',
-                    backgroundColor: '#FEF3EC', border: '1px solid #F76902',
+                    backgroundColor: '#FFF6EE', border: '1px solid #F76902',
                     borderRadius: '8px', cursor: 'pointer'
                   }}
                 >
@@ -329,13 +329,13 @@ export function ListingsView({ type, onContact, onView }: ListingsViewProps) {
                     key={listing.id}
                     className="bg-white cursor-pointer group"
                     style={{
-                      borderRadius: '12px', border: '1px solid #E5E7EB',
+                      borderRadius: '12px', border: '1px solid #E8D5C4',
                       overflow: 'hidden', transition: 'all 0.15s ease-out'
                     }}
                     onClick={() => onView(listing)}
                     onMouseEnter={(e) => {
                       e.currentTarget.style.transform = 'translateY(-3px)';
-                      e.currentTarget.style.boxShadow = '0 12px 24px rgba(0, 0, 0, 0.08)';
+                      e.currentTarget.style.boxShadow = '0 12px 24px rgba(64, 46, 50, 0.08)';
                     }}
                     onMouseLeave={(e) => {
                       e.currentTarget.style.transform = 'translateY(0)';
@@ -351,28 +351,28 @@ export function ListingsView({ type, onContact, onView }: ListingsViewProps) {
                       />
                     </div>
                     <div style={{ padding: '20px' }}>
-                      <h3 className="font-semibold" style={{ fontSize: '18px', color: '#111827', marginBottom: type === 'housing' ? '12px' : '8px', lineHeight: '1.3' }}>
+                      <h3 className="font-semibold" style={{ fontSize: '18px', color: '#402E32', marginBottom: type === 'housing' ? '12px' : '8px', lineHeight: '1.3' }}>
                         {listing.title}
                       </h3>
                       <div className="font-bold" style={{ fontSize: '28px', color: '#F76902', marginBottom: type === 'housing' ? '4px' : '8px', lineHeight: '1.2' }}>
                         ${listing.price}
                         {type === 'housing' && (
-                          <span className="font-normal" style={{ fontSize: '16px', color: '#9CA3AF' }}>/mo</span>
+                          <span className="font-normal" style={{ fontSize: '16px', color: '#C4A88E' }}>/mo</span>
                         )}
                       </div>
 
                       {type === 'housing' && (
                         <>
-                          <p className="font-normal" style={{ fontSize: '14px', color: '#6B7280', marginBottom: '16px' }}>
+                          <p className="font-normal" style={{ fontSize: '14px', color: '#B5866E', marginBottom: '16px' }}>
                             {listing.location || 'Near RIT'}
                           </p>
                           <div className="flex flex-col" style={{ gap: '6px', marginBottom: '20px' }}>
-                            <p className="font-normal" style={{ fontSize: '14px', color: '#9CA3AF' }}>
+                            <p className="font-normal" style={{ fontSize: '14px', color: '#C4A88E' }}>
                               {listing.bedrooms === 0 ? 'Studio' : `${listing.bedrooms} bed`} · {listing.bathrooms} bath
                               {listing.housing_type ? ` · ${listing.housing_type}` : ''}
                             </p>
                             {listing.available_from && (
-                              <p className="font-normal" style={{ fontSize: '14px', color: '#9CA3AF' }}>
+                              <p className="font-normal" style={{ fontSize: '14px', color: '#C4A88E' }}>
                                 Available {new Date(listing.available_from).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                               </p>
                             )}
@@ -381,7 +381,7 @@ export function ListingsView({ type, onContact, onView }: ListingsViewProps) {
                       )}
 
                       {type === 'marketplace' && listing.condition && (
-                        <p className="font-normal" style={{ fontSize: '14px', color: '#9CA3AF' }}>
+                        <p className="font-normal" style={{ fontSize: '14px', color: '#C4A88E' }}>
                           {listing.condition}
                         </p>
                       )}
@@ -394,7 +394,7 @@ export function ListingsView({ type, onContact, onView }: ListingsViewProps) {
                           border: 'none', cursor: 'pointer', marginTop: type === 'marketplace' ? '16px' : '0'
                         }}
                         onClick={(e) => { e.stopPropagation(); onContact(listing); }}
-                        onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#E65F00'; }}
+                        onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#D85802'; }}
                         onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#F76902'; }}
                       >
                         Contact Seller

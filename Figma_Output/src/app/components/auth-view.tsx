@@ -45,14 +45,14 @@ export function AuthView() {
   // Logged-in: Profile view
   if (user) {
     return (
-      <div className="w-full min-h-screen" style={{ backgroundColor: '#F9FAFB', padding: '48px 24px' }}>
+      <div className="w-full min-h-screen" style={{ backgroundColor: '#FFF6EE', padding: '48px 24px' }}>
         <div className="mx-auto" style={{ maxWidth: '800px', display: 'flex', flexDirection: 'column', gap: '32px' }}>
           <div>
-            <h1 className="font-bold" style={{ fontSize: '56px', color: '#0F172A', marginBottom: '8px', lineHeight: '1.1' }}>Profile</h1>
-            <p className="font-normal" style={{ fontSize: '16px', color: '#64748B', lineHeight: '1.6' }}>Manage your account information</p>
+            <h1 className="font-bold" style={{ fontSize: '56px', color: '#402E32', marginBottom: '8px', lineHeight: '1.1' }}>Profile</h1>
+            <p className="font-normal" style={{ fontSize: '16px', color: '#B5866E', lineHeight: '1.6' }}>Manage your account information</p>
           </div>
 
-          <div className="bg-white" style={{ borderRadius: '12px', border: '1px solid #E5E7EB', padding: '32px' }}>
+          <div className="bg-white" style={{ borderRadius: '12px', border: '1px solid #E8D5C4', padding: '32px' }}>
             {/* Avatar and User Info */}
             <div className="flex items-center" style={{ gap: '16px', marginBottom: '32px' }}>
               <div className="relative flex-shrink-0" style={{ width: '64px', height: '64px' }}>
@@ -60,8 +60,8 @@ export function AuthView() {
                   className="flex items-center justify-center font-semibold"
                   style={{
                     width: '64px', height: '64px', borderRadius: '50%',
-                    backgroundColor: '#FEF3EC', color: '#F76902', fontSize: '24px',
-                    border: '2px solid #FFFFFF', boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)'
+                    backgroundColor: '#FFF6EE', color: '#F76902', fontSize: '24px',
+                    border: '2px solid #FFFFFF', boxShadow: '0 2px 8px rgba(64, 46, 50, 0.08)'
                   }}
                 >
                   {user.name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)}
@@ -78,13 +78,13 @@ export function AuthView() {
                 </button>
               </div>
               <div style={{ flex: 1 }}>
-                <h2 className="font-semibold" style={{ fontSize: '20px', color: '#111827', marginBottom: '4px' }}>{user.name}</h2>
-                <p className="font-normal" style={{ fontSize: '14px', color: '#6B7280' }}>{user.email}</p>
+                <h2 className="font-semibold" style={{ fontSize: '20px', color: '#402E32', marginBottom: '4px' }}>{user.name}</h2>
+                <p className="font-normal" style={{ fontSize: '14px', color: '#B5866E' }}>{user.email}</p>
               </div>
               <span
                 className="font-medium"
                 style={{
-                  fontSize: '13px', color: '#F76902', backgroundColor: '#FEF3EC',
+                  fontSize: '13px', color: '#F76902', backgroundColor: '#FFF6EE',
                   padding: '4px 12px', borderRadius: '12px', textTransform: 'capitalize'
                 }}
               >
@@ -92,20 +92,20 @@ export function AuthView() {
               </span>
             </div>
 
-            <div style={{ height: '1px', backgroundColor: '#E5E7EB', marginBottom: '32px' }} />
+            <div style={{ height: '1px', backgroundColor: '#E8D5C4', marginBottom: '32px' }} />
 
             {/* Profile Details */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
               <div>
-                <label className="font-semibold" style={{ fontSize: '14px', color: '#111827', display: 'block', marginBottom: '8px' }}>Full Name</label>
+                <label className="font-semibold" style={{ fontSize: '14px', color: '#402E32', display: 'block', marginBottom: '8px' }}>Full Name</label>
                 <input type="text" value={user.name} readOnly className="w-full outline-none"
-                  style={{ padding: '12px 16px', borderRadius: '8px', border: '1px solid #E5E7EB', fontSize: '16px', color: '#111827', backgroundColor: '#F9FAFB' }}
+                  style={{ padding: '12px 16px', borderRadius: '8px', border: '1px solid #E8D5C4', fontSize: '16px', color: '#402E32', backgroundColor: '#FFF6EE' }}
                 />
               </div>
               <div>
-                <label className="font-semibold" style={{ fontSize: '14px', color: '#111827', display: 'block', marginBottom: '8px' }}>Email Address</label>
+                <label className="font-semibold" style={{ fontSize: '14px', color: '#402E32', display: 'block', marginBottom: '8px' }}>Email Address</label>
                 <input type="email" value={user.email} readOnly className="w-full outline-none"
-                  style={{ padding: '12px 16px', borderRadius: '8px', border: '1px solid #E5E7EB', fontSize: '16px', color: '#111827', backgroundColor: '#F9FAFB' }}
+                  style={{ padding: '12px 16px', borderRadius: '8px', border: '1px solid #E8D5C4', fontSize: '16px', color: '#402E32', backgroundColor: '#FFF6EE' }}
                 />
               </div>
             </div>
@@ -116,7 +116,7 @@ export function AuthView() {
                 className="font-semibold transition-all"
                 style={{
                   backgroundColor: '#FFFFFF', color: '#DC2626', padding: '12px 24px',
-                  borderRadius: '8px', fontSize: '16px', border: '1px solid #E5E7EB', cursor: 'pointer'
+                  borderRadius: '8px', fontSize: '16px', border: '1px solid #E8D5C4', cursor: 'pointer'
                 }}
                 onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#FEF2F2'; }}
                 onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#FFFFFF'; }}
@@ -138,7 +138,7 @@ export function AuthView() {
         className="flex-shrink-0 flex items-center justify-center relative overflow-hidden hidden lg:flex"
         style={{
           width: '40%', minHeight: '100vh',
-          background: 'linear-gradient(135deg, #FEF3EC 0%, #FFFBF7 50%, #F9FAFB 100%)',
+          background: 'linear-gradient(135deg, #FFF6EE 0%, #FFFBF7 50%, #FFF6EE 100%)',
           padding: '48px'
         }}
       >
@@ -159,16 +159,16 @@ export function AuthView() {
           >
             RIT Students Only
           </div>
-          <h1 className="font-bold" style={{ fontSize: '48px', color: '#111827', lineHeight: '1.1', letterSpacing: '-0.02em' }}>
+          <h1 className="font-bold" style={{ fontSize: '48px', color: '#402E32', lineHeight: '1.1', letterSpacing: '-0.02em' }}>
             Swap smarter at RIT
           </h1>
-          <p className="font-normal" style={{ fontSize: '18px', color: '#6B7280', lineHeight: '1.6' }}>
+          <p className="font-normal" style={{ fontSize: '18px', color: '#B5866E', lineHeight: '1.6' }}>
             Find housing, sell items, and connect with students — all in one place.
           </p>
           <div style={{ marginTop: '16px' }}>
             <div className="flex items-center" style={{ gap: '16px' }}>
               <div style={{ width: '48px', height: '4px', borderRadius: '2px', backgroundColor: '#F76902' }} />
-              <span className="font-medium" style={{ fontSize: '14px', color: '#9CA3AF' }}>Trusted by RIT students</span>
+              <span className="font-medium" style={{ fontSize: '14px', color: '#C4A88E' }}>Trusted by RIT students</span>
             </div>
           </div>
         </div>
@@ -178,7 +178,7 @@ export function AuthView() {
       <div className="flex-1 flex items-center justify-center" style={{ backgroundColor: '#FFFFFF', padding: '48px' }}>
         <div className="bg-white" style={{ maxWidth: '440px', width: '100%', padding: '48px' }}>
           {/* Tab Toggle */}
-          <div className="flex" style={{ backgroundColor: '#F9FAFB', padding: '4px', borderRadius: '8px', marginBottom: '32px', gap: '4px' }}>
+          <div className="flex" style={{ backgroundColor: '#FFF6EE', padding: '4px', borderRadius: '8px', marginBottom: '32px', gap: '4px' }}>
             <button
               type="button"
               onClick={() => setActiveTab('signin')}
@@ -186,8 +186,8 @@ export function AuthView() {
               style={{
                 padding: '10px 24px', borderRadius: '6px', fontSize: '14px', border: 'none', cursor: 'pointer',
                 backgroundColor: activeTab === 'signin' ? '#FFFFFF' : 'transparent',
-                color: activeTab === 'signin' ? '#F76902' : '#6B7280',
-                boxShadow: activeTab === 'signin' ? '0 2px 4px rgba(0, 0, 0, 0.04)' : 'none'
+                color: activeTab === 'signin' ? '#F76902' : '#B5866E',
+                boxShadow: activeTab === 'signin' ? '0 2px 4px rgba(64, 46, 50, 0.04)' : 'none'
               }}
             >
               Sign In
@@ -199,18 +199,18 @@ export function AuthView() {
               style={{
                 padding: '10px 24px', borderRadius: '6px', fontSize: '14px', border: 'none', cursor: 'pointer',
                 backgroundColor: activeTab === 'signup' ? '#FFFFFF' : 'transparent',
-                color: activeTab === 'signup' ? '#F76902' : '#6B7280',
-                boxShadow: activeTab === 'signup' ? '0 2px 4px rgba(0, 0, 0, 0.04)' : 'none'
+                color: activeTab === 'signup' ? '#F76902' : '#B5866E',
+                boxShadow: activeTab === 'signup' ? '0 2px 4px rgba(64, 46, 50, 0.04)' : 'none'
               }}
             >
               Sign Up
             </button>
           </div>
 
-          <h2 className="font-bold" style={{ fontSize: '32px', color: '#111827', marginBottom: '8px', lineHeight: '1.2' }}>
+          <h2 className="font-bold" style={{ fontSize: '32px', color: '#402E32', marginBottom: '8px', lineHeight: '1.2' }}>
             {activeTab === 'signin' ? 'Sign in to BrickCitySwap' : 'Create your account'}
           </h2>
-          <p className="font-normal" style={{ fontSize: '16px', color: '#6B7280', lineHeight: '1.6', marginBottom: '32px' }}>
+          <p className="font-normal" style={{ fontSize: '16px', color: '#B5866E', lineHeight: '1.6', marginBottom: '32px' }}>
             Use your RIT email to continue
           </p>
 
@@ -220,46 +220,46 @@ export function AuthView() {
           >
             {activeTab === 'signup' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <label className="font-semibold" style={{ fontSize: '14px', color: '#111827' }}>Name</label>
-                <div className="flex items-center bg-white" style={{ padding: '12px 16px', borderRadius: '8px', border: '1px solid #E5E7EB', gap: '8px' }}>
-                  <UserIcon size={20} style={{ color: '#9CA3AF' }} />
+                <label className="font-semibold" style={{ fontSize: '14px', color: '#402E32' }}>Name</label>
+                <div className="flex items-center bg-white" style={{ padding: '12px 16px', borderRadius: '8px', border: '1px solid #E8D5C4', gap: '8px' }}>
+                  <UserIcon size={20} style={{ color: '#C4A88E' }} />
                   <input type="text" placeholder="Your full name" value={name} onChange={(e) => setName(e.target.value)} required
-                    className="flex-1 outline-none" style={{ fontSize: '16px', color: '#111827', backgroundColor: 'transparent', border: 'none' }}
+                    className="flex-1 outline-none" style={{ fontSize: '16px', color: '#402E32', backgroundColor: 'transparent', border: 'none' }}
                   />
                 </div>
               </div>
             )}
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <label className="font-semibold" style={{ fontSize: '14px', color: '#111827' }}>Email</label>
-              <div className="flex items-center bg-white" style={{ padding: '12px 16px', borderRadius: '8px', border: '1px solid #E5E7EB', gap: '8px' }}>
-                <Mail size={20} style={{ color: '#9CA3AF' }} />
+              <label className="font-semibold" style={{ fontSize: '14px', color: '#402E32' }}>Email</label>
+              <div className="flex items-center bg-white" style={{ padding: '12px 16px', borderRadius: '8px', border: '1px solid #E8D5C4', gap: '8px' }}>
+                <Mail size={20} style={{ color: '#C4A88E' }} />
                 <input type="email" placeholder="your.name@rit.edu" value={email} onChange={(e) => setEmail(e.target.value)} required
-                  className="flex-1 outline-none" style={{ fontSize: '16px', color: '#111827', backgroundColor: 'transparent', border: 'none' }}
+                  className="flex-1 outline-none" style={{ fontSize: '16px', color: '#402E32', backgroundColor: 'transparent', border: 'none' }}
                 />
               </div>
               {activeTab === 'signup' && (
-                <p className="font-normal" style={{ fontSize: '13px', color: '#9CA3AF', marginTop: '4px' }}>Only RIT emails allowed</p>
+                <p className="font-normal" style={{ fontSize: '13px', color: '#C4A88E', marginTop: '4px' }}>Only RIT emails allowed</p>
               )}
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <label className="font-semibold" style={{ fontSize: '14px', color: '#111827' }}>Password</label>
-              <div className="flex items-center bg-white" style={{ padding: '12px 16px', borderRadius: '8px', border: '1px solid #E5E7EB', gap: '8px' }}>
-                <Lock size={20} style={{ color: '#9CA3AF' }} />
+              <label className="font-semibold" style={{ fontSize: '14px', color: '#402E32' }}>Password</label>
+              <div className="flex items-center bg-white" style={{ padding: '12px 16px', borderRadius: '8px', border: '1px solid #E8D5C4', gap: '8px' }}>
+                <Lock size={20} style={{ color: '#C4A88E' }} />
                 <input type="password" placeholder="Enter your password" value={password} onChange={(e) => setPassword(e.target.value)} required
-                  className="flex-1 outline-none" style={{ fontSize: '16px', color: '#111827', backgroundColor: 'transparent', border: 'none' }}
+                  className="flex-1 outline-none" style={{ fontSize: '16px', color: '#402E32', backgroundColor: 'transparent', border: 'none' }}
                 />
               </div>
             </div>
 
             {activeTab === 'signup' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <label className="font-semibold" style={{ fontSize: '14px', color: '#111827' }}>Confirm Password</label>
-                <div className="flex items-center bg-white" style={{ padding: '12px 16px', borderRadius: '8px', border: '1px solid #E5E7EB', gap: '8px' }}>
-                  <Lock size={20} style={{ color: '#9CA3AF' }} />
+                <label className="font-semibold" style={{ fontSize: '14px', color: '#402E32' }}>Confirm Password</label>
+                <div className="flex items-center bg-white" style={{ padding: '12px 16px', borderRadius: '8px', border: '1px solid #E8D5C4', gap: '8px' }}>
+                  <Lock size={20} style={{ color: '#C4A88E' }} />
                   <input type="password" placeholder="Confirm your password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required
-                    className="flex-1 outline-none" style={{ fontSize: '16px', color: '#111827', backgroundColor: 'transparent', border: 'none' }}
+                    className="flex-1 outline-none" style={{ fontSize: '16px', color: '#402E32', backgroundColor: 'transparent', border: 'none' }}
                   />
                 </div>
               </div>
@@ -275,7 +275,7 @@ export function AuthView() {
                 opacity: loading ? 0.7 : 1,
                 boxShadow: '0 4px 14px rgba(247, 105, 2, 0.4)'
               }}
-              onMouseEnter={(e) => { if (!loading) { e.currentTarget.style.backgroundColor = '#D55A02'; e.currentTarget.style.transform = 'translateY(-2px)'; } }}
+              onMouseEnter={(e) => { if (!loading) { e.currentTarget.style.backgroundColor = '#D85802'; e.currentTarget.style.transform = 'translateY(-2px)'; } }}
               onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#F76902'; e.currentTarget.style.transform = 'translateY(0)'; }}
             >
               {loading
@@ -285,7 +285,7 @@ export function AuthView() {
           </form>
 
           <div className="text-center" style={{ marginTop: '16px' }}>
-            <p className="font-normal" style={{ fontSize: '13px', color: '#9CA3AF', lineHeight: '1.5' }}>
+            <p className="font-normal" style={{ fontSize: '13px', color: '#C4A88E', lineHeight: '1.5' }}>
               RIT email required for access
             </p>
           </div>

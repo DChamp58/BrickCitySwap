@@ -5,11 +5,12 @@
 
   /* Colors */
   --primary: #F76902; /* RIT Orange */
-  --dark-text: #111827;
-  --secondary-text: #6B7280;
-  --background: #F9FAFB;
+  --primary-dark: #D85802; /* Darker orange for hover states */
+  --dark-text: #402E32; /* Dark brown secondary */
+  --secondary-text: #B5866E; /* Tan accent */
+  --background: #FFF6EE; /* Cream */
   --white: #FFFFFF;
-  --border: #E5E7EB;
+  --border: #E8D5C4; /* Warm border */
 
   /* Typography Sizes */
   --text-h1: 56px;
@@ -41,7 +42,7 @@
   --popover: var(--white);
   --popover-foreground: var(--dark-text);
   --primary-foreground: var(--white);
-  --secondary: #E5E7EB;
+  --secondary: #E8D5C4;
   --secondary-foreground: var(--dark-text);
   --muted: var(--background);
   --muted-foreground: var(--secondary-text);
@@ -51,7 +52,7 @@
   --destructive-foreground: var(--white);
   --input: transparent;
   --input-background: var(--white);
-  --switch-background: #cbced4;
+  --switch-background: #C4A88E;
   --font-weight-normal: 400;
   --ring: var(--primary);
   --chart-1: #f59e0b;
@@ -71,31 +72,31 @@
 }
 
 .dark {
-  --background: #111827;
+  --background: #2A1F1B;
   --foreground: var(--white);
-  --card: #1f2937;
+  --card: #3D2E28;
   --card-foreground: var(--white);
-  --popover: #1f2937;
+  --popover: #3D2E28;
   --popover-foreground: var(--white);
   --primary-foreground: var(--white);
-  --secondary: #374151;
+  --secondary: #5A4A44;
   --secondary-foreground: var(--white);
-  --muted: #374151;
-  --muted-foreground: #9ca3af;
+  --muted: #5A4A44;
+  --muted-foreground: #C4A88E;
   --accent: var(--primary);
   --accent-foreground: var(--white);
   --destructive: #ef4444;
   --destructive-foreground: var(--white);
-  --border: #374151;
-  --input: #374151;
+  --border: #5A4A44;
+  --input: #5A4A44;
   --ring: var(--primary);
-  --sidebar: #1f2937;
+  --sidebar: #3D2E28;
   --sidebar-foreground: var(--white);
   --sidebar-primary: var(--primary);
   --sidebar-primary-foreground: var(--white);
-  --sidebar-accent: #374151;
+  --sidebar-accent: #5A4A44;
   --sidebar-accent-foreground: var(--white);
-  --sidebar-border: #374151;
+  --sidebar-border: #5A4A44;
   --sidebar-ring: var(--primary);
 }
 
@@ -143,7 +144,7 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Merriweather', serif;
   }
 
   body {

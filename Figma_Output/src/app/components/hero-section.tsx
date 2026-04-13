@@ -18,7 +18,7 @@ export function HeroSection({ onGetStarted }: HeroSectionProps) {
             Welcome to <span className="text-[#F76902]">BrickCitySwap</span>
           </h1>
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            The safe, student-exclusive marketplace for RIT students. Find housing, sell items, 
+            The safe, student-exclusive marketplace for RIT students. Find housing, sell items,
             and connect with verified RIT students - all in one place.
           </p>
           <Button

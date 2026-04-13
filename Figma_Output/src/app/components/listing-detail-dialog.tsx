@@ -89,7 +89,7 @@ export function ListingDetailDialog({
           )}
 
           {/* Price */}
-          <div className="flex items-center gap-2 text-3xl font-bold text-[#F76902]">
+          <div className="flex items-center gap-2 text-3xl font-bold text-[#F76902]" >
             <DollarSign className="w-8 h-8" />
             {listing.price}{isHousing ? '/month' : ''}
           </div>

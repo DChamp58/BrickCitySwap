@@ -3,7 +3,7 @@ export function Footer() {
     <footer
       className="w-full"
       style={{
-        backgroundColor: '#111827',
+        backgroundColor: '#402E32',
         color: '#FFFFFF',
         padding: '48px'
       }}
@@ -24,32 +24,32 @@ export function Footer() {
             <span style={{ color: '#FFFFFF' }}>BrickCity</span>
             <span style={{ color: '#F76902' }}>Swap</span>
           </h2>
-          <p className="font-normal" style={{ fontSize: '14px', color: '#9CA3AF', lineHeight: '1.6' }}>
+          <p className="font-normal" style={{ fontSize: '14px', color: '#C4A88E', lineHeight: '1.6' }}>
             The safe, student-exclusive marketplace for RIT students. Find housing, sell items, and connect.
           </p>
         </div>
 
         {/* About */}
         <div>
-          <h3 className="font-semibold" style={{ fontSize: '14px', color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '16px' }}>
+          <h3 className="font-semibold" style={{ fontSize: '14px', color: '#B5866E', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '16px' }}>
             About
           </h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            <p className="font-normal" style={{ fontSize: '14px', color: '#D1D5DB' }}>Built for RIT Students</p>
-            <p className="font-normal" style={{ fontSize: '14px', color: '#D1D5DB' }}>Verified Email Access</p>
-            <p className="font-normal" style={{ fontSize: '14px', color: '#D1D5DB' }}>Campus-Focused Community</p>
+            <p className="font-normal" style={{ fontSize: '14px', color: '#E8D5C4' }}>Built for RIT Students</p>
+            <p className="font-normal" style={{ fontSize: '14px', color: '#E8D5C4' }}>Verified Email Access</p>
+            <p className="font-normal" style={{ fontSize: '14px', color: '#E8D5C4' }}>Campus-Focused Community</p>
           </div>
         </div>
 
         {/* Community */}
         <div>
-          <h3 className="font-semibold" style={{ fontSize: '14px', color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '16px' }}>
+          <h3 className="font-semibold" style={{ fontSize: '14px', color: '#B5866E', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '16px' }}>
             Community
           </h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            <p className="font-normal" style={{ fontSize: '14px', color: '#D1D5DB' }}>Housing & Subletting</p>
-            <p className="font-normal" style={{ fontSize: '14px', color: '#D1D5DB' }}>Student Marketplace</p>
-            <p className="font-normal" style={{ fontSize: '14px', color: '#D1D5DB' }}>Safe Transactions</p>
+            <p className="font-normal" style={{ fontSize: '14px', color: '#E8D5C4' }}>Housing & Subletting</p>
+            <p className="font-normal" style={{ fontSize: '14px', color: '#E8D5C4' }}>Student Marketplace</p>
+            <p className="font-normal" style={{ fontSize: '14px', color: '#E8D5C4' }}>Safe Transactions</p>
           </div>
         </div>
       </div>
@@ -60,7 +60,7 @@ export function Footer() {
         style={{
           marginTop: '48px',
           paddingTop: '24px',
-          borderTop: '1px solid #374151',
+          borderTop: '1px solid #5A4A44',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
@@ -68,10 +68,10 @@ export function Footer() {
           gap: '16px'
         }}
       >
-        <p className="font-normal" style={{ fontSize: '13px', color: '#6B7280' }}>
+        <p className="font-normal" style={{ fontSize: '13px', color: '#B5866E' }}>
           &copy; {new Date().getFullYear()} BrickCitySwap. For RIT Students Only.
         </p>
-        <p className="font-normal" style={{ fontSize: '13px', color: '#6B7280' }}>
+        <p className="font-normal" style={{ fontSize: '13px', color: '#B5866E' }}>
           Made with care by RIT students.
         </p>
       </div>

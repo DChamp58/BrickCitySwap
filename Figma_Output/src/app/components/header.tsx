@@ -35,7 +35,7 @@ export function Header({ currentView, onViewChange, onCreateListing }: HeaderPro
   return (
     <nav
       className="bg-white border-b w-full sticky top-0 z-50"
-      style={{ height: '72px', borderBottomColor: '#E5E7EB' }}
+      style={{ height: '72px', borderBottomColor: '#E8D5C4' }}
     >
       <div className="h-full mx-auto flex items-center" style={{ padding: '0 48px' }}>
         {/* Logo */}
@@ -46,7 +46,7 @@ export function Header({ currentView, onViewChange, onCreateListing }: HeaderPro
             style={{ background: 'none', border: 'none', cursor: 'pointer' }}
           >
             <h1 className="text-[24px] font-bold leading-none" style={{ fontSize: '24px' }}>
-              <span style={{ color: '#111827' }}>BrickCity</span>
+              <span style={{ color: '#402E32' }}>BrickCity</span>
               <span style={{ color: '#F76902' }}>Swap</span>
             </h1>
           </button>
@@ -58,7 +58,7 @@ export function Header({ currentView, onViewChange, onCreateListing }: HeaderPro
             onClick={() => onViewChange('housing')}
             className="text-[16px] font-normal relative group transition-colors"
             style={{
-              color: isActive('housing') ? '#F76902' : '#111827',
+              color: isActive('housing') ? '#F76902' : '#402E32',
               background: 'none', border: 'none', cursor: 'pointer',
               padding: '4px 0'
             }}
@@ -67,7 +67,7 @@ export function Header({ currentView, onViewChange, onCreateListing }: HeaderPro
             <span
               className="absolute left-0 bottom-[-4px] h-[2px] group-hover:w-full transition-all"
               style={{
-                backgroundColor: isActive('housing') ? '#F76902' : '#111827',
+                backgroundColor: isActive('housing') ? '#F76902' : '#402E32',
                 width: isActive('housing') ? '100%' : '0',
                 transitionDuration: '200ms'
               }}
@@ -77,7 +77,7 @@ export function Header({ currentView, onViewChange, onCreateListing }: HeaderPro
             onClick={() => onViewChange('marketplace')}
             className="text-[16px] font-normal relative group transition-colors"
             style={{
-              color: isActive('marketplace') ? '#F76902' : '#111827',
+              color: isActive('marketplace') ? '#F76902' : '#402E32',
               background: 'none', border: 'none', cursor: 'pointer',
               padding: '4px 0'
             }}
@@ -86,7 +86,7 @@ export function Header({ currentView, onViewChange, onCreateListing }: HeaderPro
             <span
               className="absolute left-0 bottom-[-4px] h-[2px] group-hover:w-full transition-all"
               style={{
-                backgroundColor: isActive('marketplace') ? '#F76902' : '#111827',
+                backgroundColor: isActive('marketplace') ? '#F76902' : '#402E32',
                 width: isActive('marketplace') ? '100%' : '0',
                 transitionDuration: '200ms'
               }}
@@ -96,7 +96,7 @@ export function Header({ currentView, onViewChange, onCreateListing }: HeaderPro
             onClick={() => onViewChange('pricing')}
             className="text-[16px] font-normal relative group transition-colors"
             style={{
-              color: isActive('pricing') ? '#F76902' : '#111827',
+              color: isActive('pricing') ? '#F76902' : '#402E32',
               background: 'none', border: 'none', cursor: 'pointer',
               padding: '4px 0'
             }}
@@ -105,7 +105,7 @@ export function Header({ currentView, onViewChange, onCreateListing }: HeaderPro
             <span
               className="absolute left-0 bottom-[-4px] h-[2px] group-hover:w-full transition-all"
               style={{
-                backgroundColor: isActive('pricing') ? '#F76902' : '#111827',
+                backgroundColor: isActive('pricing') ? '#F76902' : '#402E32',
                 width: isActive('pricing') ? '100%' : '0',
                 transitionDuration: '200ms'
               }}
@@ -120,7 +120,7 @@ export function Header({ currentView, onViewChange, onCreateListing }: HeaderPro
               onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
               className="text-[16px] font-normal hover:opacity-70 transition-opacity"
               style={{
-                color: isActive('profile') || isActive('my-listings') || isActive('messages') ? '#F76902' : '#111827',
+                color: isActive('profile') || isActive('my-listings') || isActive('messages') ? '#F76902' : '#402E32',
                 padding: '8px 16px', background: 'none', border: 'none', cursor: 'pointer'
               }}
             >
@@ -132,8 +132,8 @@ export function Header({ currentView, onViewChange, onCreateListing }: HeaderPro
                 className="absolute bg-white"
                 style={{
                   top: 'calc(100% + 12px)', right: '0', width: '220px',
-                  borderRadius: '12px', border: '1px solid #E5E7EB',
-                  boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08)',
+                  borderRadius: '12px', border: '1px solid #E8D5C4',
+                  boxShadow: '0 4px 16px rgba(64, 46, 50, 0.08)',
                   padding: '8px', zIndex: 50
                 }}
               >
@@ -145,7 +145,7 @@ export function Header({ currentView, onViewChange, onCreateListing }: HeaderPro
                       className="flex items-center w-full text-left transition-all"
                       style={{
                         padding: '12px 16px', borderRadius: '8px', gap: '12px',
-                        backgroundColor: '#FEF3EC', border: 'none', cursor: 'pointer'
+                        backgroundColor: '#FFF6EE', border: 'none', cursor: 'pointer'
                       }}
                     >
                       <div
@@ -156,7 +156,7 @@ export function Header({ currentView, onViewChange, onCreateListing }: HeaderPro
                       </div>
                       <span className="font-semibold" style={{ fontSize: '15px', color: '#F76902' }}>Post</span>
                     </button>
-                    <div style={{ height: '1px', backgroundColor: '#E5E7EB', margin: '8px 0' }} />
+                    <div style={{ height: '1px', backgroundColor: '#E8D5C4', margin: '8px 0' }} />
                   </>
                 )}
 
@@ -168,8 +168,8 @@ export function Header({ currentView, onViewChange, onCreateListing }: HeaderPro
                       className="flex items-center w-full text-left hover:bg-gray-50 transition-colors"
                       style={{ padding: '10px 16px', borderRadius: '8px', gap: '12px', border: 'none', backgroundColor: 'transparent', cursor: 'pointer' }}
                     >
-                      <Package size={18} style={{ color: '#6B7280' }} />
-                      <span className="font-normal" style={{ fontSize: '15px', color: '#111827' }}>My Listings</span>
+                      <Package size={18} style={{ color: '#B5866E' }} />
+                      <span className="font-normal" style={{ fontSize: '15px', color: '#402E32' }}>My Listings</span>
                     </button>
 
                     {/* Messages */}
@@ -178,8 +178,8 @@ export function Header({ currentView, onViewChange, onCreateListing }: HeaderPro
                       className="flex items-center w-full text-left hover:bg-gray-50 transition-colors"
                       style={{ padding: '10px 16px', borderRadius: '8px', gap: '12px', border: 'none', backgroundColor: 'transparent', cursor: 'pointer' }}
                     >
-                      <MessageSquare size={18} style={{ color: '#6B7280' }} />
-                      <span className="font-normal" style={{ fontSize: '15px', color: '#111827' }}>
+                      <MessageSquare size={18} style={{ color: '#B5866E' }} />
+                      <span className="font-normal" style={{ fontSize: '15px', color: '#402E32' }}>
                         Messages
                         {unreadCount > 0 && (
                           <span
@@ -202,22 +202,22 @@ export function Header({ currentView, onViewChange, onCreateListing }: HeaderPro
                   className="flex items-center w-full text-left hover:bg-gray-50 transition-colors"
                   style={{ padding: '10px 16px', borderRadius: '8px', gap: '12px', border: 'none', backgroundColor: 'transparent', cursor: 'pointer' }}
                 >
-                  <User size={18} style={{ color: '#6B7280' }} />
-                  <span className="font-normal" style={{ fontSize: '15px', color: '#111827' }}>
+                  <User size={18} style={{ color: '#B5866E' }} />
+                  <span className="font-normal" style={{ fontSize: '15px', color: '#402E32' }}>
                     {user ? 'Profile' : 'Sign In'}
                   </span>
                 </button>
 
                 {user && (
                   <>
-                    <div style={{ height: '1px', backgroundColor: '#E5E7EB', margin: '8px 0' }} />
+                    <div style={{ height: '1px', backgroundColor: '#E8D5C4', margin: '8px 0' }} />
                     <button
                       onClick={() => { setIsProfileDropdownOpen(false); signOut(); }}
                       className="flex items-center w-full text-left hover:bg-gray-50 transition-colors"
                       style={{ padding: '10px 16px', borderRadius: '8px', gap: '12px', border: 'none', backgroundColor: 'transparent', cursor: 'pointer' }}
                     >
-                      <LogOut size={18} style={{ color: '#6B7280' }} />
-                      <span className="font-normal" style={{ fontSize: '15px', color: '#111827' }}>Sign Out</span>
+                      <LogOut size={18} style={{ color: '#B5866E' }} />
+                      <span className="font-normal" style={{ fontSize: '15px', color: '#402E32' }}>Sign Out</span>
                     </button>
                   </>
                 )}

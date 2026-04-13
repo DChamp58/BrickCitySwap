@@ -64,15 +64,15 @@ export function MyListingsView({ accessToken, onView }: MyListingsViewProps) {
   const totalViews = listings.reduce((sum, l) => sum + (l.view_count ?? 0), 0);
 
   return (
-    <div className="w-full min-h-screen" style={{ backgroundColor: '#F9FAFB', padding: '48px 24px' }}>
+    <div className="w-full min-h-screen" style={{ backgroundColor: '#FFF6EE', padding: '48px 24px' }}>
       <div className="mx-auto" style={{ maxWidth: '1200px', display: 'flex', flexDirection: 'column', gap: '32px' }}>
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="font-bold" style={{ fontSize: '56px', color: '#0F172A', marginBottom: '8px', lineHeight: '1.1' }}>
+            <h1 className="font-bold" style={{ fontSize: '56px', color: '#402E32', marginBottom: '8px', lineHeight: '1.1' }}>
               My Listings
             </h1>
-            <p className="font-normal" style={{ fontSize: '16px', color: '#64748B', lineHeight: '1.6' }}>
+            <p className="font-normal" style={{ fontSize: '16px', color: '#B5866E', lineHeight: '1.6' }}>
               Manage your posted items
             </p>
           </div>
@@ -80,24 +80,24 @@ export function MyListingsView({ accessToken, onView }: MyListingsViewProps) {
 
         {/* Stats Cards */}
         <div className="grid gap-[24px]" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))' }}>
-          <div className="bg-white" style={{ borderRadius: '12px', border: '1px solid #E5E7EB', padding: '24px' }}>
-            <p className="font-normal" style={{ fontSize: '14px', color: '#6B7280', marginBottom: '8px' }}>Active Listings</p>
-            <p className="font-bold" style={{ fontSize: '32px', color: '#111827' }}>{activeCount}</p>
+          <div className="bg-white" style={{ borderRadius: '12px', border: '1px solid #E8D5C4', padding: '24px' }}>
+            <p className="font-normal" style={{ fontSize: '14px', color: '#B5866E', marginBottom: '8px' }}>Active Listings</p>
+            <p className="font-bold" style={{ fontSize: '32px', color: '#402E32' }}>{activeCount}</p>
           </div>
-          <div className="bg-white" style={{ borderRadius: '12px', border: '1px solid #E5E7EB', padding: '24px' }}>
-            <p className="font-normal" style={{ fontSize: '14px', color: '#6B7280', marginBottom: '8px' }}>Total Listings</p>
-            <p className="font-bold" style={{ fontSize: '32px', color: '#111827' }}>{listings.length}</p>
+          <div className="bg-white" style={{ borderRadius: '12px', border: '1px solid #E8D5C4', padding: '24px' }}>
+            <p className="font-normal" style={{ fontSize: '14px', color: '#B5866E', marginBottom: '8px' }}>Total Listings</p>
+            <p className="font-bold" style={{ fontSize: '32px', color: '#402E32' }}>{listings.length}</p>
           </div>
-          <div className="bg-white" style={{ borderRadius: '12px', border: '1px solid #E5E7EB', padding: '24px' }}>
-            <p className="font-normal" style={{ fontSize: '14px', color: '#6B7280', marginBottom: '8px' }}>Sold</p>
-            <p className="font-bold" style={{ fontSize: '32px', color: '#111827' }}>{listings.filter(l => l.status === 'sold').length}</p>
+          <div className="bg-white" style={{ borderRadius: '12px', border: '1px solid #E8D5C4', padding: '24px' }}>
+            <p className="font-normal" style={{ fontSize: '14px', color: '#B5866E', marginBottom: '8px' }}>Sold</p>
+            <p className="font-bold" style={{ fontSize: '32px', color: '#402E32' }}>{listings.filter(l => l.status === 'sold').length}</p>
           </div>
-          <div className="bg-white" style={{ borderRadius: '12px', border: '1px solid #E5E7EB', padding: '24px' }}>
+          <div className="bg-white" style={{ borderRadius: '12px', border: '1px solid #E8D5C4', padding: '24px' }}>
             <div className="flex items-center" style={{ gap: '6px', marginBottom: '8px' }}>
-              <Eye size={16} style={{ color: '#6B7280' }} />
-              <p className="font-normal" style={{ fontSize: '14px', color: '#6B7280' }}>Total Views</p>
+              <Eye size={16} style={{ color: '#B5866E' }} />
+              <p className="font-normal" style={{ fontSize: '14px', color: '#B5866E' }}>Total Views</p>
             </div>
-            <p className="font-bold" style={{ fontSize: '32px', color: '#111827' }}>{totalViews}</p>
+            <p className="font-bold" style={{ fontSize: '32px', color: '#402E32' }}>{totalViews}</p>
           </div>
         </div>
 
@@ -110,7 +110,7 @@ export function MyListingsView({ accessToken, onView }: MyListingsViewProps) {
             onChange={(e) => setShowAllListings(e.target.checked)}
             style={{ accentColor: '#F76902', width: '16px', height: '16px', cursor: 'pointer' }}
           />
-          <label htmlFor="show-all" style={{ fontSize: '14px', color: '#6B7280', cursor: 'pointer' }}>
+          <label htmlFor="show-all" style={{ fontSize: '14px', color: '#B5866E', cursor: 'pointer' }}>
             Show all listings (including sold)
           </label>
         </div>
@@ -118,34 +118,34 @@ export function MyListingsView({ accessToken, onView }: MyListingsViewProps) {
         {/* Listings Table */}
         {loading ? (
           <div className="text-center" style={{ padding: '48px' }}>
-            <p style={{ fontSize: '16px', color: '#6B7280' }}>Loading your listings...</p>
+            <p style={{ fontSize: '16px', color: '#B5866E' }}>Loading your listings...</p>
           </div>
         ) : filteredListings.length === 0 ? (
-          <div className="bg-white text-center" style={{ borderRadius: '12px', border: '1px solid #E5E7EB', padding: '48px' }}>
-            <p style={{ fontSize: '16px', color: '#6B7280', marginBottom: '16px' }}>
+          <div className="bg-white text-center" style={{ borderRadius: '12px', border: '1px solid #E8D5C4', padding: '48px' }}>
+            <p style={{ fontSize: '16px', color: '#B5866E', marginBottom: '16px' }}>
               {showAllListings ? "You haven't created any listings yet" : "No active listings"}
             </p>
-            <p style={{ fontSize: '14px', color: '#9CA3AF' }}>
+            <p style={{ fontSize: '14px', color: '#C4A88E' }}>
               Click "Post" in the navigation to create your first listing
             </p>
           </div>
         ) : (
-          <div className="bg-white" style={{ borderRadius: '12px', border: '1px solid #E5E7EB', overflow: 'hidden' }}>
+          <div className="bg-white" style={{ borderRadius: '12px', border: '1px solid #E8D5C4', overflow: 'hidden' }}>
             {/* Table Header */}
             <div
               className="grid items-center"
               style={{
                 gridTemplateColumns: '2fr 1fr 1fr 0.7fr 1fr auto',
-                padding: '16px 24px', borderBottom: '1px solid #E5E7EB',
-                backgroundColor: '#F9FAFB', gap: '16px'
+                padding: '16px 24px', borderBottom: '1px solid #E8D5C4',
+                backgroundColor: '#FFF6EE', gap: '16px'
               }}
             >
-              <span className="font-semibold" style={{ fontSize: '14px', color: '#6B7280' }}>Listing</span>
-              <span className="font-semibold" style={{ fontSize: '14px', color: '#6B7280' }}>Category</span>
-              <span className="font-semibold" style={{ fontSize: '14px', color: '#6B7280' }}>Price</span>
-              <span className="font-semibold" style={{ fontSize: '14px', color: '#6B7280' }}>Views</span>
-              <span className="font-semibold" style={{ fontSize: '14px', color: '#6B7280' }}>Status</span>
-              <span className="font-semibold" style={{ fontSize: '14px', color: '#6B7280' }}>Actions</span>
+              <span className="font-semibold" style={{ fontSize: '14px', color: '#B5866E' }}>Listing</span>
+              <span className="font-semibold" style={{ fontSize: '14px', color: '#B5866E' }}>Category</span>
+              <span className="font-semibold" style={{ fontSize: '14px', color: '#B5866E' }}>Price</span>
+              <span className="font-semibold" style={{ fontSize: '14px', color: '#B5866E' }}>Views</span>
+              <span className="font-semibold" style={{ fontSize: '14px', color: '#B5866E' }}>Status</span>
+              <span className="font-semibold" style={{ fontSize: '14px', color: '#B5866E' }}>Actions</span>
             </div>
 
             {filteredListings.map((listing) => (
@@ -154,7 +154,7 @@ export function MyListingsView({ accessToken, onView }: MyListingsViewProps) {
                 className="grid items-center hover:bg-gray-50 transition-colors cursor-pointer"
                 style={{
                   gridTemplateColumns: '2fr 1fr 1fr 0.7fr 1fr auto',
-                  padding: '16px 24px', borderBottom: '1px solid #E5E7EB', gap: '16px'
+                  padding: '16px 24px', borderBottom: '1px solid #E8D5C4', gap: '16px'
                 }}
                 onClick={() => onView(listing)}
               >
@@ -167,23 +167,23 @@ export function MyListingsView({ accessToken, onView }: MyListingsViewProps) {
                     />
                   </div>
                   <div>
-                    <p className="font-medium" style={{ fontSize: '15px', color: '#111827', marginBottom: '4px' }}>
+                    <p className="font-medium" style={{ fontSize: '15px', color: '#402E32', marginBottom: '4px' }}>
                       {listing.title}
                     </p>
-                    <p className="font-normal" style={{ fontSize: '13px', color: '#9CA3AF' }}>
+                    <p className="font-normal" style={{ fontSize: '13px', color: '#C4A88E' }}>
                       Posted {new Date(listing.created_at).toLocaleDateString()}
                     </p>
                   </div>
                 </div>
-                <span className="font-normal" style={{ fontSize: '14px', color: '#6B7280' }}>
+                <span className="font-normal" style={{ fontSize: '14px', color: '#B5866E' }}>
                   {listing.type === 'housing' ? 'Housing' : 'Marketplace'}
                 </span>
-                <span className="font-semibold" style={{ fontSize: '15px', color: '#111827' }}>
+                <span className="font-semibold" style={{ fontSize: '15px', color: '#402E32' }}>
                   ${listing.price}{listing.type === 'housing' ? '/mo' : ''}
                 </span>
                 <div className="flex items-center" style={{ gap: '4px' }}>
-                  <Eye size={14} style={{ color: '#6B7280' }} />
-                  <span className="font-medium" style={{ fontSize: '14px', color: '#374151' }}>
+                  <Eye size={14} style={{ color: '#B5866E' }} />
+                  <span className="font-medium" style={{ fontSize: '14px', color: '#5A4A44' }}>
                     {listing.view_count ?? 0}
                   </span>
                 </div>
@@ -191,7 +191,7 @@ export function MyListingsView({ accessToken, onView }: MyListingsViewProps) {
                   className="font-medium inline-block"
                   style={{
                     fontSize: '13px',
-                    color: listing.status === 'available' ? '#059669' : listing.status === 'sold' ? '#6B7280' : '#D97706',
+                    color: listing.status === 'available' ? '#059669' : listing.status === 'sold' ? '#B5866E' : '#D97706',
                     backgroundColor: listing.status === 'available' ? '#D1FAE5' : listing.status === 'sold' ? '#F3F4F6' : '#FEF3C7',
                     padding: '4px 12px', borderRadius: '12px',
                     textTransform: 'capitalize', width: 'fit-content'
@@ -206,7 +206,7 @@ export function MyListingsView({ accessToken, onView }: MyListingsViewProps) {
                       className="flex items-center justify-center hover:opacity-70 transition-opacity"
                       style={{
                         padding: '6px 12px', borderRadius: '6px',
-                        border: '1px solid #E5E7EB', backgroundColor: '#FFFFFF',
+                        border: '1px solid #E8D5C4', backgroundColor: '#FFFFFF',
                         cursor: 'pointer', fontSize: '13px', color: '#059669'
                       }}
                       title="Mark as Sold"
@@ -220,7 +220,7 @@ export function MyListingsView({ accessToken, onView }: MyListingsViewProps) {
                       className="flex items-center justify-center hover:opacity-70 transition-opacity"
                       style={{
                         padding: '6px 12px', borderRadius: '6px',
-                        border: '1px solid #E5E7EB', backgroundColor: '#FFFFFF',
+                        border: '1px solid #E8D5C4', backgroundColor: '#FFFFFF',
                         cursor: 'pointer', fontSize: '13px', color: '#3B82F6'
                       }}
                       title="Relist"
@@ -234,7 +234,7 @@ export function MyListingsView({ accessToken, onView }: MyListingsViewProps) {
                     className="flex items-center justify-center hover:opacity-70 transition-opacity"
                     style={{
                       width: '32px', height: '32px', borderRadius: '6px',
-                      border: '1px solid #E5E7EB', backgroundColor: '#FFFFFF', cursor: 'pointer'
+                      border: '1px solid #E8D5C4', backgroundColor: '#FFFFFF', cursor: 'pointer'
                     }}
                     title="Delete"
                   >

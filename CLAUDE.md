@@ -219,10 +219,13 @@ className={cn('base-class', condition && 'conditional-class')}
 
 ### Branding Colors
 
-RIT orange is the primary brand color:
-- Primary: `#F76902`
-- Darker variant: `#D85802`
-- Use these inline or via Tailwind utilities that reference CSS variables.
+The branding uses the "Discreet Palette":
+- Primary orange: `#F76902` (hover: `#D85802`)
+- Primary cream: `#FFF6EE` (light backgrounds)
+- Secondary dark brown: `#402E32` (dark text, footer)
+- Accent tan: `#B5866E` (secondary/muted text)
+- Font: **Merriweather** (serif)
+- Use these inline or via CSS variables defined in `theme.css`.
 
 ---
 

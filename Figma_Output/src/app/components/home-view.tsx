@@ -16,29 +16,29 @@ export function HomeView({ onNavigate, onView }: HomeViewProps) {
       {/* Hero Section */}
       <section
         className="w-full flex items-center justify-center"
-        style={{ padding: '64px 48px', backgroundColor: '#F9FAFB' }}
+        style={{ padding: '64px 48px', backgroundColor: '#FFF6EE' }}
       >
         <div className="flex flex-col items-center text-center" style={{ gap: '32px', maxWidth: '800px' }}>
           <div className="flex flex-col" style={{ gap: '8px' }}>
             <h1
               className="font-bold leading-tight"
-              style={{ fontSize: '56px', color: '#0F172A' }}
+              style={{ fontSize: '56px', color: '#402E32' }}
             >
               RIT Students Only.
             </h1>
             <h1
               className="font-bold leading-tight"
-              style={{ fontSize: '56px', color: '#0F172A' }}
+              style={{ fontSize: '56px', color: '#402E32' }}
             >
               Housing + Marketplace in One Place.
             </h1>
           </div>
 
           <div className="flex flex-col" style={{ gap: '8px' }}>
-            <p className="font-normal" style={{ fontSize: '16px', color: '#64748B', lineHeight: '1.6' }}>
+            <p className="font-normal" style={{ fontSize: '16px', color: '#B5866E', lineHeight: '1.6' }}>
               Find sublets, swap items, and connect with verified RIT students.
             </p>
-            <p className="font-normal" style={{ fontSize: '16px', color: '#64748B', lineHeight: '1.6' }}>
+            <p className="font-normal" style={{ fontSize: '16px', color: '#B5866E', lineHeight: '1.6' }}>
               No scams. No strangers.
             </p>
           </div>
@@ -54,7 +54,7 @@ export function HomeView({ onNavigate, onView }: HomeViewProps) {
                 boxShadow: '0 4px 14px rgba(247, 105, 2, 0.4)'
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = '#D55A02';
+                e.currentTarget.style.backgroundColor = '#D85802';
                 e.currentTarget.style.transform = 'translateY(-2px)';
               }}
               onMouseLeave={(e) => {
@@ -68,19 +68,19 @@ export function HomeView({ onNavigate, onView }: HomeViewProps) {
               onClick={() => onNavigate('marketplace')}
               className="font-medium transition-all"
               style={{
-                backgroundColor: '#FFFFFF', color: '#64748B',
+                backgroundColor: '#FFFFFF', color: '#B5866E',
                 padding: '14px 32px', borderRadius: '8px',
-                border: '1px solid #E2E8F0', fontSize: '16px', cursor: 'pointer'
+                border: '1px solid #E8D5C4', fontSize: '16px', cursor: 'pointer'
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = '#F8FAFC';
-                e.currentTarget.style.borderColor = '#94A3B8';
-                e.currentTarget.style.color = '#0F172A';
+                e.currentTarget.style.backgroundColor = '#FFF6EE';
+                e.currentTarget.style.borderColor = '#B5866E';
+                e.currentTarget.style.color = '#402E32';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.backgroundColor = '#FFFFFF';
-                e.currentTarget.style.borderColor = '#E2E8F0';
-                e.currentTarget.style.color = '#64748B';
+                e.currentTarget.style.borderColor = '#E8D5C4';
+                e.currentTarget.style.color = '#B5866E';
               }}
             >
               Browse Marketplace

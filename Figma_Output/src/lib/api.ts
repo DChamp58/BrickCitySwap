@@ -105,6 +105,26 @@ export async function uploadListingImage(
   return urlData.publicUrl;
 }
 
+export async function deleteListingImage(imageId: string) {
+  const { error } = await supabase
+    .from('listing_images')
+    .delete()
+    .eq('id', imageId);
+
+  if (error) throw error;
+}
+
+export async function updateImagePositions(updates: { id: string; position: number }[]) {
+  for (const { id, position } of updates) {
+    const { error } = await supabase
+      .from('listing_images')
+      .update({ position })
+      .eq('id', id);
+
+    if (error) throw error;
+  }
+}
+
 // ── Saved Listings ──────────────────────────────────────────────────────────
 
 export async function saveListing(userId: string, listingId: string) {

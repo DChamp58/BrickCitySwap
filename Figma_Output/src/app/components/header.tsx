@@ -132,12 +132,15 @@ export function Header({ currentView, onViewChange, onCreateListing }: HeaderPro
                 style={{
                   width: '36px', height: '36px', borderRadius: '50%',
                   backgroundColor: '#FFF6EE',
-                  border: '2px solid #F76902',
+                  border: 'none',
                   cursor: 'pointer', overflow: 'hidden',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   flexShrink: 0, padding: 0,
-                  opacity: avatarHovered ? 0.8 : 1,
-                  transition: 'opacity 180ms ease',
+                  transform: avatarHovered ? 'scale(1.1)' : 'scale(1)',
+                  boxShadow: avatarHovered
+                    ? '0 0 0 3px rgba(247, 105, 2, 0.35)'
+                    : '0 0 0 2px #F76902',
+                  transition: 'transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 200ms ease',
                 }}
               >
                 {user.avatarUrl ? (

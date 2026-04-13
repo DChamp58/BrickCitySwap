@@ -40,6 +40,7 @@ export function ListingDetailDialog({
   const sheetRef = React.useRef<HTMLDivElement>(null);
   // Use a ref to track drag state inside the non-passive listener (avoids stale closure)
   const drag = React.useRef({ startY: 0, active: false, y: 0 });
+  const imgSwipe = React.useRef({ startX: 0, startY: 0 });
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
@@ -137,6 +138,24 @@ export function ListingDetailDialog({
   const isHousing = listing.type === 'housing';
   const images = listing.listing_images ?? [];
 
+  // Horizontal swipe to navigate images
+  const onImgTouchStart = (e: React.TouchEvent) => {
+    imgSwipe.current.startX = e.touches[0].clientX;
+    imgSwipe.current.startY = e.touches[0].clientY;
+  };
+  const onImgTouchEnd = (e: React.TouchEvent) => {
+    if (images.length <= 1) return;
+    const dx = e.changedTouches[0].clientX - imgSwipe.current.startX;
+    const dy = e.changedTouches[0].clientY - imgSwipe.current.startY;
+    // Only swipe if horizontal movement is dominant and crosses the 40px threshold
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40) {
+      setImgIdx(prev => dx < 0
+        ? (prev + 1) % images.length
+        : (prev - 1 + images.length) % images.length
+      );
+    }
+  };
+
   // ── Marketplace ────────────────────────────────────────────────────────────
   if (!isHousing) {
     const cond = listing.condition ? conditionStyle[listing.condition.toLowerCase()] ?? null : null;
@@ -218,7 +237,9 @@ export function ListingDetailDialog({
               {/* ── Mobile: image at top (fixed, not scrollable) like housing ─── */}
               {isMobile && (
                 <div
-                  style={{ position: 'relative', height: '220px', backgroundColor: '#F3F4F6', flexShrink: 0, cursor: images.length > 0 ? 'pointer' : 'default' }}
+                  onTouchStart={onImgTouchStart}
+                  onTouchEnd={onImgTouchEnd}
+                  style={{ position: 'relative', height: '220px', backgroundColor: '#F3F4F6', flexShrink: 0, cursor: images.length > 0 ? 'pointer' : 'default', touchAction: 'pan-y' }}
                   onClick={() => images.length > 0 && setGalleryOpen(true)}
                 >
                   {images.length > 0
@@ -489,7 +510,12 @@ export function ListingDetailDialog({
 
           {/* ── Photo (mobile: single image; desktop: grid) ─────────── */}
           {hasImages && (
-            <div className="relative flex-shrink-0" style={{ height: isMobile ? '220px' : '360px', backgroundColor: '#1a1a1a' }}>
+            <div
+              className="relative flex-shrink-0"
+              onTouchStart={onImgTouchStart}
+              onTouchEnd={onImgTouchEnd}
+              style={{ height: isMobile ? '220px' : '360px', backgroundColor: '#1a1a1a', touchAction: 'pan-y' }}
+            >
               {(isMobile || images.length === 1) ? (
                 <>
                   <img src={images[imgIdx]?.url || main.url} alt={listing.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onClick={() => setGalleryOpen(true)} />

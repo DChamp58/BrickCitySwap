@@ -35,9 +35,9 @@ export function ListingDetailDialog({
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [saved, setSaved] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const [dragY, setDragY] = useState(0);
-  const [isDragging, setIsDragging] = useState(false);
   const scrollRef = React.useRef<HTMLDivElement>(null);
+  // sheetRef is used for direct DOM transforms (60fps drag, no React re-renders)
+  const sheetRef = React.useRef<HTMLDivElement>(null);
   // Use a ref to track drag state inside the non-passive listener (avoids stale closure)
   const drag = React.useRef({ startY: 0, active: false, y: 0 });
 
@@ -58,6 +58,7 @@ export function ListingDetailDialog({
       drag.current.startY = e.touches[0].clientY;
       drag.current.active = el.scrollTop === 0;
       drag.current.y = 0;
+      if (sheetRef.current) sheetRef.current.style.transition = 'none';
     };
     const onMove = (e: TouchEvent) => {
       if (!drag.current.active) return;
@@ -65,22 +66,22 @@ export function ListingDetailDialog({
       if (delta > 5) {
         e.preventDefault(); // stop scroll — requires non-passive
         drag.current.y = delta - 5;
-        setDragY(drag.current.y);
-        setIsDragging(true);
+        if (sheetRef.current) sheetRef.current.style.transform = `translateY(${drag.current.y}px)`;
       }
     };
     const onEnd = () => {
       if (!drag.current.active) return;
       drag.current.active = false;
-      setIsDragging(false);
       if (drag.current.y > 80) {
-        setDragY(0);
         drag.current.y = 0;
         setGalleryOpen(false);
         onClose();
       } else {
         drag.current.y = 0;
-        setDragY(0);
+        if (sheetRef.current) {
+          sheetRef.current.style.transition = 'transform 300ms cubic-bezier(0.25,1,0.5,1)';
+          sheetRef.current.style.transform = 'translateY(0)';
+        }
       }
     };
 
@@ -99,19 +100,28 @@ export function ListingDetailDialog({
     drag.current.startY = e.touches[0].clientY;
     drag.current.active = true;
     drag.current.y = 0;
+    if (sheetRef.current) sheetRef.current.style.transition = 'none';
   };
   const handleDragMove = (e: React.TouchEvent) => {
     if (!drag.current.active) return;
     const delta = e.touches[0].clientY - drag.current.startY;
-    if (delta > 0) { drag.current.y = delta; setDragY(delta); setIsDragging(true); }
+    if (delta > 0) {
+      drag.current.y = delta;
+      if (sheetRef.current) sheetRef.current.style.transform = `translateY(${delta}px)`;
+    }
   };
   const handleDragEnd = () => {
     drag.current.active = false;
-    setIsDragging(false);
     if (drag.current.y > 80) {
-      drag.current.y = 0; setDragY(0); setGalleryOpen(false); onClose();
+      drag.current.y = 0;
+      setGalleryOpen(false);
+      onClose();
     } else {
-      drag.current.y = 0; setDragY(0);
+      drag.current.y = 0;
+      if (sheetRef.current) {
+        sheetRef.current.style.transition = 'transform 300ms cubic-bezier(0.25,1,0.5,1)';
+        sheetRef.current.style.transform = 'translateY(0)';
+      }
     }
   };
 
@@ -169,11 +179,9 @@ export function ListingDetailDialog({
               ? { maxHeight: '88vh', display: 'flex', flexDirection: 'column' }
               : { maxWidth: '820px', width: '95vw', maxHeight: '92vh', borderRadius: '16px', display: 'flex', flexDirection: 'column' }}
           >
-            {/* Outer transform wrapper — whole sheet slides together */}
-            <div style={{
+            {/* Outer transform wrapper — whole sheet slides together (DOM-driven for 60fps) */}
+            <div ref={isMobile ? sheetRef : undefined} style={{
               display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden',
-              transform: isMobile ? `translateY(${dragY}px)` : 'none',
-              transition: isDragging ? 'none' : 'transform 300ms cubic-bezier(0.25,1,0.5,1)',
             }}>
 
             {/* Mobile: drag handle bar */}
@@ -182,17 +190,20 @@ export function ListingDetailDialog({
                 onTouchStart={handleDragStart}
                 onTouchMove={handleDragMove}
                 onTouchEnd={handleDragEnd}
-                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '12px 16px 8px', flexShrink: 0, position: 'relative', cursor: 'grab', touchAction: 'none' }}
+                style={{ display: 'flex', alignItems: 'center', padding: '14px 16px 10px', flexShrink: 0, cursor: 'grab', touchAction: 'none' }}
               >
+                <div style={{ flex: 1 }} />
                 <div style={{ width: '40px', height: '4px', borderRadius: '2px', backgroundColor: '#D1C4BC' }} />
-                <DialogClose asChild>
-                  <button
-                    style={{ position: 'absolute', right: '16px', top: '50%', transform: 'translateY(-50%)', width: '36px', height: '36px', borderRadius: '50%', backgroundColor: '#F3EDEA', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                    aria-label="Close"
-                  >
-                    <X size={16} style={{ color: '#402E32' }} />
-                  </button>
-                </DialogClose>
+                <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
+                  <DialogClose asChild>
+                    <button
+                      style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: '#F3EDEA', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                      aria-label="Close"
+                    >
+                      <X size={15} style={{ color: '#402E32' }} />
+                    </button>
+                  </DialogClose>
+                </div>
               </div>
             )}
 
@@ -410,11 +421,9 @@ export function ListingDetailDialog({
             ? { maxHeight: '88vh', display: 'flex', flexDirection: 'column' }
             : { maxWidth: '900px', width: '95vw', maxHeight: '92vh', borderRadius: '16px', display: 'flex', flexDirection: 'column' }}
         >
-          {/* Outer transform wrapper — whole sheet slides together */}
-          <div style={{
+          {/* Outer transform wrapper — whole sheet slides together (DOM-driven for 60fps) */}
+          <div ref={isMobile ? sheetRef : undefined} style={{
             display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden',
-            transform: isMobile ? `translateY(${dragY}px)` : 'none',
-            transition: isDragging ? 'none' : 'transform 300ms cubic-bezier(0.25,1,0.5,1)',
           }}>
 
           {/* Mobile: drag handle bar */}

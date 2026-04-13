@@ -14,6 +14,7 @@ export function ListingsView({ type, onContact, onView }: ListingsViewProps) {
   const [listings, setListings] = useState<Listing[]>([]);
   const [filteredListings, setFilteredListings] = useState<Listing[]>([]);
   const [loading, setLoading] = useState(true);
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('newest');
   const [maxPrice, setMaxPrice] = useState(type === 'housing' ? 2000 : 1000);
@@ -324,34 +325,45 @@ export function ListingsView({ type, onContact, onView }: ListingsViewProps) {
                 className="grid"
                 style={{ gridTemplateColumns: `repeat(auto-fill, minmax(${type === 'housing' ? '320px' : '280px'}, 1fr))`, gap: '24px' }}
               >
-                {filteredListings.map((listing) => (
+                {filteredListings.map((listing) => {
+                  const isHovered = hoveredId === listing.id;
+                  return (
                   <div
                     key={listing.id}
-                    className="bg-white cursor-pointer group"
+                    className="bg-white cursor-pointer"
                     style={{
-                      borderRadius: '12px', border: '1px solid #E8D5C4',
-                      overflow: 'hidden', transition: 'all 0.15s ease-out'
+                      borderRadius: '12px',
+                      border: isHovered ? '1.5px solid rgba(247, 105, 2, 0.4)' : '1px solid #E8D5C4',
+                      overflow: 'hidden',
+                      transform: isHovered ? 'translateY(-4px)' : 'translateY(0)',
+                      boxShadow: isHovered
+                        ? '0 12px 28px rgba(247, 105, 2, 0.12), 0 4px 10px rgba(64, 46, 50, 0.06)'
+                        : '0 1px 3px rgba(64, 46, 50, 0.06)',
+                      transition: 'transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease',
                     }}
                     onClick={() => onView(listing)}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.transform = 'translateY(-3px)';
-                      e.currentTarget.style.boxShadow = '0 12px 24px rgba(64, 46, 50, 0.08)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.transform = 'translateY(0)';
-                      e.currentTarget.style.boxShadow = 'none';
-                    }}
+                    onMouseEnter={() => setHoveredId(listing.id)}
+                    onMouseLeave={() => setHoveredId(null)}
                   >
                     <div style={{ width: '100%', height: type === 'housing' ? '260px' : '240px', overflow: 'hidden', backgroundColor: '#F3F4F6' }}>
                       <ImageWithFallback
                         src={listing.listing_images?.[0]?.url || ''}
                         alt={listing.title}
-                        className="group-hover:scale-105"
-                        style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.15s ease-out' }}
+                        style={{
+                          width: '100%', height: '100%', objectFit: 'cover',
+                          transform: isHovered ? 'scale(1.04)' : 'scale(1)',
+                          transition: 'transform 280ms ease',
+                        }}
                       />
                     </div>
                     <div style={{ padding: '20px' }}>
-                      <h3 className="font-semibold" style={{ fontSize: '18px', color: '#402E32', marginBottom: type === 'housing' ? '12px' : '8px', lineHeight: '1.3' }}>
+                      <h3 className="font-semibold" style={{
+                        fontSize: '18px',
+                        color: isHovered ? '#F76902' : '#402E32',
+                        marginBottom: type === 'housing' ? '12px' : '8px',
+                        lineHeight: '1.3',
+                        transition: 'color 180ms ease',
+                      }}>
                         {listing.title}
                       </h3>
                       <div className="font-bold" style={{ fontSize: '28px', color: '#F76902', marginBottom: type === 'housing' ? '4px' : '8px', lineHeight: '1.2' }}>
@@ -401,7 +413,8 @@ export function ListingsView({ type, onContact, onView }: ListingsViewProps) {
                       </button>
                     </div>
                   </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>

@@ -12,6 +12,7 @@ interface ListingsPreviewProps {
 export function ListingsPreview({ onNavigate, onView }: ListingsPreviewProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [listings, setListings] = useState<Listing[]>([]);
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
 
   useEffect(() => {
     const loadListings = async () => {
@@ -109,42 +110,65 @@ export function ListingsPreview({ onNavigate, onView }: ListingsPreviewProps) {
             className="flex overflow-x-auto scrollbar-hide"
             style={{ gap: '24px', padding: '0 24px', scrollbarWidth: 'none' }}
           >
-            {listings.map((listing) => (
-              <div
-                key={listing.id}
-                onClick={() => onView(listing)}
-                className="flex-shrink-0 flex flex-col overflow-hidden hover:shadow-2xl hover:-translate-y-1 transition-all cursor-pointer"
-                style={{
-                  width: '320px', backgroundColor: '#FFFFFF',
-                  border: '1px solid #E8D5C4', borderRadius: '12px',
-                  boxShadow: '0 1px 3px rgba(64, 46, 50, 0.1)'
-                }}
-              >
-                <div className="w-full overflow-hidden" style={{ height: '240px' }}>
-                  <ImageWithFallback
-                    src={listing.listing_images?.[0]?.url || ''}
-                    alt={listing.title}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="flex flex-col" style={{ padding: '24px', gap: '8px' }}>
-                  <h3
-                    className="font-medium"
-                    style={{ fontSize: '20px', color: '#402E32', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
-                  >
-                    {listing.title}
-                  </h3>
-                  <div className="flex items-center justify-between">
-                    <p className="font-semibold" style={{ fontSize: '20px', color: '#F76902' }}>
-                      ${listing.price}{listing.type === 'housing' ? '/mo' : ''}
-                    </p>
-                    <span className="font-normal" style={{ fontSize: '14px', color: '#B5866E' }}>
-                      {listing.type === 'housing' ? 'Housing' : listing.category || 'Marketplace'}
-                    </span>
+            {listings.map((listing) => {
+              const isHovered = hoveredId === listing.id;
+              return (
+                <div
+                  key={listing.id}
+                  onClick={() => onView(listing)}
+                  onMouseEnter={() => setHoveredId(listing.id)}
+                  onMouseLeave={() => setHoveredId(null)}
+                  className="flex-shrink-0 flex flex-col overflow-hidden cursor-pointer"
+                  style={{
+                    width: '320px',
+                    backgroundColor: '#FFFFFF',
+                    borderRadius: '12px',
+                    border: isHovered ? '2px solid #F76902' : '2px solid transparent',
+                    boxShadow: isHovered
+                      ? '0 20px 48px rgba(247, 105, 2, 0.18), 0 4px 12px rgba(64, 46, 50, 0.1)'
+                      : '0 1px 3px rgba(64, 46, 50, 0.1)',
+                    transform: isHovered ? 'translateY(-10px)' : 'translateY(0)',
+                    transition: 'transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease',
+                    outline: 'none',
+                  }}
+                >
+                  {/* Image with zoom */}
+                  <div className="w-full overflow-hidden" style={{ height: '240px', borderRadius: '10px 10px 0 0' }}>
+                    <ImageWithFallback
+                      src={listing.listing_images?.[0]?.url || ''}
+                      alt={listing.title}
+                      className="w-full h-full object-cover"
+                      style={{
+                        transform: isHovered ? 'scale(1.06)' : 'scale(1)',
+                        transition: 'transform 320ms ease',
+                      }}
+                    />
+                  </div>
+
+                  <div className="flex flex-col" style={{ padding: '24px', gap: '8px' }}>
+                    <h3
+                      className="font-medium"
+                      style={{
+                        fontSize: '20px',
+                        color: isHovered ? '#F76902' : '#402E32',
+                        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                        transition: 'color 200ms ease',
+                      }}
+                    >
+                      {listing.title}
+                    </h3>
+                    <div className="flex items-center justify-between">
+                      <p className="font-semibold" style={{ fontSize: '20px', color: '#F76902' }}>
+                        ${listing.price}{listing.type === 'housing' ? '/mo' : ''}
+                      </p>
+                      <span className="font-normal" style={{ fontSize: '14px', color: '#B5866E' }}>
+                        {listing.type === 'housing' ? 'Housing' : listing.category || 'Marketplace'}
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>

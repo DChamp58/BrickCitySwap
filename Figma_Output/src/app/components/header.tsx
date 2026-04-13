@@ -115,16 +115,44 @@ export function Header({ currentView, onViewChange, onCreateListing }: HeaderPro
 
         {/* Profile Dropdown */}
         <div className="flex-1 flex items-center justify-end">
-          <div className="relative" ref={dropdownRef}>
+          <div className="relative flex items-center gap-2" ref={dropdownRef}>
+            {/* Avatar — navigates directly to profile, no dropdown */}
+            {user && (
+              <button
+                onClick={() => { setIsProfileDropdownOpen(false); onViewChange('profile'); }}
+                title="Go to profile"
+                style={{
+                  width: '36px', height: '36px', borderRadius: '50%',
+                  backgroundColor: '#FFF6EE', border: '2px solid #F76902',
+                  cursor: 'pointer', overflow: 'hidden',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  flexShrink: 0, padding: 0
+                }}
+              >
+                {user.avatarUrl ? (
+                  <img
+                    src={user.avatarUrl}
+                    alt={user.name}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  />
+                ) : (
+                  <span style={{ fontSize: '14px', fontWeight: 700, color: '#F76902' }}>
+                    {user.name ? user.name.charAt(0).toUpperCase() : '?'}
+                  </span>
+                )}
+              </button>
+            )}
+
+            {/* Name / Sign In — toggles dropdown */}
             <button
               onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
               className="text-[16px] font-normal hover:opacity-70 transition-opacity"
               style={{
                 color: isActive('profile') || isActive('my-listings') || isActive('messages') ? '#F76902' : '#402E32',
-                padding: '8px 16px', background: 'none', border: 'none', cursor: 'pointer'
+                padding: '8px 4px', background: 'none', border: 'none', cursor: 'pointer'
               }}
             >
-              {user ? 'Profile' : 'Sign In'}
+              {user ? user.name.split(' ')[0] : 'Sign In'}
             </button>
 
             {isProfileDropdownOpen && (

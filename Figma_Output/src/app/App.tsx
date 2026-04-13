@@ -63,6 +63,10 @@ function AppContent() {
   };
 
   const handleGoToPayment = (plan: string, billing: 'monthly' | 'yearly') => {
+    if (!user) {
+      setCurrentView('profile');
+      return;
+    }
     setPaymentPlan(plan);
     setPaymentBilling(billing);
     setCurrentView('payment');

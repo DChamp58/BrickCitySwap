@@ -284,17 +284,11 @@ export async function markMessagesRead(conversationId: string, userId: string) {
 // ── Listing Views ───────────────────────────────────────────────────────────
 
 export async function recordListingView(listingId: string, viewerId: string | null) {
-  console.log('[views] recording view for listing:', listingId, 'viewer:', viewerId);
   const { error } = await supabase.rpc('record_listing_view', {
     p_listing_id: listingId,
     p_viewer_id: viewerId ?? undefined,
   });
-
-  if (error) {
-    console.error('[views] RPC failed:', error.message, error);
-  } else {
-    console.log('[views] view recorded successfully');
-  }
+  if (error) console.warn('Failed to record view:', error.message);
 }
 
 export async function fetchMyListingsViewCounts(listingIds: string[]): Promise<Record<string, number>> {
@@ -304,16 +298,12 @@ export async function fetchMyListingsViewCounts(listingIds: string[]): Promise<R
     .select('listing_id')
     .in('listing_id', listingIds);
 
-  if (error) {
-    console.error('[views] failed to fetch view counts:', error.message);
-    return {};
-  }
+  if (error) return {};
 
   const counts: Record<string, number> = {};
   (data ?? []).forEach(v => {
     counts[v.listing_id] = (counts[v.listing_id] ?? 0) + 1;
   });
-  console.log('[views] fetched counts:', counts);
   return counts;
 }
 

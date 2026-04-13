@@ -27,18 +27,10 @@ export async function fetchMyListings(userId: string) {
   if (error) throw error;
   const listings = (data ?? []) as ListingWithImages[];
 
-  // Count views directly from listing_views (reliable, no trigger dependency)
+  // Count views directly from listing_views
   if (listings.length > 0) {
     const ids = listings.map(l => l.id);
-    const { data: viewRows } = await supabase
-      .from('listing_views')
-      .select('listing_id')
-      .in('listing_id', ids);
-
-    const counts: Record<string, number> = {};
-    (viewRows ?? []).forEach(v => {
-      counts[v.listing_id] = (counts[v.listing_id] ?? 0) + 1;
-    });
+    const counts = await fetchMyListingsViewCounts(ids);
     return listings.map(l => ({ ...l, view_count: counts[l.id] ?? 0 }));
   }
 
@@ -292,12 +284,37 @@ export async function markMessagesRead(conversationId: string, userId: string) {
 // ── Listing Views ───────────────────────────────────────────────────────────
 
 export async function recordListingView(listingId: string, viewerId: string | null) {
+  console.log('[views] recording view for listing:', listingId, 'viewer:', viewerId);
   const { error } = await supabase.rpc('record_listing_view', {
     p_listing_id: listingId,
     p_viewer_id: viewerId ?? undefined,
   });
 
-  if (error) console.warn('Failed to record view:', error.message);
+  if (error) {
+    console.error('[views] RPC failed:', error.message, error);
+  } else {
+    console.log('[views] view recorded successfully');
+  }
+}
+
+export async function fetchMyListingsViewCounts(listingIds: string[]): Promise<Record<string, number>> {
+  if (listingIds.length === 0) return {};
+  const { data, error } = await supabase
+    .from('listing_views')
+    .select('listing_id')
+    .in('listing_id', listingIds);
+
+  if (error) {
+    console.error('[views] failed to fetch view counts:', error.message);
+    return {};
+  }
+
+  const counts: Record<string, number> = {};
+  (data ?? []).forEach(v => {
+    counts[v.listing_id] = (counts[v.listing_id] ?? 0) + 1;
+  });
+  console.log('[views] fetched counts:', counts);
+  return counts;
 }
 
 // ── Profile ─────────────────────────────────────────────────────────────────

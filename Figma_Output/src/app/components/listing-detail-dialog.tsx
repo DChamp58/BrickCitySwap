@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Dialog, DialogContent,
+  Dialog, DialogContent, DialogClose,
 } from './ui/dialog';
 import { Listing } from './listing-card';
 import {
@@ -88,8 +88,29 @@ export function ListingDetailDialog({
         )}
 
         <Dialog open={open} onOpenChange={o => { if (!o) { setGalleryOpen(false); onClose(); } }}>
-          <DialogContent className="p-0 overflow-hidden"
-            style={{ maxWidth: isMobile ? '100vw' : '820px', width: isMobile ? '100vw' : '95vw', maxHeight: isMobile ? '100dvh' : '92vh', borderRadius: isMobile ? '16px 16px 0 0' : '16px', display: 'flex', flexDirection: 'column', margin: isMobile ? 'auto auto 0 auto' : 'auto' }}>
+          <DialogContent
+            className={isMobile
+              ? 'p-0 overflow-hidden !top-auto !bottom-0 !left-0 !right-0 !translate-x-0 !translate-y-0 !max-w-full !w-full !rounded-b-none !rounded-t-2xl'
+              : 'p-0 overflow-hidden'}
+            style={isMobile
+              ? { maxHeight: '88vh', display: 'flex', flexDirection: 'column' }
+              : { maxWidth: '820px', width: '95vw', maxHeight: '92vh', borderRadius: '16px', display: 'flex', flexDirection: 'column' }}
+          >
+
+            {/* Mobile: drag handle + close button */}
+            {isMobile && (
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '12px 16px 8px', flexShrink: 0, position: 'relative' }}>
+                <div style={{ width: '40px', height: '4px', borderRadius: '2px', backgroundColor: '#D1C4BC' }} />
+                <DialogClose asChild>
+                  <button
+                    style={{ position: 'absolute', right: '16px', top: '50%', transform: 'translateY(-50%)', width: '32px', height: '32px', borderRadius: '50%', backgroundColor: '#F3EDEA', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    aria-label="Close"
+                  >
+                    <X size={16} style={{ color: '#402E32' }} />
+                  </button>
+                </DialogClose>
+              </div>
+            )}
 
             <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', flex: 1, overflow: 'hidden' }}>
 
@@ -296,9 +317,28 @@ export function ListingDetailDialog({
 
       <Dialog open={open} onOpenChange={o => { if (!o) { setGalleryOpen(false); onClose(); } }}>
         <DialogContent
-          className="p-0 overflow-hidden"
-          style={{ maxWidth: isMobile ? '100vw' : '900px', width: isMobile ? '100vw' : '95vw', maxHeight: isMobile ? '100dvh' : '92vh', borderRadius: isMobile ? '16px 16px 0 0' : '16px', display: 'flex', flexDirection: 'column', margin: isMobile ? 'auto auto 0 auto' : 'auto' }}
+          className={isMobile
+            ? 'p-0 overflow-hidden !top-auto !bottom-0 !left-0 !right-0 !translate-x-0 !translate-y-0 !max-w-full !w-full !rounded-b-none !rounded-t-2xl'
+            : 'p-0 overflow-hidden'}
+          style={isMobile
+            ? { maxHeight: '88vh', display: 'flex', flexDirection: 'column' }
+            : { maxWidth: '900px', width: '95vw', maxHeight: '92vh', borderRadius: '16px', display: 'flex', flexDirection: 'column' }}
         >
+          {/* Mobile: drag handle + close button */}
+          {isMobile && (
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '12px 16px 8px', flexShrink: 0, position: 'relative' }}>
+              <div style={{ width: '40px', height: '4px', borderRadius: '2px', backgroundColor: '#D1C4BC' }} />
+              <DialogClose asChild>
+                <button
+                  style={{ position: 'absolute', right: '16px', top: '50%', transform: 'translateY(-50%)', width: '32px', height: '32px', borderRadius: '50%', backgroundColor: '#F3EDEA', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                  aria-label="Close"
+                >
+                  <X size={16} style={{ color: '#402E32' }} />
+                </button>
+              </DialogClose>
+            </div>
+          )}
+
           {/* ── Photo (mobile: single image; desktop: grid) ─────────── */}
           {hasImages && (
             <div className="relative flex-shrink-0" style={{ height: isMobile ? '220px' : '360px', backgroundColor: '#1a1a1a' }}>

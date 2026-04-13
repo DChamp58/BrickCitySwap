@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import {
   Dialog, DialogContent, DialogClose,
 } from './ui/dialog';
@@ -140,10 +141,12 @@ export function ListingDetailDialog({
 
   // Horizontal swipe to navigate images
   const onImgTouchStart = (e: React.TouchEvent) => {
+    if (!e.touches.length) return;
     imgSwipe.current.startX = e.touches[0].clientX;
     imgSwipe.current.startY = e.touches[0].clientY;
   };
   const onImgTouchEnd = (e: React.TouchEvent) => {
+    if (!e.changedTouches.length) return;
     const dx = e.changedTouches[0].clientX - imgSwipe.current.startX;
     const dy = e.changedTouches[0].clientY - imgSwipe.current.startY;
     if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40 && images.length > 1) {
@@ -164,17 +167,17 @@ export function ListingDetailDialog({
 
     return (
       <>
-        {/* Fullscreen gallery */}
-        {galleryOpen && images.length > 0 && (
-          <div className="fixed inset-0 z-[60] flex flex-col" style={{ backgroundColor: 'rgba(0,0,0,0.96)' }}>
+        {/* Fullscreen gallery — portalled to document.body so it sits above the Radix dialog in the root stacking context */}
+        {galleryOpen && images.length > 0 && createPortal(
+          <div className="fixed inset-0 flex flex-col" style={{ backgroundColor: 'rgba(0,0,0,0.96)', zIndex: 9999 }}>
             {/* Header: counter + close (safe-area aware) */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', paddingTop: 'max(env(safe-area-inset-top), 16px)', flexShrink: 0 }}>
               <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: '14px', fontWeight: 500 }}>
                 {images.length > 1 ? `${imgIdx + 1} of ${images.length}` : ''}
               </span>
               <button onClick={() => setGalleryOpen(false)} aria-label="Close gallery"
-                style={{ width: '44px', height: '44px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.15)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <X size={20} style={{ color: '#fff' }} />
+                style={{ width: '48px', height: '48px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.18)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <X size={22} style={{ color: '#fff' }} />
               </button>
             </div>
 
@@ -182,7 +185,7 @@ export function ListingDetailDialog({
             <div
               onTouchStart={onImgTouchStart}
               onTouchEnd={onImgTouchEnd}
-              style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}
+              style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden', touchAction: 'none' }}
             >
               <img
                 src={images[imgIdx]?.url}
@@ -213,15 +216,17 @@ export function ListingDetailDialog({
                       style={{ width: i === imgIdx ? '24px' : '8px', height: '8px', borderRadius: '4px', backgroundColor: i === imgIdx ? '#F76902' : 'rgba(255,255,255,0.35)', border: 'none', cursor: 'pointer', padding: 0, transition: 'all 200ms ease' }}
                     />
                   ))
-                : <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '12px', margin: 0 }}>Swipe down to close</p>
+                : <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '12px', margin: 0 }}>Swipe down or tap × to close</p>
               }
             </div>
-          </div>
+          </div>,
+          document.body
         )}
 
         <Dialog open={open} onOpenChange={o => { if (!o) { setGalleryOpen(false); onClose(); } }}>
           <DialogContent
             showCloseButton={!isMobile}
+            onInteractOutside={e => { if (galleryOpen) e.preventDefault(); }}
             className={isMobile
               ? 'p-0 overflow-hidden !top-auto !bottom-0 !left-0 !right-0 !translate-x-0 !translate-y-0 !max-w-full !w-full !rounded-none !bg-transparent !border-0 !shadow-none'
               : 'p-0 overflow-hidden'}
@@ -470,17 +475,17 @@ export function ListingDetailDialog({
 
   return (
     <>
-      {/* Full-screen gallery overlay */}
-      {galleryOpen && images.length > 0 && (
-        <div className="fixed inset-0 z-[60] flex flex-col" style={{ backgroundColor: 'rgba(0,0,0,0.96)' }}>
+      {/* Full-screen gallery — portalled to document.body so it sits above the Radix dialog in the root stacking context */}
+      {galleryOpen && images.length > 0 && createPortal(
+        <div className="fixed inset-0 flex flex-col" style={{ backgroundColor: 'rgba(0,0,0,0.96)', zIndex: 9999 }}>
           {/* Header: counter + close (safe-area aware) */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', paddingTop: 'max(env(safe-area-inset-top), 16px)', flexShrink: 0 }}>
             <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: '14px', fontWeight: 500 }}>
               {images.length > 1 ? `${imgIdx + 1} of ${images.length}` : ''}
             </span>
             <button onClick={() => setGalleryOpen(false)} aria-label="Close gallery"
-              style={{ width: '44px', height: '44px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.15)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <X size={20} style={{ color: '#fff' }} />
+              style={{ width: '48px', height: '48px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.18)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <X size={22} style={{ color: '#fff' }} />
             </button>
           </div>
 
@@ -488,7 +493,7 @@ export function ListingDetailDialog({
           <div
             onTouchStart={onImgTouchStart}
             onTouchEnd={onImgTouchEnd}
-            style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}
+            style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden', touchAction: 'none' }}
           >
             <img
               src={images[imgIdx]?.url}
@@ -519,15 +524,17 @@ export function ListingDetailDialog({
                     style={{ width: i === imgIdx ? '24px' : '8px', height: '8px', borderRadius: '4px', backgroundColor: i === imgIdx ? '#F76902' : 'rgba(255,255,255,0.35)', border: 'none', cursor: 'pointer', padding: 0, transition: 'all 200ms ease' }}
                   />
                 ))
-              : <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '12px', margin: 0 }}>Swipe down to close</p>
+              : <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '12px', margin: 0 }}>Swipe down or tap × to close</p>
             }
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       <Dialog open={open} onOpenChange={o => { if (!o) { setGalleryOpen(false); onClose(); } }}>
         <DialogContent
           showCloseButton={!isMobile}
+          onInteractOutside={e => { if (galleryOpen) e.preventDefault(); }}
           className={isMobile
             ? 'p-0 overflow-hidden !top-auto !bottom-0 !left-0 !right-0 !translate-x-0 !translate-y-0 !max-w-full !w-full !rounded-none !bg-transparent !border-0 !shadow-none'
             : 'p-0 overflow-hidden'}

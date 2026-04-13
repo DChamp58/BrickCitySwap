@@ -20,10 +20,22 @@ export function ListingsPreview({ onNavigate, onView }: ListingsPreviewProps) {
           fetchListings('housing'),
           fetchListings('marketplace'),
         ]);
-        const combined = [...(housing as Listing[]), ...(marketplace as Listing[])]
-          .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-          .slice(0, 8);
-        setListings(combined);
+
+        const byRecency = (a: Listing, b: Listing) =>
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+
+        const sortedMarket = (marketplace as Listing[]).sort(byRecency);
+        const sortedHousing = (housing as Listing[]).sort(byRecency);
+
+        // Interleave: marketplace, housing, marketplace, housing...
+        const interleaved: Listing[] = [];
+        const maxLen = Math.max(sortedMarket.length, sortedHousing.length);
+        for (let i = 0; i < maxLen && interleaved.length < 8; i++) {
+          if (i < sortedMarket.length) interleaved.push(sortedMarket[i]);
+          if (interleaved.length < 8 && i < sortedHousing.length) interleaved.push(sortedHousing[i]);
+        }
+
+        setListings(interleaved);
       } catch {
         // Listings will remain empty
       }

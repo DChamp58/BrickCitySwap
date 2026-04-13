@@ -292,9 +292,10 @@ export async function markMessagesRead(conversationId: string, userId: string) {
 // ── Listing Views ───────────────────────────────────────────────────────────
 
 export async function recordListingView(listingId: string, viewerId: string | null) {
-  const { error } = await supabase
-    .from('listing_views')
-    .insert({ listing_id: listingId, viewer_id: viewerId });
+  const { error } = await supabase.rpc('record_listing_view', {
+    p_listing_id: listingId,
+    p_viewer_id: viewerId ?? undefined,
+  });
 
   if (error) console.warn('Failed to record view:', error.message);
 }

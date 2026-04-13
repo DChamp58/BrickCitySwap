@@ -352,3 +352,26 @@ alter table public.profiles
   add column if not exists year  text check (year in ('Freshman','Sophomore','Junior','Senior','Graduate','Other') or year is null),
   add column if not exists major text,
   add column if not exists bio   text;
+
+-- ╔══════════════════════════════════════════════════════════════════════════╗
+-- ║ FIX VIEW RECORDING (run if views are always showing 0)                 ║
+-- ╚══════════════════════════════════════════════════════════════════════════╝
+
+-- RPC function that records a view bypassing RLS (security definer)
+-- This allows any visitor (logged in or not) to record a view.
+create or replace function public.record_listing_view(
+  p_listing_id uuid,
+  p_viewer_id  uuid default null
+)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  insert into public.listing_views (listing_id, viewer_id)
+  values (p_listing_id, p_viewer_id);
+exception when others then
+  null; -- silently ignore duplicates or constraint errors
+end;
+$$;

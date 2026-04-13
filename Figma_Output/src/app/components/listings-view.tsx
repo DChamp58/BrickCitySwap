@@ -23,6 +23,7 @@ export function ListingsView({ type, onContact, onView }: ListingsViewProps) {
   const [housingTypes, setHousingTypes] = useState({ house: false, apartment: false });
   const [categories, setCategories] = useState({ furniture: false, electronics: false, books: false });
   const [conditions, setConditions] = useState({ new: false, used: false });
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   useEffect(() => {
     fetchListings();
@@ -124,40 +125,56 @@ export function ListingsView({ type, onContact, onView }: ListingsViewProps) {
     <div className="w-full" style={{ backgroundColor: '#FFFFFF' }}>
       {/* Page Header */}
       <div className="w-full" style={{ backgroundColor: '#FFF6EE', borderBottom: '1px solid #E8D5C4' }}>
-        <div className="max-w-[1400px] mx-auto" style={{ padding: '48px 48px 32px 48px' }}>
-          <h1 className="font-bold" style={{ fontSize: '56px', color: '#402E32', marginBottom: '16px', lineHeight: '1.1' }}>
+        <div className="max-w-[1400px] mx-auto px-6 md:px-12" style={{ paddingTop: '32px', paddingBottom: '24px' }}>
+          <h1 className="font-bold text-4xl md:text-6xl" style={{ color: '#402E32', marginBottom: '12px', lineHeight: '1.1' }}>
             {type === 'housing' ? 'Housing' : 'Marketplace'}
           </h1>
-          <p className="font-normal" style={{ fontSize: '16px', color: '#B5866E', lineHeight: '1.6' }}>
+          <p className="font-normal text-sm md:text-base" style={{ color: '#B5866E', lineHeight: '1.6' }}>
             {type === 'housing'
               ? 'Find verified housing from RIT students. No scams, no strangers.'
               : 'Furniture, electronics, and student deals at RIT'}
           </p>
 
           {/* Search and Sort */}
-          <div className="flex items-center" style={{ gap: '16px', marginTop: '32px' }}>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center" style={{ gap: '12px', marginTop: '24px' }}>
             <div
               className="flex-1 flex items-center bg-white"
               style={{ padding: '12px 16px', borderRadius: '8px', border: '1px solid #E8D5C4', gap: '8px' }}
             >
-              <Search size={20} style={{ color: '#B5866E' }} />
+              <Search size={20} style={{ color: '#B5866E', flexShrink: 0 }} />
               <input
                 type="text"
                 placeholder={type === 'housing' ? 'Search by location, type, or keywords...' : 'Search items...'}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="flex-1 outline-none"
-                style={{ fontSize: '16px', color: '#402E32', backgroundColor: 'transparent', border: 'none' }}
+                style={{ fontSize: '16px', color: '#402E32', backgroundColor: 'transparent', border: 'none', minWidth: 0 }}
               />
             </div>
             <div className="flex items-center" style={{ gap: '8px' }}>
-              <SlidersHorizontal size={20} style={{ color: '#B5866E' }} />
+              {/* Mobile filter button */}
+              <button
+                onClick={() => setMobileFiltersOpen(!mobileFiltersOpen)}
+                className="flex md:hidden items-center justify-center flex-1"
+                style={{
+                  padding: '12px 16px', borderRadius: '8px', border: '1px solid #E8D5C4',
+                  backgroundColor: mobileFiltersOpen ? '#FFF6EE' : '#FFFFFF',
+                  color: mobileFiltersOpen ? '#F76902' : '#B5866E',
+                  cursor: 'pointer', gap: '8px', fontSize: '15px', fontWeight: 500
+                }}
+              >
+                <SlidersHorizontal size={18} />
+                Filters
+              </button>
+              <div className="hidden md:flex items-center" style={{ gap: '8px' }}>
+                <SlidersHorizontal size={20} style={{ color: '#B5866E' }} />
+              </div>
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="outline-none"
+                className="outline-none flex-1 sm:flex-none"
                 style={{
-                  fontSize: '16px', color: '#402E32', padding: '12px 16px',
+                  fontSize: '15px', color: '#402E32', padding: '12px 14px',
                   borderRadius: '8px', border: '1px solid #E8D5C4',
                   backgroundColor: '#FFFFFF', cursor: 'pointer'
                 }}
@@ -173,9 +190,109 @@ export function ListingsView({ type, onContact, onView }: ListingsViewProps) {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-[1400px] mx-auto" style={{ padding: '48px 48px' }}>
+      <div className="max-w-[1400px] mx-auto px-4 md:px-12 py-6 md:py-12">
+
+        {/* Mobile filters panel */}
+        {mobileFiltersOpen && (
+          <div
+            className="md:hidden bg-white mb-6"
+            style={{ padding: '20px', borderRadius: '12px', border: '1px solid #E8D5C4' }}
+          >
+            {/* Max Price */}
+            <div style={{ marginBottom: '20px' }}>
+              <div className="flex items-center justify-between" style={{ marginBottom: '10px' }}>
+                <label className="font-bold" style={{ fontSize: '14px', color: '#402E32' }}>Max Price</label>
+                <span className="font-semibold" style={{ fontSize: '15px', color: '#F76902' }}>
+                  ${maxPrice >= (type === 'housing' ? 2500 : 1000) ? `${type === 'housing' ? '2500' : '1000'}+` : maxPrice}
+                  {type === 'housing' ? '/month' : ''}
+                </span>
+              </div>
+              <input
+                type="range" min="0" max={type === 'housing' ? '2500' : '1000'}
+                step={type === 'housing' ? '50' : '25'}
+                value={maxPrice}
+                onChange={(e) => setMaxPrice(Number(e.target.value))}
+                className="w-full" style={{ accentColor: '#F76902', cursor: 'pointer' }}
+              />
+            </div>
+            {type === 'housing' && (
+              <>
+                <div className="grid grid-cols-2" style={{ gap: '12px', marginBottom: '20px' }}>
+                  <div>
+                    <label className="font-bold" style={{ fontSize: '13px', color: '#402E32', display: 'block', marginBottom: '6px' }}>Move-in</label>
+                    <input type="date" value={moveInDate} onChange={(e) => setMoveInDate(e.target.value)}
+                      className="w-full outline-none"
+                      style={{ fontSize: '14px', color: '#402E32', padding: '9px 10px', borderRadius: '8px', border: '1px solid #E8D5C4', backgroundColor: '#FFF6EE' }}
+                    />
+                  </div>
+                  <div>
+                    <label className="font-bold" style={{ fontSize: '13px', color: '#402E32', display: 'block', marginBottom: '6px' }}>Move-out</label>
+                    <input type="date" value={moveOutDate} onChange={(e) => setMoveOutDate(e.target.value)}
+                      className="w-full outline-none"
+                      style={{ fontSize: '14px', color: '#402E32', padding: '9px 10px', borderRadius: '8px', border: '1px solid #E8D5C4', backgroundColor: '#FFF6EE' }}
+                    />
+                  </div>
+                </div>
+                <div style={{ marginBottom: '16px' }}>
+                  <label className="font-bold" style={{ fontSize: '13px', color: '#402E32', display: 'block', marginBottom: '8px' }}>Housing Type</label>
+                  <div className="flex" style={{ gap: '12px' }}>
+                    {Object.entries(housingTypes).map(([key, checked]) => (
+                      <label key={key} className="flex items-center cursor-pointer" style={{ fontSize: '14px', color: '#5A4A44' }}>
+                        <input type="checkbox" checked={checked}
+                          onChange={() => setHousingTypes(prev => ({ ...prev, [key]: !prev[key as keyof typeof prev] }))}
+                          style={{ width: '15px', height: '15px', marginRight: '8px', accentColor: '#F76902', cursor: 'pointer' }}
+                        />
+                        {key.charAt(0).toUpperCase() + key.slice(1)}
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
+            {type === 'marketplace' && (
+              <div className="grid grid-cols-2" style={{ gap: '16px', marginBottom: '16px' }}>
+                <div>
+                  <label className="font-bold" style={{ fontSize: '13px', color: '#402E32', display: 'block', marginBottom: '8px' }}>Category</label>
+                  <div className="flex flex-col" style={{ gap: '8px' }}>
+                    {Object.entries(categories).map(([key, checked]) => (
+                      <label key={key} className="flex items-center cursor-pointer" style={{ fontSize: '14px', color: '#5A4A44' }}>
+                        <input type="checkbox" checked={checked}
+                          onChange={() => setCategories(prev => ({ ...prev, [key]: !prev[key as keyof typeof prev] }))}
+                          style={{ width: '15px', height: '15px', marginRight: '8px', accentColor: '#F76902', cursor: 'pointer' }}
+                        />
+                        {key.charAt(0).toUpperCase() + key.slice(1)}
+                      </label>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <label className="font-bold" style={{ fontSize: '13px', color: '#402E32', display: 'block', marginBottom: '8px' }}>Condition</label>
+                  <div className="flex flex-col" style={{ gap: '8px' }}>
+                    {Object.entries(conditions).map(([key, checked]) => (
+                      <label key={key} className="flex items-center cursor-pointer" style={{ fontSize: '14px', color: '#5A4A44' }}>
+                        <input type="checkbox" checked={checked}
+                          onChange={() => setConditions(prev => ({ ...prev, [key]: !prev[key as keyof typeof prev] }))}
+                          style={{ width: '15px', height: '15px', marginRight: '8px', accentColor: '#F76902', cursor: 'pointer' }}
+                        />
+                        {key.charAt(0).toUpperCase() + key.slice(1)}
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+            <button
+              className="w-full font-medium hover:opacity-70 transition-opacity"
+              style={{ padding: '10px 12px', fontSize: '14px', color: '#B5866E', backgroundColor: '#FFF6EE', border: '1px solid #E8D5C4', borderRadius: '8px', cursor: 'pointer' }}
+              onClick={clearFilters}
+            >
+              Clear All Filters
+            </button>
+          </div>
+        )}
+
         <div className="flex" style={{ gap: '32px' }}>
-          {/* Sidebar Filters */}
+          {/* Sidebar Filters — desktop only */}
           <div className="flex-shrink-0 hidden md:block" style={{ width: type === 'housing' ? '280px' : '240px' }}>
             <div
               className="bg-white sticky"
@@ -323,7 +440,7 @@ export function ListingsView({ type, onContact, onView }: ListingsViewProps) {
             ) : (
               <div
                 className="grid"
-                style={{ gridTemplateColumns: `repeat(auto-fill, minmax(${type === 'housing' ? '320px' : '280px'}, 1fr))`, gap: '24px' }}
+                style={{ gridTemplateColumns: `repeat(auto-fill, minmax(min(100%, ${type === 'housing' ? '300px' : '260px'}), 1fr))`, gap: '20px' }}
               >
                 {filteredListings.map((listing) => {
                   const isHovered = hoveredId === listing.id;

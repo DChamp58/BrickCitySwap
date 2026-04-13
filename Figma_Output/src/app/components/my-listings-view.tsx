@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Trash2, Eye, RotateCcw } from 'lucide-react';
+import { Trash2, Eye, RotateCcw, Pencil } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Listing } from './listing-card';
 import { useAuth } from './auth-context';
 import { fetchMyListings as fetchMyListingsApi, updateListing, deleteListing } from '@/lib/api';
 import { toast } from 'sonner';
+import { EditListingDialog } from './edit-listing-dialog';
 
 interface MyListingsViewProps {
   accessToken: string | null;
@@ -16,6 +17,7 @@ export function MyListingsView({ accessToken, onView }: MyListingsViewProps) {
   const [listings, setListings] = useState<Listing[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAllListings, setShowAllListings] = useState(false);
+  const [editingListing, setEditingListing] = useState<Listing | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -230,6 +232,17 @@ export function MyListingsView({ accessToken, onView }: MyListingsViewProps) {
                     </button>
                   )}
                   <button
+                    onClick={(e) => { e.stopPropagation(); setEditingListing(listing); }}
+                    className="flex items-center justify-center hover:opacity-70 transition-opacity"
+                    style={{
+                      width: '32px', height: '32px', borderRadius: '6px',
+                      border: '1px solid #E8D5C4', backgroundColor: '#FFFFFF', cursor: 'pointer'
+                    }}
+                    title="Edit"
+                  >
+                    <Pencil size={14} style={{ color: '#F76902' }} />
+                  </button>
+                  <button
                     onClick={(e) => { e.stopPropagation(); handleDelete(listing.id); }}
                     className="flex items-center justify-center hover:opacity-70 transition-opacity"
                     style={{
@@ -246,6 +259,16 @@ export function MyListingsView({ accessToken, onView }: MyListingsViewProps) {
           </div>
         )}
       </div>
+
+      <EditListingDialog
+        open={editingListing !== null}
+        onClose={() => setEditingListing(null)}
+        listing={editingListing}
+        onListingUpdated={(updated) => {
+          setListings(listings.map(l => l.id === updated.id ? updated : l));
+          setEditingListing(null);
+        }}
+      />
     </div>
   );
 }

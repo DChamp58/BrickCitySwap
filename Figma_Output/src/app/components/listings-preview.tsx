@@ -108,7 +108,7 @@ export function ListingsPreview({ onNavigate, onView }: ListingsPreviewProps) {
           <div
             ref={scrollContainerRef}
             className="flex overflow-x-auto scrollbar-hide"
-            style={{ gap: '24px', padding: '16px 24px 8px 24px', scrollbarWidth: 'none' }}
+            style={{ gap: '24px', padding: '32px 24px 16px 24px', scrollbarWidth: 'none' }}
           >
             {listings.map((listing) => {
               const isHovered = hoveredId === listing.id;
@@ -125,7 +125,7 @@ export function ListingsPreview({ onNavigate, onView }: ListingsPreviewProps) {
                     borderRadius: '12px',
                     border: isHovered ? '2px solid #F76902' : '2px solid transparent',
                     boxShadow: isHovered
-                      ? '0 20px 48px rgba(247, 105, 2, 0.18), 0 4px 12px rgba(64, 46, 50, 0.1)'
+                      ? '0 24px 56px rgba(247, 105, 2, 0.35), 0 8px 20px rgba(64, 46, 50, 0.12)'
                       : '0 1px 3px rgba(64, 46, 50, 0.1)',
                     transform: isHovered ? 'translateY(-10px)' : 'translateY(0)',
                     transition: 'transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease',

@@ -94,10 +94,15 @@ export function ProfileView({ onNavigate, onCreateListing }: ProfileViewProps) {
                 </div>
               </div>
 
-              {/* Email */}
-              <p style={{ fontSize: '16px', color: '#B5866E', marginBottom: '14px' }}>
+              {/* Email + year/major */}
+              <p style={{ fontSize: '15px', color: '#B5866E', marginBottom: user.year || user.major ? '6px' : '14px' }}>
                 {user.email}
               </p>
+              {(user.year || user.major) && (
+                <p style={{ fontSize: '15px', color: '#B5866E', marginBottom: '14px' }}>
+                  {[user.year, user.major].filter(Boolean).join(' · ')}
+                </p>
+              )}
 
               {/* Badges row */}
               <div className="flex items-center" style={{ gap: '14px' }}>
@@ -119,6 +124,13 @@ export function ProfileView({ onNavigate, onCreateListing }: ProfileViewProps) {
                   </span>
                 </div>
               </div>
+
+              {/* Bio */}
+              {user.bio && (
+                <p style={{ fontSize: '15px', color: '#5A4A44', marginTop: '14px', lineHeight: '1.6', maxWidth: '560px' }}>
+                  {user.bio}
+                </p>
+              )}
             </div>
 
             {/* Action buttons */}

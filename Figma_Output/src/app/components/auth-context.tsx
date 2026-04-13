@@ -11,6 +11,9 @@ export interface User {
   subscriptionTier: string;
   schoolId: string | null;
   avatarUrl: string | null;
+  year: string | null;
+  major: string | null;
+  bio: string | null;
 }
 
 interface AuthContextType {
@@ -33,6 +36,9 @@ function profileToUser(profile: Profile): User {
     subscriptionTier: profile.subscription_tier,
     schoolId: profile.school_id,
     avatarUrl: profile.avatar_url,
+    year: profile.year ?? null,
+    major: profile.major ?? null,
+    bio: profile.bio ?? null,
   };
 }
 
@@ -65,6 +71,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         subscriptionTier: 'free',
         schoolId: null,
         avatarUrl: null,
+        year: null,
+        major: null,
+        bio: null,
       });
       return;
     }

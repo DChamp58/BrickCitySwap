@@ -298,7 +298,7 @@ export async function fetchProfile(userId: string) {
 
 export async function updateProfile(
   userId: string,
-  updates: { full_name?: string; avatar_url?: string }
+  updates: { full_name?: string; avatar_url?: string; year?: string | null; major?: string | null; bio?: string | null }
 ) {
   const { data, error } = await supabase
     .from('profiles')

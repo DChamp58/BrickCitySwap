@@ -344,3 +344,11 @@ $$ language plpgsql security definer;
 create trigger trg_increment_view_count
   after insert on public.listing_views
   for each row execute function public.increment_view_on_insert();
+
+-- ╔══════════════════════════════════════════════════════════════════════════╗
+-- ║ ADD PROFILE FIELDS (run if upgrading an existing database)             ║
+-- ╚══════════════════════════════════════════════════════════════════════════╝
+alter table public.profiles
+  add column if not exists year  text check (year in ('Freshman','Sophomore','Junior','Senior','Graduate','Other') or year is null),
+  add column if not exists major text,
+  add column if not exists bio   text;

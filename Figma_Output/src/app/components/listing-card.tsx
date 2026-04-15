@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
-import { MapPin, DollarSign, Calendar, User, MessageCircle } from 'lucide-react';
+import { MapPin, DollarSign, Calendar, User, MessageCircle, Eye } from 'lucide-react';
 
 export interface ListingImage {
   id: string;
@@ -142,8 +142,14 @@ export function ListingCard({ listing, onContact, onView, showActions = true, sh
           <Badge variant="outline" className="capitalize">{listing.condition}</Badge>
         )}
 
-        <div className="text-xs text-muted-foreground">
-          Posted {new Date(listing.created_at).toLocaleDateString()}
+        <div className="flex items-center justify-between text-xs text-muted-foreground">
+          <span>Posted {new Date(listing.created_at).toLocaleDateString()}</span>
+          {listing.view_count != null && (
+            <span className="flex items-center gap-1">
+              <Eye className="w-3.5 h-3.5" />
+              {listing.view_count}
+            </span>
+          )}
         </div>
       </CardContent>
 

@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
-import { Search, SlidersHorizontal, Calendar } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { Search, SlidersHorizontal, Calendar, Eye } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Listing } from './listing-card';
 import { fetchListings as fetchListingsApi } from '@/lib/api';
+import { supabase } from '@/lib/supabase';
 
 interface ListingsViewProps {
   type: 'housing' | 'marketplace';
@@ -28,6 +29,31 @@ export function ListingsView({ type, onContact, onView }: ListingsViewProps) {
   useEffect(() => {
     fetchListings();
   }, [type]);
+
+  // Subscribe to Supabase Realtime for live view_count updates
+  useEffect(() => {
+    const channel = supabase
+      .channel('listing-view-counts')
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'listings' },
+        (payload) => {
+          const updated = payload.new as { id: string; view_count: number };
+          if (updated.id && typeof updated.view_count === 'number') {
+            setListings((prev) =>
+              prev.map((l) =>
+                l.id === updated.id ? { ...l, view_count: updated.view_count } : l
+              )
+            );
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
 
   useEffect(() => {
     filterAndSortListings();
@@ -492,9 +518,15 @@ export function ListingsView({ type, onContact, onView }: ListingsViewProps) {
 
                       {type === 'housing' && (
                         <>
-                          <p className="font-normal" style={{ fontSize: '14px', color: '#B5866E', marginBottom: '16px' }}>
-                            {listing.location || 'Near RIT'}
-                          </p>
+                          <div className="flex items-center justify-between" style={{ marginBottom: '16px' }}>
+                            <p className="font-normal" style={{ fontSize: '14px', color: '#B5866E' }}>
+                              {listing.location || 'Near RIT'}
+                            </p>
+                            <div className="flex items-center" style={{ gap: '4px', color: '#B5866E' }}>
+                              <Eye size={15} />
+                              <span style={{ fontSize: '13px', fontWeight: 500 }}>{listing.view_count ?? 0}</span>
+                            </div>
+                          </div>
                           <div className="flex flex-col" style={{ gap: '6px', marginBottom: '20px' }}>
                             <p className="font-normal" style={{ fontSize: '14px', color: '#C4A88E' }}>
                               {listing.bedrooms === 0 ? 'Studio' : `${listing.bedrooms} bed`} · {listing.bathrooms} bath
@@ -509,10 +541,18 @@ export function ListingsView({ type, onContact, onView }: ListingsViewProps) {
                         </>
                       )}
 
-                      {type === 'marketplace' && listing.condition && (
-                        <p className="font-normal" style={{ fontSize: '14px', color: '#C4A88E' }}>
-                          {listing.condition}
-                        </p>
+                      {type === 'marketplace' && (
+                        <div className="flex items-center justify-between">
+                          {listing.condition && (
+                            <p className="font-normal" style={{ fontSize: '14px', color: '#C4A88E' }}>
+                              {listing.condition}
+                            </p>
+                          )}
+                          <div className="flex items-center" style={{ gap: '4px', color: '#B5866E' }}>
+                            <Eye size={15} />
+                            <span style={{ fontSize: '13px', fontWeight: 500 }}>{listing.view_count ?? 0}</span>
+                          </div>
+                        </div>
                       )}
 
                       <button

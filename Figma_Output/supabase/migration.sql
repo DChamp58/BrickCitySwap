@@ -435,7 +435,7 @@ begin
   v_listing_image_url := (
     select url from public.listing_images
     where listing_id = v_listing_id
-    order by sort_order asc
+    order by position asc
     limit 1
   );
 
@@ -493,7 +493,7 @@ begin
   v_listing_image_url := (
     select url from public.listing_images
     where listing_id = NEW.listing_id
-    order by sort_order asc
+    order by position asc
     limit 1
   );
 

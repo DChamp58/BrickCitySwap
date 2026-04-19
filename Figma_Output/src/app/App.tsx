@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AuthProvider, useAuth } from './components/auth-context';
 import { MessagingProvider } from './components/messaging-context';
 import { SavedProvider } from './components/saved-context';
@@ -35,6 +35,8 @@ function AppContent() {
   const [openConversationId, setOpenConversationId] = useState<string | null>(null);
   const [paymentPlan, setPaymentPlan] = useState<string>('poster');
   const [paymentBilling, setPaymentBilling] = useState<'monthly' | 'yearly'>('monthly');
+
+  useEffect(() => { window.scrollTo(0, 0); }, [currentView]);
 
   const handleCreateListing = () => {
     if (!user) {

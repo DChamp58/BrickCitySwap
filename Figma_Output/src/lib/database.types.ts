@@ -83,6 +83,10 @@ export interface Database {
           gender_pref: string | null;
           housing_type: string | null;
           distance_from_campus: number | null;
+          total_rooms: number | null;
+          available_rooms: number | null;
+          roommates: number | null;
+          female_roommates: number | null;
           // Marketplace fields
           category: string | null;
           condition: string | null;
@@ -107,6 +111,10 @@ export interface Database {
           gender_pref?: string | null;
           housing_type?: string | null;
           distance_from_campus?: number | null;
+          total_rooms?: number | null;
+          available_rooms?: number | null;
+          roommates?: number | null;
+          female_roommates?: number | null;
           category?: string | null;
           condition?: string | null;
           view_count?: number;
@@ -126,6 +134,10 @@ export interface Database {
           gender_pref?: string | null;
           housing_type?: string | null;
           distance_from_campus?: number | null;
+          total_rooms?: number | null;
+          available_rooms?: number | null;
+          roommates?: number | null;
+          female_roommates?: number | null;
           category?: string | null;
           condition?: string | null;
           view_count?: number;

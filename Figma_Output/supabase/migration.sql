@@ -354,6 +354,15 @@ alter table public.profiles
   add column if not exists bio   text;
 
 -- ╔══════════════════════════════════════════════════════════════════════════╗
+-- ║ ADD HOUSING LISTING FIELDS (run if upgrading an existing database)     ║
+-- ╚══════════════════════════════════════════════════════════════════════════╝
+alter table public.listings
+  add column if not exists total_rooms      integer,
+  add column if not exists available_rooms  integer,
+  add column if not exists roommates        integer,
+  add column if not exists female_roommates integer;
+
+-- ╔══════════════════════════════════════════════════════════════════════════╗
 -- ║ FIX VIEW RECORDING (run if views are always showing 0)                 ║
 -- ╚══════════════════════════════════════════════════════════════════════════╝
 

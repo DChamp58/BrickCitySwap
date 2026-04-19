@@ -34,6 +34,10 @@ export interface Listing {
   gender_pref?: string | null;
   housing_type?: string | null;
   distance_from_campus?: number | null;
+  total_rooms?: number | null;
+  available_rooms?: number | null;
+  roommates?: number | null;
+  female_roommates?: number | null;
 
   // Marketplace specific
   category?: string | null;

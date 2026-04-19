@@ -35,11 +35,14 @@ export function CreateListingDialog({ open, onClose, onListingCreated }: CreateL
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
   const [location, setLocation] = useState('');
-  const [bedrooms, setBedrooms] = useState('');
+  const [housingType, setHousingType] = useState('');
+  const [totalRooms, setTotalRooms] = useState('');
+  const [availableRooms, setAvailableRooms] = useState('');
   const [bathrooms, setBathrooms] = useState('');
+  const [roommates, setRoommates] = useState('');
+  const [femaleRoommates, setFemaleRoommates] = useState('');
   const [availableFrom, setAvailableFrom] = useState('');
   const [availableTo, setAvailableTo] = useState('');
-  const [gender, setGender] = useState('any');
   const [category, setCategory] = useState('');
   const [condition, setCondition] = useState('');
   const [images, setImages] = useState<File[]>([]);
@@ -47,8 +50,10 @@ export function CreateListingDialog({ open, onClose, onListingCreated }: CreateL
 
   const resetForm = () => {
     setTitle(''); setDescription(''); setPrice(''); setLocation('');
-    setBedrooms(''); setBathrooms(''); setAvailableFrom(''); setAvailableTo('');
-    setGender('any'); setCategory(''); setCondition('');
+    setHousingType(''); setTotalRooms(''); setAvailableRooms('');
+    setBathrooms(''); setRoommates(''); setFemaleRoommates('');
+    setAvailableFrom(''); setAvailableTo('');
+    setCategory(''); setCondition('');
     setImages([]); setImagePreviews([]);
   };
 
@@ -84,11 +89,14 @@ export function CreateListingDialog({ open, onClose, onListingCreated }: CreateL
         price: parseFloat(price),
         ...(type === 'housing' ? {
           location,
-          bedrooms: parseInt(bedrooms),
+          housing_type: housingType || null,
+          total_rooms: totalRooms ? parseInt(totalRooms) : null,
+          available_rooms: availableRooms ? parseInt(availableRooms) : null,
           bathrooms: parseFloat(bathrooms),
+          roommates: roommates ? parseInt(roommates) : null,
+          female_roommates: femaleRoommates ? parseInt(femaleRoommates) : null,
           available_from: availableFrom || null,
           available_to: availableTo || null,
-          gender_pref: gender,
         } : {
           category,
           condition,
@@ -130,7 +138,7 @@ export function CreateListingDialog({ open, onClose, onListingCreated }: CreateL
             <TabsContent value="housing" className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="title">Title *</Label>
-                <Input id="title" placeholder="e.g., 1BR Apartment near RIT" value={title} onChange={(e) => setTitle(e.target.value)} required />
+                <Input id="title" placeholder="e.g., Apartment near RIT — 2 rooms available" value={title} onChange={(e) => setTitle(e.target.value)} required />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="description">Description *</Label>
@@ -138,33 +146,48 @@ export function CreateListingDialog({ open, onClose, onListingCreated }: CreateL
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
+                  <Label htmlFor="location">Address *</Label>
+                  <Input id="location" placeholder="e.g., 100 Park Point Dr, Rochester, NY" value={location} onChange={(e) => setLocation(e.target.value)} required />
+                </div>
+                <div className="space-y-2">
                   <Label htmlFor="price">Monthly Rent ($) *</Label>
                   <Input id="price" type="number" placeholder="800" value={price} onChange={(e) => setPrice(e.target.value)} required min="0" step="0.01" />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="location">Location *</Label>
-                  <Input id="location" placeholder="e.g., Park Point" value={location} onChange={(e) => setLocation(e.target.value)} required />
-                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="housingType">Property Type *</Label>
+                <Select value={housingType} onValueChange={setHousingType}>
+                  <SelectTrigger id="housingType"><SelectValue placeholder="Select property type..." /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="apartment">Apartment</SelectItem>
+                    <SelectItem value="house">House</SelectItem>
+                    <SelectItem value="studio">Studio</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <div className="grid grid-cols-3 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="bedrooms">Bedrooms *</Label>
-                  <Input id="bedrooms" type="number" placeholder="1" value={bedrooms} onChange={(e) => setBedrooms(e.target.value)} required min="0" />
+                  <Label htmlFor="totalRooms">Total Rooms *</Label>
+                  <Input id="totalRooms" type="number" placeholder="4" value={totalRooms} onChange={(e) => setTotalRooms(e.target.value)} required min="1" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="availableRooms">Available Rooms *</Label>
+                  <Input id="availableRooms" type="number" placeholder="1" value={availableRooms} onChange={(e) => setAvailableRooms(e.target.value)} required min="1" />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="bathrooms">Bathrooms *</Label>
                   <Input id="bathrooms" type="number" placeholder="1" value={bathrooms} onChange={(e) => setBathrooms(e.target.value)} required min="0" step="0.5" />
+                  <p className="text-xs text-muted-foreground">0.5 = half bathroom (no shower)</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="roommates">Roommates</Label>
+                  <Input id="roommates" type="number" placeholder="3" value={roommates} onChange={(e) => setRoommates(e.target.value)} min="0" />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="gender">Gender Preference</Label>
-                  <Select value={gender} onValueChange={setGender}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="any">Any</SelectItem>
-                      <SelectItem value="male">Male</SelectItem>
-                      <SelectItem value="female">Female</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <Label htmlFor="femaleRoommates">Female Roommates</Label>
+                  <Input id="femaleRoommates" type="number" placeholder="2" value={femaleRoommates} onChange={(e) => setFemaleRoommates(e.target.value)} min="0" />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">

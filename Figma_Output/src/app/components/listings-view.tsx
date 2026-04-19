@@ -25,10 +25,16 @@ export function ListingsView({ type, onContact, onView }: ListingsViewProps) {
   const [maxPrice, setMaxPrice] = useState(type === 'housing' ? 2000 : 1000);
   const [moveInDate, setMoveInDate] = useState('');
   const [moveOutDate, setMoveOutDate] = useState('');
-  const [housingTypes, setHousingTypes] = useState({ house: false, apartment: false });
+  const [housingTypes, setHousingTypes] = useState({ house: false, apartment: false, studio: false });
   const [categories, setCategories] = useState({ furniture: false, electronics: false, books: false });
   const [conditions, setConditions] = useState({ new: false, used: false });
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [bedrooms, setBedrooms] = useState('');
+  const [bathrooms, setBathrooms] = useState('');
+  const [genderPref, setGenderPref] = useState('');
+  const [distanceFromCampus, setDistanceFromCampus] = useState('');
+  const [petsAllowed, setPetsAllowed] = useState(false);
+  const [utilitiesFilter, setUtilitiesFilter] = useState({ electric: false, water: false, gas: false });
 
   useEffect(() => {
     fetchListings();
@@ -61,7 +67,7 @@ export function ListingsView({ type, onContact, onView }: ListingsViewProps) {
 
   useEffect(() => {
     filterAndSortListings();
-  }, [listings, searchQuery, sortBy, maxPrice, moveInDate, moveOutDate, housingTypes, categories, conditions]);
+  }, [listings, searchQuery, sortBy, maxPrice, moveInDate, moveOutDate, housingTypes, categories, conditions, bedrooms, bathrooms, genderPref, distanceFromCampus, petsAllowed, utilitiesFilter]);
 
   const fetchListings = async () => {
     setLoading(true);
@@ -104,6 +110,28 @@ export function ListingsView({ type, onContact, onView }: ListingsViewProps) {
       if (activeTypes.length > 0) {
         filtered = filtered.filter(l => l.housing_type && activeTypes.includes(l.housing_type.toLowerCase()));
       }
+      if (bedrooms) {
+        if (bedrooms === 'studio') filtered = filtered.filter(l => l.bedrooms === 0);
+        else if (bedrooms === '3+') filtered = filtered.filter(l => (l.bedrooms ?? 0) >= 3);
+        else filtered = filtered.filter(l => l.bedrooms === parseInt(bedrooms));
+      }
+      if (bathrooms) {
+        if (bathrooms === '2+') filtered = filtered.filter(l => (l.bathrooms ?? 0) >= 2);
+        else filtered = filtered.filter(l => (l.bathrooms ?? 0) >= parseFloat(bathrooms));
+      }
+      if (genderPref) {
+        filtered = filtered.filter(l => !l.gender_pref || l.gender_pref === 'any' || l.gender_pref === genderPref);
+      }
+      if (distanceFromCampus) {
+        if (distanceFromCampus === 'walking') filtered = filtered.filter(l => (l.distance_from_campus ?? 999) <= 0.25);
+        else if (distanceFromCampus === '<1') filtered = filtered.filter(l => (l.distance_from_campus ?? 999) < 1);
+        else if (distanceFromCampus === '1-3') filtered = filtered.filter(l => (l.distance_from_campus ?? 999) >= 1 && (l.distance_from_campus ?? 999) <= 3);
+        else if (distanceFromCampus === '3+') filtered = filtered.filter(l => (l.distance_from_campus ?? 0) > 3);
+      }
+      if (petsAllowed) filtered = filtered.filter(l => l.pets_allowed === true);
+      if (utilitiesFilter.electric) filtered = filtered.filter(l => l.electric_included === true);
+      if (utilitiesFilter.water) filtered = filtered.filter(l => l.water_included === true);
+      if (utilitiesFilter.gas) filtered = filtered.filter(l => l.gas_included === true);
     }
 
     if (type === 'marketplace') {
@@ -145,10 +173,16 @@ export function ListingsView({ type, onContact, onView }: ListingsViewProps) {
     setMaxPrice(type === 'housing' ? 2000 : 1000);
     setMoveInDate('');
     setMoveOutDate('');
-    setHousingTypes({ house: false, apartment: false });
+    setHousingTypes({ house: false, apartment: false, studio: false });
     setCategories({ furniture: false, electronics: false, books: false });
     setConditions({ new: false, used: false });
     setSearchQuery('');
+    setBedrooms('');
+    setBathrooms('');
+    setGenderPref('');
+    setDistanceFromCampus('');
+    setPetsAllowed(false);
+    setUtilitiesFilter({ electric: false, water: false, gas: false });
   };
 
   return (
@@ -265,7 +299,7 @@ export function ListingsView({ type, onContact, onView }: ListingsViewProps) {
                 </div>
                 <div style={{ marginBottom: '16px' }}>
                   <label className="font-bold" style={{ fontSize: '13px', color: '#402E32', display: 'block', marginBottom: '8px' }}>Housing Type</label>
-                  <div className="flex" style={{ gap: '12px' }}>
+                  <div className="flex flex-wrap" style={{ gap: '10px' }}>
                     {Object.entries(housingTypes).map(([key, checked]) => (
                       <label key={key} className="flex items-center cursor-pointer" style={{ fontSize: '14px', color: '#5A4A44' }}>
                         <input type="checkbox" checked={checked}
@@ -273,6 +307,67 @@ export function ListingsView({ type, onContact, onView }: ListingsViewProps) {
                           style={{ width: '15px', height: '15px', marginRight: '8px', accentColor: '#F76902', cursor: 'pointer' }}
                         />
                         {key.charAt(0).toUpperCase() + key.slice(1)}
+                      </label>
+                    ))}
+                  </div>
+                </div>
+                <div className="grid grid-cols-2" style={{ gap: '12px', marginBottom: '16px' }}>
+                  <div>
+                    <label className="font-bold" style={{ fontSize: '13px', color: '#402E32', display: 'block', marginBottom: '6px' }}>Min Bedrooms</label>
+                    <select value={bedrooms} onChange={(e) => setBedrooms(e.target.value)} className="w-full outline-none"
+                      style={{ fontSize: '14px', color: bedrooms ? '#402E32' : '#B5866E', padding: '9px 10px', borderRadius: '8px', border: bedrooms ? '1px solid #F76902' : '1px solid #E8D5C4', backgroundColor: '#FFF6EE', cursor: 'pointer' }}>
+                      <option value="">Any</option>
+                      <option value="studio">Studio</option>
+                      <option value="1">1 Bed</option>
+                      <option value="2">2 Bed</option>
+                      <option value="3+">3+ Bed</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="font-bold" style={{ fontSize: '13px', color: '#402E32', display: 'block', marginBottom: '6px' }}>Min Bathrooms</label>
+                    <select value={bathrooms} onChange={(e) => setBathrooms(e.target.value)} className="w-full outline-none"
+                      style={{ fontSize: '14px', color: bathrooms ? '#402E32' : '#B5866E', padding: '9px 10px', borderRadius: '8px', border: bathrooms ? '1px solid #F76902' : '1px solid #E8D5C4', backgroundColor: '#FFF6EE', cursor: 'pointer' }}>
+                      <option value="">Any</option>
+                      <option value="1">1+</option>
+                      <option value="1.5">1.5+</option>
+                      <option value="2">2+</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="font-bold" style={{ fontSize: '13px', color: '#402E32', display: 'block', marginBottom: '6px' }}>Gender Pref.</label>
+                    <select value={genderPref} onChange={(e) => setGenderPref(e.target.value)} className="w-full outline-none"
+                      style={{ fontSize: '14px', color: genderPref ? '#402E32' : '#B5866E', padding: '9px 10px', borderRadius: '8px', border: genderPref ? '1px solid #F76902' : '1px solid #E8D5C4', backgroundColor: '#FFF6EE', cursor: 'pointer' }}>
+                      <option value="">Any</option>
+                      <option value="female">Female</option>
+                      <option value="male">Male</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="font-bold" style={{ fontSize: '13px', color: '#402E32', display: 'block', marginBottom: '6px' }}>Distance</label>
+                    <select value={distanceFromCampus} onChange={(e) => setDistanceFromCampus(e.target.value)} className="w-full outline-none"
+                      style={{ fontSize: '14px', color: distanceFromCampus ? '#402E32' : '#B5866E', padding: '9px 10px', borderRadius: '8px', border: distanceFromCampus ? '1px solid #F76902' : '1px solid #E8D5C4', backgroundColor: '#FFF6EE', cursor: 'pointer' }}>
+                      <option value="">Any</option>
+                      <option value="walking">Walking</option>
+                      <option value="<1">&lt;1 mi</option>
+                      <option value="1-3">1–3 mi</option>
+                      <option value="3+">3+ mi</option>
+                    </select>
+                  </div>
+                </div>
+                <div style={{ marginBottom: '16px' }}>
+                  <label className="font-bold" style={{ fontSize: '13px', color: '#402E32', display: 'block', marginBottom: '8px' }}>Features & Utilities Included</label>
+                  <div className="flex flex-wrap" style={{ gap: '10px' }}>
+                    <label className="flex items-center cursor-pointer" style={{ fontSize: '14px', color: '#5A4A44' }}>
+                      <input type="checkbox" checked={petsAllowed} onChange={() => setPetsAllowed(prev => !prev)}
+                        style={{ width: '15px', height: '15px', marginRight: '8px', accentColor: '#F76902', cursor: 'pointer' }} />
+                      Pets OK
+                    </label>
+                    {([['electric', 'Electric'], ['water', 'Water'], ['gas', 'Gas']] as const).map(([key, label]) => (
+                      <label key={key} className="flex items-center cursor-pointer" style={{ fontSize: '14px', color: '#5A4A44' }}>
+                        <input type="checkbox" checked={utilitiesFilter[key]}
+                          onChange={() => setUtilitiesFilter(prev => ({ ...prev, [key]: !prev[key] }))}
+                          style={{ width: '15px', height: '15px', marginRight: '8px', accentColor: '#F76902', cursor: 'pointer' }} />
+                        {label} incl.
                       </label>
                     ))}
                   </div>
@@ -390,6 +485,76 @@ export function ListingsView({ type, onContact, onView }: ListingsViewProps) {
                             style={{ width: '16px', height: '16px', marginRight: '10px', accentColor: '#F76902' }}
                           />
                           {key.charAt(0).toUpperCase() + key.slice(1)}
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                  {/* Bedrooms */}
+                  <div style={{ marginBottom: '24px' }}>
+                    <label className="font-bold" style={{ fontSize: '14px', color: '#402E32', display: 'block', marginBottom: '8px' }}>Min Bedrooms</label>
+                    <select value={bedrooms} onChange={(e) => setBedrooms(e.target.value)} className="w-full outline-none"
+                      style={{ fontSize: '15px', color: bedrooms ? '#402E32' : '#B5866E', padding: '10px 12px', borderRadius: '8px', border: bedrooms ? '1px solid #F76902' : '1px solid #E8D5C4', backgroundColor: '#FFF6EE', cursor: 'pointer' }}>
+                      <option value="">Any</option>
+                      <option value="studio">Studio</option>
+                      <option value="1">1 Bedroom</option>
+                      <option value="2">2 Bedrooms</option>
+                      <option value="3+">3+ Bedrooms</option>
+                    </select>
+                  </div>
+                  {/* Bathrooms */}
+                  <div style={{ marginBottom: '24px' }}>
+                    <label className="font-bold" style={{ fontSize: '14px', color: '#402E32', display: 'block', marginBottom: '8px' }}>Min Bathrooms</label>
+                    <select value={bathrooms} onChange={(e) => setBathrooms(e.target.value)} className="w-full outline-none"
+                      style={{ fontSize: '15px', color: bathrooms ? '#402E32' : '#B5866E', padding: '10px 12px', borderRadius: '8px', border: bathrooms ? '1px solid #F76902' : '1px solid #E8D5C4', backgroundColor: '#FFF6EE', cursor: 'pointer' }}>
+                      <option value="">Any</option>
+                      <option value="1">1+</option>
+                      <option value="1.5">1.5+</option>
+                      <option value="2">2+</option>
+                    </select>
+                  </div>
+                  {/* Gender Preference */}
+                  <div style={{ marginBottom: '24px' }}>
+                    <label className="font-bold" style={{ fontSize: '14px', color: '#402E32', display: 'block', marginBottom: '8px' }}>Gender Preference</label>
+                    <select value={genderPref} onChange={(e) => setGenderPref(e.target.value)} className="w-full outline-none"
+                      style={{ fontSize: '15px', color: genderPref ? '#402E32' : '#B5866E', padding: '10px 12px', borderRadius: '8px', border: genderPref ? '1px solid #F76902' : '1px solid #E8D5C4', backgroundColor: '#FFF6EE', cursor: 'pointer' }}>
+                      <option value="">Any</option>
+                      <option value="female">Female preferred</option>
+                      <option value="male">Male preferred</option>
+                    </select>
+                  </div>
+                  {/* Distance from Campus */}
+                  <div style={{ marginBottom: '24px' }}>
+                    <label className="font-bold" style={{ fontSize: '14px', color: '#402E32', display: 'block', marginBottom: '8px' }}>Distance from Campus</label>
+                    <select value={distanceFromCampus} onChange={(e) => setDistanceFromCampus(e.target.value)} className="w-full outline-none"
+                      style={{ fontSize: '15px', color: distanceFromCampus ? '#402E32' : '#B5866E', padding: '10px 12px', borderRadius: '8px', border: distanceFromCampus ? '1px solid #F76902' : '1px solid #E8D5C4', backgroundColor: '#FFF6EE', cursor: 'pointer' }}>
+                      <option value="">Any</option>
+                      <option value="walking">Walking (≤0.25 mi)</option>
+                      <option value="<1">&lt;1 mile</option>
+                      <option value="1-3">1–3 miles</option>
+                      <option value="3+">3+ miles</option>
+                    </select>
+                  </div>
+                  {/* Pets & Utilities */}
+                  <div style={{ marginBottom: '24px' }}>
+                    <label className="font-bold" style={{ fontSize: '14px', color: '#402E32', display: 'block', marginBottom: '10px' }}>Features</label>
+                    <div className="flex flex-col" style={{ gap: '10px' }}>
+                      <label className="flex items-center cursor-pointer" style={{ fontSize: '15px', color: '#5A4A44' }}>
+                        <input type="checkbox" checked={petsAllowed} onChange={() => setPetsAllowed(prev => !prev)}
+                          className="cursor-pointer" style={{ width: '16px', height: '16px', marginRight: '10px', accentColor: '#F76902' }} />
+                        Pets Allowed
+                      </label>
+                    </div>
+                  </div>
+                  {/* Utilities Included */}
+                  <div style={{ marginBottom: '24px' }}>
+                    <label className="font-bold" style={{ fontSize: '14px', color: '#402E32', display: 'block', marginBottom: '10px' }}>Utilities Included in Rent</label>
+                    <div className="flex flex-col" style={{ gap: '10px' }}>
+                      {([['electric', 'Electric'], ['water', 'Water'], ['gas', 'Gas']] as const).map(([key, label]) => (
+                        <label key={key} className="flex items-center cursor-pointer" style={{ fontSize: '15px', color: '#5A4A44' }}>
+                          <input type="checkbox" checked={utilitiesFilter[key]}
+                            onChange={() => setUtilitiesFilter(prev => ({ ...prev, [key]: !prev[key] }))}
+                            className="cursor-pointer" style={{ width: '16px', height: '16px', marginRight: '10px', accentColor: '#F76902' }} />
+                          {label}
                         </label>
                       ))}
                     </div>

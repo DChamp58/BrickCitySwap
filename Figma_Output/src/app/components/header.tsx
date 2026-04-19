@@ -217,9 +217,9 @@ export function Header({ currentView, onViewChange, onCreateListing }: HeaderPro
                               <p style={{ fontSize: '12px', color: '#B5866E', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                 {n.body.split('📍')[0].trim()}
                               </p>
-                              {n.data?.listing_location && (
-                                <p style={{ fontSize: '12px', color: '#B5866E', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginTop: '1px' }}>
-                                  📍 {n.data.listing_location}
+                              {n.type === 'new_message' && (n.data?.listing_location || n.data?.listing_title) && (
+                                <p style={{ fontSize: '12px', color: '#F76902', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginTop: '1px' }}>
+                                  {n.data?.listing_location ? `📍 ${n.data.listing_location}` : n.data?.listing_title}
                                 </p>
                               )}
                               <p style={{ fontSize: '11px', color: '#C4A88E', marginTop: '4px' }}>{formatRelativeTime(n.created_at)}</p>

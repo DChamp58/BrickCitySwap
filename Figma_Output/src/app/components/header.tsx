@@ -207,7 +207,7 @@ export function Header({ currentView, onViewChange, onCreateListing }: HeaderPro
                             onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = n.read ? '#FFFFFF' : '#FFF6EE'; }}
                           >
                             <div style={{ width: '36px', height: '36px', borderRadius: '8px', backgroundColor: '#FFEEE0', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-                              {n.data?.listing_image_url
+                              {n.type === 'new_message' && n.data?.listing_image_url
                                 ? <img src={n.data.listing_image_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                 : notifIcon(n)
                               }

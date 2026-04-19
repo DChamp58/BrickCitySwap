@@ -71,8 +71,8 @@ export function CreateListingDialog({ open, onClose, onListingCreated }: CreateL
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    if (images.length + files.length > 5) {
-      toast.error('Maximum 5 images allowed');
+    if (images.length + files.length > 10) {
+      toast.error('Maximum 10 images allowed');
       return;
     }
     const newImages = [...images, ...files];
@@ -193,10 +193,10 @@ export function CreateListingDialog({ open, onClose, onListingCreated }: CreateL
                   <Label htmlFor="availableRooms">Available Rooms *</Label>
                   <Input id="availableRooms" type="number" placeholder="1" value={availableRooms} onChange={(e) => setAvailableRooms(e.target.value)} required min="1" />
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-1">
                   <Label htmlFor="bathrooms">Bathrooms *</Label>
-                  <Input id="bathrooms" type="number" placeholder="1" value={bathrooms} onChange={(e) => setBathrooms(e.target.value)} required min="0" step="0.5" />
                   <p className="text-xs text-muted-foreground">0.5 = half bath (no shower)</p>
+                  <Input id="bathrooms" type="number" placeholder="1" value={bathrooms} onChange={(e) => setBathrooms(e.target.value)} required min="0" step="0.5" />
                 </div>
               </div>
 
@@ -307,7 +307,7 @@ export function CreateListingDialog({ open, onClose, onListingCreated }: CreateL
 
             {/* Image Upload */}
             <div className="space-y-2 mt-4">
-              <Label>Photos (up to 5)</Label>
+              <Label>Photos (up to 10)</Label>
               <div className="flex gap-2 flex-wrap">
                 {imagePreviews.map((src, i) => (
                   <div key={i} className="relative w-20 h-20 rounded border overflow-hidden">
@@ -321,7 +321,7 @@ export function CreateListingDialog({ open, onClose, onListingCreated }: CreateL
                     </button>
                   </div>
                 ))}
-                {images.length < 5 && (
+                {images.length < 10 && (
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}

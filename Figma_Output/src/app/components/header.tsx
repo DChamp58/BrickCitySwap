@@ -213,16 +213,30 @@ export function Header({ currentView, onViewChange, onCreateListing }: HeaderPro
                               }
                             </div>
                             <div style={{ flex: 1, minWidth: 0 }}>
-                              <p className="font-medium" style={{ fontSize: '13px', color: '#402E32', marginBottom: '2px', lineHeight: '1.4' }}>{n.title}</p>
-                              <p style={{ fontSize: '12px', color: '#B5866E', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                {n.body.split('📍')[0].trim()}
-                              </p>
-                              {n.type === 'new_message' && (n.data?.listing_location || n.data?.listing_title) && (
-                                <p style={{ fontSize: '12px', color: '#F76902', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginTop: '1px' }}>
-                                  {n.data?.listing_location ? `📍 ${n.data.listing_location}` : n.data?.listing_title}
-                                </p>
-                              )}
-                              <p style={{ fontSize: '11px', color: '#C4A88E', marginTop: '4px' }}>{formatRelativeTime(n.created_at)}</p>
+                              {(() => {
+                                const parts = n.body.split('📍');
+                                const messageText = parts[0].trim();
+                                const meetupLocation = parts[1]?.replace(/suggested meetup location:\s*/i, '').trim();
+                                return (
+                                  <>
+                                    <p className="font-medium" style={{ fontSize: '13px', color: '#402E32', marginBottom: '2px', lineHeight: '1.4' }}>{n.title}</p>
+                                    {n.type === 'new_message' && n.data?.listing_title && (
+                                      <p style={{ fontSize: '12px', color: '#F76902', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: '1px' }}>
+                                        {n.data.listing_title}
+                                      </p>
+                                    )}
+                                    <p style={{ fontSize: '12px', color: '#B5866E', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                      {messageText || n.body}
+                                    </p>
+                                    {meetupLocation && (
+                                      <p style={{ fontSize: '12px', color: '#B5866E', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginTop: '1px' }}>
+                                        📍 {meetupLocation}
+                                      </p>
+                                    )}
+                                    <p style={{ fontSize: '11px', color: '#C4A88E', marginTop: '4px' }}>{formatRelativeTime(n.created_at)}</p>
+                                  </>
+                                );
+                              })()}
                             </div>
                             {!n.read && (
                               <div style={{ width: '7px', height: '7px', borderRadius: '50%', backgroundColor: '#F76902', flexShrink: 0, marginTop: '4px' }} />

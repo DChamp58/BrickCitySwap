@@ -6,7 +6,7 @@ import { Listing } from './listing-card';
 import {
   MapPin, Calendar, Bath, BedDouble, Home, MessageCircle,
   ChevronLeft, ChevronRight, X, Share2, Heart,
-  Tag, ShieldCheck,
+  Tag, ShieldCheck, Users, DoorOpen,
 } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { trackEvent } from '@/lib/analytics';
@@ -694,10 +694,10 @@ export function ListingDetailDialog({
                       <span style={{ fontSize: '13px', color: '#402E32' }}>{fmt(listing.available_from)}{listing.available_to ? ` – ${fmt(listing.available_to)}` : ''}</span>
                     </div>
                   )}
-                  {listing.bedrooms != null && (
+                  {listing.housing_type && (
                     <div className="flex items-center" style={{ gap: '6px' }}>
-                      <BedDouble size={15} style={{ color: '#F76902', flexShrink: 0 }} />
-                      <span style={{ fontSize: '13px', color: '#402E32' }}>{listing.bedrooms === 0 ? 'Studio' : `${listing.bedrooms} bed`}</span>
+                      <Home size={15} style={{ color: '#F76902', flexShrink: 0 }} />
+                      <span style={{ fontSize: '13px', color: '#402E32', textTransform: 'capitalize' }}>{listing.housing_type}</span>
                     </div>
                   )}
                   {listing.bathrooms != null && (
@@ -706,10 +706,22 @@ export function ListingDetailDialog({
                       <span style={{ fontSize: '13px', color: '#402E32' }}>{listing.bathrooms} bath</span>
                     </div>
                   )}
-                  {listing.housing_type && (
+                  {(listing.total_rooms != null || listing.available_rooms != null) && (
                     <div className="flex items-center" style={{ gap: '6px' }}>
-                      <Home size={15} style={{ color: '#F76902', flexShrink: 0 }} />
-                      <span style={{ fontSize: '13px', color: '#402E32', textTransform: 'capitalize' }}>{listing.housing_type}</span>
+                      <DoorOpen size={15} style={{ color: '#F76902', flexShrink: 0 }} />
+                      <span style={{ fontSize: '13px', color: '#402E32' }}>
+                        {listing.available_rooms != null && listing.total_rooms != null
+                          ? `${listing.available_rooms} of ${listing.total_rooms} rooms available`
+                          : listing.total_rooms != null
+                            ? `${listing.total_rooms} rooms total`
+                            : `${listing.available_rooms} rooms available`}
+                      </span>
+                    </div>
+                  )}
+                  {listing.roommates != null && (
+                    <div className="flex items-center" style={{ gap: '6px' }}>
+                      <Users size={15} style={{ color: '#F76902', flexShrink: 0 }} />
+                      <span style={{ fontSize: '13px', color: '#402E32' }}>{listing.roommates} roommate{listing.roommates !== 1 ? 's' : ''}</span>
                     </div>
                   )}
                 </div>
@@ -719,11 +731,40 @@ export function ListingDetailDialog({
                   <p style={{ fontSize: '15px', color: '#5A4A44', lineHeight: '1.7' }}>{listing.description}</p>
                 </div>
 
-                {listing.gender_pref && listing.gender_pref !== 'any' && (
-                  <div style={{ marginBottom: '24px', padding: '14px 16px', borderRadius: '10px', backgroundColor: '#FFF6EE', border: '1px solid #E8D5C4' }}>
-                    <p style={{ fontSize: '14px', color: '#B5866E' }}>
-                      <span style={{ color: '#F76902', fontWeight: 600 }}>Preference:</span> {listing.gender_pref.charAt(0).toUpperCase() + listing.gender_pref.slice(1)} preferred
-                    </p>
+                {/* Roommates breakdown */}
+                {(listing.female_roommates != null || listing.male_roommates != null || listing.other_roommates != null || listing.prefer_not_to_say_roommates != null) && (
+                  <div style={{ marginBottom: '24px' }}>
+                    <h3 className="font-semibold" style={{ fontSize: '16px', color: '#402E32', marginBottom: '12px' }}>
+                      <span className="flex items-center" style={{ gap: '7px' }}>
+                        <Users size={16} style={{ color: '#F76902' }} /> Roommates
+                      </span>
+                    </h3>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: '10px' }}>
+                      {listing.female_roommates != null && (
+                        <div style={{ padding: '12px', borderRadius: '10px', backgroundColor: '#FFF6EE', border: '1px solid #E8D5C4', textAlign: 'center' }}>
+                          <p style={{ fontSize: '22px', fontWeight: 700, color: '#F76902', margin: 0 }}>{listing.female_roommates}</p>
+                          <p style={{ fontSize: '12px', color: '#B5866E', margin: '2px 0 0' }}>Female</p>
+                        </div>
+                      )}
+                      {listing.male_roommates != null && (
+                        <div style={{ padding: '12px', borderRadius: '10px', backgroundColor: '#FFF6EE', border: '1px solid #E8D5C4', textAlign: 'center' }}>
+                          <p style={{ fontSize: '22px', fontWeight: 700, color: '#F76902', margin: 0 }}>{listing.male_roommates}</p>
+                          <p style={{ fontSize: '12px', color: '#B5866E', margin: '2px 0 0' }}>Male</p>
+                        </div>
+                      )}
+                      {listing.other_roommates != null && listing.other_roommates > 0 && (
+                        <div style={{ padding: '12px', borderRadius: '10px', backgroundColor: '#FFF6EE', border: '1px solid #E8D5C4', textAlign: 'center' }}>
+                          <p style={{ fontSize: '22px', fontWeight: 700, color: '#F76902', margin: 0 }}>{listing.other_roommates}</p>
+                          <p style={{ fontSize: '12px', color: '#B5866E', margin: '2px 0 0' }}>{listing.other_roommates_spec || 'Other'}</p>
+                        </div>
+                      )}
+                      {listing.prefer_not_to_say_roommates != null && listing.prefer_not_to_say_roommates > 0 && (
+                        <div style={{ padding: '12px', borderRadius: '10px', backgroundColor: '#FFF6EE', border: '1px solid #E8D5C4', textAlign: 'center' }}>
+                          <p style={{ fontSize: '22px', fontWeight: 700, color: '#F76902', margin: 0 }}>{listing.prefer_not_to_say_roommates}</p>
+                          <p style={{ fontSize: '12px', color: '#B5866E', margin: '2px 0 0' }}>Prefer Not to Say</p>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
 

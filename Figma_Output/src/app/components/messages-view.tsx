@@ -23,6 +23,7 @@ export function MessagesView({ openConversationId }: MessagesViewProps) {
   const [input, setInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const bottomRef = useRef<HTMLDivElement>(null);
+  const chatScrollRef = useRef<HTMLDivElement>(null);
 
   const allConversations = user ? getConversationsForUser(user.id) : [];
   const conversations = searchQuery.trim()
@@ -41,8 +42,8 @@ export function MessagesView({ openConversationId }: MessagesViewProps) {
   }, [selected?.id, selected?.messages.length]);
 
   useEffect(() => {
-    if (bottomRef.current) {
-      bottomRef.current.scrollIntoView({ behavior: 'instant' });
+    if (chatScrollRef.current) {
+      chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
     }
   }, [selected?.messages.length]);
 
@@ -207,7 +208,7 @@ export function MessagesView({ openConversationId }: MessagesViewProps) {
               </div>
 
               {/* Messages */}
-              <div className="flex-1" style={{ overflowY: 'auto', padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div ref={chatScrollRef} className="flex-1" style={{ overflowY: 'auto', padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 {selected.messages.map((message) => {
                   const isMe = message.senderId === user.id;
                   const msgAvatar = isMe ? user.avatarUrl : otherAvatar(selected);
@@ -228,7 +229,6 @@ export function MessagesView({ openConversationId }: MessagesViewProps) {
                     </div>
                   );
                 })}
-                <div ref={bottomRef} />
               </div>
 
               {/* Message Input */}

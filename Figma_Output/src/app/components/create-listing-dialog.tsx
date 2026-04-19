@@ -143,7 +143,7 @@ export function CreateListingDialog({ open, onClose, onListingCreated }: CreateL
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[78vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Create New Listing</DialogTitle>
           <DialogDescription>Post a housing sublease or marketplace item</DialogDescription>
@@ -162,29 +162,29 @@ export function CreateListingDialog({ open, onClose, onListingCreated }: CreateL
                 <Input id="title" placeholder="e.g., Apartment near RIT — 2 rooms available" value={title} onChange={(e) => setTitle(e.target.value)} required />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="location">Address *</Label>
-                <Input id="location" placeholder="e.g., 100 Park Point Dr, Rochester, NY" value={location} onChange={(e) => setLocation(e.target.value)} required />
+              <div className="grid grid-cols-3 gap-4">
+                <div className="space-y-2 col-span-2">
+                  <Label htmlFor="location">Address *</Label>
+                  <Input id="location" placeholder="e.g., 100 Park Point Dr, Rochester, NY" value={location} onChange={(e) => setLocation(e.target.value)} required />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="price">Monthly Rent ($) *</Label>
+                  <Input id="price" type="number" placeholder="800" value={price} onChange={(e) => setPrice(e.target.value)} required min="0" step="0.01" />
+                </div>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="price">Monthly Rent ($) *</Label>
-                <Input id="price" type="number" placeholder="800" value={price} onChange={(e) => setPrice(e.target.value)} required min="0" step="0.01" />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="housingType">Property Type *</Label>
-                <Select value={housingType} onValueChange={setHousingType} required>
-                  <SelectTrigger id="housingType"><SelectValue placeholder="Select property type..." /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="apartment">Apartment</SelectItem>
-                    <SelectItem value="house">House</SelectItem>
-                    <SelectItem value="studio">Studio</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-4 gap-4">
+                <div className="space-y-2 col-span-2">
+                  <Label htmlFor="housingType">Property Type *</Label>
+                  <Select value={housingType} onValueChange={setHousingType} required>
+                    <SelectTrigger id="housingType"><SelectValue placeholder="Select type..." /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="apartment">Apartment</SelectItem>
+                      <SelectItem value="house">House</SelectItem>
+                      <SelectItem value="studio">Studio</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
                 <div className="space-y-2">
                   <Label htmlFor="totalRooms">Total Rooms *</Label>
                   <Input id="totalRooms" type="number" placeholder="4" value={totalRooms} onChange={(e) => setTotalRooms(e.target.value)} required min="1" />
@@ -195,7 +195,7 @@ export function CreateListingDialog({ open, onClose, onListingCreated }: CreateL
                 </div>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-2 w-1/4">
                 <Label htmlFor="bathrooms">Bathrooms *</Label>
                 <Input id="bathrooms" type="number" placeholder="1" value={bathrooms} onChange={(e) => setBathrooms(e.target.value)} required min="0" step="0.5" />
                 <p className="text-xs text-muted-foreground">0.5 = half bathroom (no shower)</p>
@@ -204,11 +204,11 @@ export function CreateListingDialog({ open, onClose, onListingCreated }: CreateL
               {/* Roommates */}
               <div className="space-y-3 rounded-lg border p-4">
                 <p className="text-sm font-medium">Roommates</p>
-                <div className="space-y-2">
-                  <Label htmlFor="roommates">Total Roommates</Label>
-                  <Input id="roommates" type="number" placeholder="3" value={roommates} onChange={(e) => setRoommates(e.target.value)} min="0" />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-4 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="roommates">Total</Label>
+                    <Input id="roommates" type="number" placeholder="3" value={roommates} onChange={(e) => setRoommates(e.target.value)} min="0" />
+                  </div>
                   <div className="space-y-2">
                     <Label htmlFor="femaleRoommates">Female</Label>
                     <Input id="femaleRoommates" type="number" placeholder="0" value={femaleRoommates} onChange={(e) => setFemaleRoommates(e.target.value)} min="0" />
@@ -217,13 +217,17 @@ export function CreateListingDialog({ open, onClose, onListingCreated }: CreateL
                     <Label htmlFor="maleRoommates">Male</Label>
                     <Input id="maleRoommates" type="number" placeholder="0" value={maleRoommates} onChange={(e) => setMaleRoommates(e.target.value)} min="0" />
                   </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="preferNotToSayRoommates">Prefer Not to Say</Label>
+                    <Input id="preferNotToSayRoommates" type="number" placeholder="0" value={preferNotToSayRoommates} onChange={(e) => setPreferNotToSayRoommates(e.target.value)} min="0" />
+                  </div>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-4 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="otherRoommates">Other</Label>
                     <Input id="otherRoommates" type="number" placeholder="0" value={otherRoommates} onChange={(e) => setOtherRoommates(e.target.value)} min="0" />
                   </div>
-                  <div className="space-y-2">
+                  <div className="space-y-2 col-span-3">
                     <Label htmlFor="otherRoommatesSpec">
                       Other — Specification
                       {otherRoommates && parseInt(otherRoommates) > 0 && <span className="text-destructive ml-1">*</span>}
@@ -236,10 +240,6 @@ export function CreateListingDialog({ open, onClose, onListingCreated }: CreateL
                       disabled={!otherRoommates || parseInt(otherRoommates) === 0}
                     />
                   </div>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="preferNotToSayRoommates">Prefer Not to Say</Label>
-                  <Input id="preferNotToSayRoommates" type="number" placeholder="0" value={preferNotToSayRoommates} onChange={(e) => setPreferNotToSayRoommates(e.target.value)} min="0" />
                 </div>
               </div>
 
@@ -260,7 +260,7 @@ export function CreateListingDialog({ open, onClose, onListingCreated }: CreateL
 
               <div className="space-y-2">
                 <Label htmlFor="description">Description *</Label>
-                <Textarea id="description" placeholder="Describe the housing..." value={description} onChange={(e) => setDescription(e.target.value)} required rows={4} />
+                <Textarea id="description" placeholder="Describe the housing..." value={description} onChange={(e) => setDescription(e.target.value)} required rows={3} />
               </div>
             </TabsContent>
 

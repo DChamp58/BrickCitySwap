@@ -6,7 +6,7 @@ import { Listing } from './listing-card';
 import {
   MapPin, Calendar, Bath, BedDouble, Home, MessageCircle,
   ChevronLeft, ChevronRight, X, Share2, Heart,
-  Tag, ShieldCheck, Users, DoorOpen,
+  Tag, ShieldCheck, Users, DoorOpen, PawPrint, Zap, Droplets, Flame,
 } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { trackEvent } from '@/lib/analytics';
@@ -731,39 +731,30 @@ export function ListingDetailDialog({
                   <p style={{ fontSize: '15px', color: '#5A4A44', lineHeight: '1.7' }}>{listing.description}</p>
                 </div>
 
-                {/* Roommates breakdown */}
+                {/* Roommates breakdown — circles */}
                 {(listing.female_roommates != null || listing.male_roommates != null || listing.other_roommates != null || listing.prefer_not_to_say_roommates != null) && (
                   <div style={{ marginBottom: '24px' }}>
-                    <h3 className="font-semibold" style={{ fontSize: '16px', color: '#402E32', marginBottom: '12px' }}>
-                      <span className="flex items-center" style={{ gap: '7px' }}>
-                        <Users size={16} style={{ color: '#F76902' }} /> Roommates
-                      </span>
+                    <h3 className="font-semibold" style={{ fontSize: '16px', color: '#402E32', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '7px' }}>
+                      <Users size={16} style={{ color: '#F76902' }} /> Roommates
                     </h3>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: '10px' }}>
-                      {listing.female_roommates != null && (
-                        <div style={{ padding: '12px', borderRadius: '10px', backgroundColor: '#FFF6EE', border: '1px solid #E8D5C4', textAlign: 'center' }}>
-                          <p style={{ fontSize: '22px', fontWeight: 700, color: '#F76902', margin: 0 }}>{listing.female_roommates}</p>
-                          <p style={{ fontSize: '12px', color: '#B5866E', margin: '2px 0 0' }}>Female</p>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px' }}>
+                      {[
+                        { count: listing.female_roommates, label: 'Female' },
+                        { count: listing.male_roommates, label: 'Male' },
+                        { count: listing.other_roommates, label: listing.other_roommates_spec || 'Other' },
+                        { count: listing.prefer_not_to_say_roommates, label: 'Prefer Not to Say' },
+                      ].filter(r => r.count != null && r.count > 0).map(r => (
+                        <div key={r.label} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
+                          <div style={{
+                            width: '64px', height: '64px', borderRadius: '50%',
+                            backgroundColor: '#FFF6EE', border: '2px solid #F76902',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          }}>
+                            <span style={{ fontSize: '24px', fontWeight: 800, color: '#F76902' }}>{r.count}</span>
+                          </div>
+                          <span style={{ fontSize: '12px', color: '#B5866E', textAlign: 'center', maxWidth: '70px' }}>{r.label}</span>
                         </div>
-                      )}
-                      {listing.male_roommates != null && (
-                        <div style={{ padding: '12px', borderRadius: '10px', backgroundColor: '#FFF6EE', border: '1px solid #E8D5C4', textAlign: 'center' }}>
-                          <p style={{ fontSize: '22px', fontWeight: 700, color: '#F76902', margin: 0 }}>{listing.male_roommates}</p>
-                          <p style={{ fontSize: '12px', color: '#B5866E', margin: '2px 0 0' }}>Male</p>
-                        </div>
-                      )}
-                      {listing.other_roommates != null && listing.other_roommates > 0 && (
-                        <div style={{ padding: '12px', borderRadius: '10px', backgroundColor: '#FFF6EE', border: '1px solid #E8D5C4', textAlign: 'center' }}>
-                          <p style={{ fontSize: '22px', fontWeight: 700, color: '#F76902', margin: 0 }}>{listing.other_roommates}</p>
-                          <p style={{ fontSize: '12px', color: '#B5866E', margin: '2px 0 0' }}>{listing.other_roommates_spec || 'Other'}</p>
-                        </div>
-                      )}
-                      {listing.prefer_not_to_say_roommates != null && listing.prefer_not_to_say_roommates > 0 && (
-                        <div style={{ padding: '12px', borderRadius: '10px', backgroundColor: '#FFF6EE', border: '1px solid #E8D5C4', textAlign: 'center' }}>
-                          <p style={{ fontSize: '22px', fontWeight: 700, color: '#F76902', margin: 0 }}>{listing.prefer_not_to_say_roommates}</p>
-                          <p style={{ fontSize: '12px', color: '#B5866E', margin: '2px 0 0' }}>Prefer Not to Say</p>
-                        </div>
-                      )}
+                      ))}
                     </div>
                   </div>
                 )}
@@ -822,6 +813,80 @@ export function ListingDetailDialog({
                         </button>
                       )}
                     </div>
+                    {/* Compact roommates */}
+                    {(listing.female_roommates != null || listing.male_roommates != null || listing.other_roommates != null || listing.prefer_not_to_say_roommates != null) && (
+                      <div style={{ padding: '18px', borderRadius: '14px', border: '1.5px solid #E8D5C4', backgroundColor: '#FFFFFF' }}>
+                        <p style={{ fontSize: '13px', fontWeight: 600, color: '#402E32', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <Users size={14} style={{ color: '#F76902' }} /> Roommates
+                        </p>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                          {[
+                            { count: listing.female_roommates, label: 'Female' },
+                            { count: listing.male_roommates, label: 'Male' },
+                            { count: listing.other_roommates, label: listing.other_roommates_spec || 'Other' },
+                            { count: listing.prefer_not_to_say_roommates, label: 'Prefer Not to Say' },
+                          ].filter(r => r.count != null && r.count > 0).map(r => (
+                            <div key={r.label} style={{ padding: '6px 12px', borderRadius: '20px', backgroundColor: '#FFF6EE', border: '1px solid #E8D5C4', textAlign: 'center' }}>
+                              <span style={{ fontSize: '15px', fontWeight: 700, color: '#F76902' }}>{r.count}</span>
+                              <span style={{ fontSize: '11px', color: '#B5866E', marginLeft: '4px' }}>{r.label}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Pets */}
+                    {listing.pets_allowed != null && (
+                      <div style={{ padding: '18px', borderRadius: '14px', border: '1.5px solid #E8D5C4', backgroundColor: '#FFFFFF' }}>
+                        <p style={{ fontSize: '13px', fontWeight: 600, color: '#402E32', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <PawPrint size={14} style={{ color: '#F76902' }} /> Pets
+                        </p>
+                        <span style={{
+                          display: 'inline-block', padding: '4px 12px', borderRadius: '20px', fontSize: '13px', fontWeight: 600,
+                          backgroundColor: listing.pets_allowed ? '#DCFCE7' : '#FEE2E2',
+                          color: listing.pets_allowed ? '#16A34A' : '#DC2626',
+                        }}>
+                          {listing.pets_allowed ? 'Pets Allowed' : 'No Pets'}
+                        </span>
+                        {listing.pets_allowed && listing.pet_fee != null && (
+                          <p style={{ fontSize: '12px', color: '#B5866E', marginTop: '6px' }}>Pet fee: ${listing.pet_fee}/mo</p>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Other charges */}
+                    {(!listing.electric_included || !listing.water_included || !listing.gas_included) && (
+                      <div style={{ padding: '18px', borderRadius: '14px', border: '1.5px solid #E8D5C4', backgroundColor: '#FFFFFF' }}>
+                        <p style={{ fontSize: '13px', fontWeight: 600, color: '#402E32', marginBottom: '10px' }}>Other Charges</p>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                          {!listing.electric_included && (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                              <Zap size={13} style={{ color: '#F76902' }} />
+                              <span style={{ fontSize: '13px', color: '#5A4A44' }}>Electric</span>
+                            </div>
+                          )}
+                          {!listing.water_included && (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                              <Droplets size={13} style={{ color: '#F76902' }} />
+                              <span style={{ fontSize: '13px', color: '#5A4A44' }}>Water</span>
+                            </div>
+                          )}
+                          {!listing.gas_included && (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                              <Flame size={13} style={{ color: '#F76902' }} />
+                              <span style={{ fontSize: '13px', color: '#5A4A44' }}>Gas</span>
+                            </div>
+                          )}
+                          {listing.pets_allowed && listing.pet_fee != null && (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                              <PawPrint size={13} style={{ color: '#F76902' }} />
+                              <span style={{ fontSize: '13px', color: '#5A4A44' }}>Pet Fee ${listing.pet_fee}/mo</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
                     <p style={{ fontSize: '12px', color: '#B5866E', textAlign: 'center' }}>
                       Listed {new Date(listing.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
                     </p>

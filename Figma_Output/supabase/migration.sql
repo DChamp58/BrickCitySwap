@@ -535,3 +535,13 @@ drop trigger if exists trg_notify_listing_saved on public.saved_listings;
 create trigger trg_notify_listing_saved
   after insert on public.saved_listings
   for each row execute function public.notify_on_listing_saved();
+
+-- ╔══════════════════════════════════════════════════════════════════════════╗
+-- ║ ADD UTILITIES & PETS FIELDS                                            ║
+-- ╚══════════════════════════════════════════════════════════════════════════╝
+alter table public.listings
+  add column if not exists pets_allowed      boolean not null default false,
+  add column if not exists electric_included boolean not null default false,
+  add column if not exists water_included    boolean not null default false,
+  add column if not exists gas_included      boolean not null default false,
+  add column if not exists pet_fee           numeric;

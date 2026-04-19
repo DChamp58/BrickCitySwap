@@ -91,6 +91,11 @@ export interface Database {
           other_roommates: number | null;
           other_roommates_spec: string | null;
           prefer_not_to_say_roommates: number | null;
+          pets_allowed: boolean;
+          electric_included: boolean;
+          water_included: boolean;
+          gas_included: boolean;
+          pet_fee: number | null;
           // Marketplace fields
           category: string | null;
           condition: string | null;
@@ -123,6 +128,11 @@ export interface Database {
           other_roommates?: number | null;
           other_roommates_spec?: string | null;
           prefer_not_to_say_roommates?: number | null;
+          pets_allowed?: boolean;
+          electric_included?: boolean;
+          water_included?: boolean;
+          gas_included?: boolean;
+          pet_fee?: number | null;
           category?: string | null;
           condition?: string | null;
           view_count?: number;
@@ -150,6 +160,11 @@ export interface Database {
           other_roommates?: number | null;
           other_roommates_spec?: string | null;
           prefer_not_to_say_roommates?: number | null;
+          pets_allowed?: boolean;
+          electric_included?: boolean;
+          water_included?: boolean;
+          gas_included?: boolean;
+          pet_fee?: number | null;
           category?: string | null;
           condition?: string | null;
           view_count?: number;

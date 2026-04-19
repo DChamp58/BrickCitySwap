@@ -814,27 +814,39 @@ export function ListingDetailDialog({
                         <p style={{ fontSize: '13px', fontWeight: 600, color: '#402E32', marginBottom: '10px' }}>Other Charges</p>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                           {!listing.electric_included && (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                              <Zap size={13} style={{ color: '#F76902' }} />
-                              <span style={{ fontSize: '13px', color: '#5A4A44' }}>Electric</span>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <Zap size={13} style={{ color: '#F76902' }} />
+                                <span style={{ fontSize: '13px', color: '#5A4A44' }}>Electric</span>
+                              </div>
+                              {listing.electric_cost != null && <span style={{ fontSize: '12px', color: '#B5866E' }}>~${listing.electric_cost}/mo</span>}
                             </div>
                           )}
                           {!listing.water_included && (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                              <Droplets size={13} style={{ color: '#F76902' }} />
-                              <span style={{ fontSize: '13px', color: '#5A4A44' }}>Water</span>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <Droplets size={13} style={{ color: '#F76902' }} />
+                                <span style={{ fontSize: '13px', color: '#5A4A44' }}>Water</span>
+                              </div>
+                              {listing.water_cost != null && <span style={{ fontSize: '12px', color: '#B5866E' }}>~${listing.water_cost}/mo</span>}
                             </div>
                           )}
                           {!listing.gas_included && (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                              <Flame size={13} style={{ color: '#F76902' }} />
-                              <span style={{ fontSize: '13px', color: '#5A4A44' }}>Gas</span>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <Flame size={13} style={{ color: '#F76902' }} />
+                                <span style={{ fontSize: '13px', color: '#5A4A44' }}>Gas</span>
+                              </div>
+                              {listing.gas_cost != null && <span style={{ fontSize: '12px', color: '#B5866E' }}>~${listing.gas_cost}/mo</span>}
                             </div>
                           )}
                           {listing.pets_allowed && listing.pet_fee != null && (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                              <PawPrint size={13} style={{ color: '#F76902' }} />
-                              <span style={{ fontSize: '13px', color: '#5A4A44' }}>Pet Fee ${listing.pet_fee}/mo</span>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <PawPrint size={13} style={{ color: '#F76902' }} />
+                                <span style={{ fontSize: '13px', color: '#5A4A44' }}>Pet Fee</span>
+                              </div>
+                              <span style={{ fontSize: '12px', color: '#B5866E' }}>~${listing.pet_fee}/mo</span>
                             </div>
                           )}
                         </div>

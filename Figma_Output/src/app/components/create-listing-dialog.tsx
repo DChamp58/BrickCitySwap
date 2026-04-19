@@ -49,9 +49,12 @@ export function CreateListingDialog({ open, onClose, onListingCreated }: CreateL
   const [otherRoommatesSpec, setOtherRoommatesSpec] = useState('');
   const [preferNotToSayRoommates, setPreferNotToSayRoommates] = useState('');
   const [petsAllowed, setPetsAllowed] = useState(false);
-  const [electricIncluded, setElectricIncluded] = useState(false);
-  const [waterIncluded, setWaterIncluded] = useState(false);
-  const [gasIncluded, setGasIncluded] = useState(false);
+  const [electricNotIncluded, setElectricNotIncluded] = useState(false);
+  const [electricCost, setElectricCost] = useState('');
+  const [waterNotIncluded, setWaterNotIncluded] = useState(false);
+  const [waterCost, setWaterCost] = useState('');
+  const [gasNotIncluded, setGasNotIncluded] = useState(false);
+  const [gasCost, setGasCost] = useState('');
   const [petFee, setPetFee] = useState('');
   const [availableFrom, setAvailableFrom] = useState('');
   const [availableTo, setAvailableTo] = useState('');
@@ -70,8 +73,11 @@ export function CreateListingDialog({ open, onClose, onListingCreated }: CreateL
     setBathrooms(''); setRoommates(''); setFemaleRoommates(''); setMaleRoommates('');
     setOtherRoommates(''); setOtherRoommatesSpec(''); setPreferNotToSayRoommates('');
     setAvailableFrom(''); setAvailableTo('');
-    setPetsAllowed(false); setElectricIncluded(false); setWaterIncluded(false);
-    setGasIncluded(false); setPetFee('');
+    setPetsAllowed(false);
+    setElectricNotIncluded(false); setElectricCost('');
+    setWaterNotIncluded(false); setWaterCost('');
+    setGasNotIncluded(false); setGasCost('');
+    setPetFee('');
     setCategory(''); setCondition('');
     setImages([]); setImagePreviews([]);
   };
@@ -127,9 +133,12 @@ export function CreateListingDialog({ open, onClose, onListingCreated }: CreateL
           available_from: availableFrom || null,
           available_to: availableTo || null,
           pets_allowed: petsAllowed,
-          electric_included: electricIncluded,
-          water_included: waterIncluded,
-          gas_included: gasIncluded,
+          electric_included: !electricNotIncluded,
+          electric_cost: electricNotIncluded && electricCost ? parseFloat(electricCost) : null,
+          water_included: !waterNotIncluded,
+          water_cost: waterNotIncluded && waterCost ? parseFloat(waterCost) : null,
+          gas_included: !gasNotIncluded,
+          gas_cost: gasNotIncluded && gasCost ? parseFloat(gasCost) : null,
           pet_fee: petFee ? parseFloat(petFee) : null,
         } : {
           category,
@@ -255,32 +264,60 @@ export function CreateListingDialog({ open, onClose, onListingCreated }: CreateL
               {/* Utilities & Pets */}
               <div className="space-y-3 rounded-lg border p-4">
                 <p className="text-sm font-medium">Utilities & Extras</p>
-                <div className="space-y-1">
-                  <p className="text-xs text-muted-foreground">Utilities included in rent:</p>
-                  <div className="flex flex-wrap gap-4 pt-1">
-                    <label className="flex items-center gap-2 cursor-pointer text-sm">
-                      <input type="checkbox" checked={electricIncluded} onChange={e => setElectricIncluded(e.target.checked)} className="w-4 h-4 accent-[#F76902]" />
-                      Electric
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer text-sm">
-                      <input type="checkbox" checked={waterIncluded} onChange={e => setWaterIncluded(e.target.checked)} className="w-4 h-4 accent-[#F76902]" />
-                      Water
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer text-sm">
-                      <input type="checkbox" checked={gasIncluded} onChange={e => setGasIncluded(e.target.checked)} className="w-4 h-4 accent-[#F76902]" />
-                      Gas
-                    </label>
+                <div className="space-y-2">
+                  <p className="text-xs text-muted-foreground">Check utilities NOT included in rent — add approximate monthly cost if known:</p>
+                  <div className="space-y-2 pt-1">
+                    <div className="flex items-center gap-3">
+                      <label className="flex items-center gap-2 cursor-pointer text-sm w-28">
+                        <input type="checkbox" checked={electricNotIncluded} onChange={e => setElectricNotIncluded(e.target.checked)} className="w-4 h-4 accent-[#F76902]" />
+                        Electric
+                      </label>
+                      {electricNotIncluded && (
+                        <div className="flex items-center gap-1">
+                          <span className="text-xs text-muted-foreground">~$</span>
+                          <Input type="number" placeholder="80" value={electricCost} onChange={e => setElectricCost(e.target.value)} min="0" className="w-24 h-8 text-sm" />
+                          <span className="text-xs text-muted-foreground">/mo</span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <label className="flex items-center gap-2 cursor-pointer text-sm w-28">
+                        <input type="checkbox" checked={waterNotIncluded} onChange={e => setWaterNotIncluded(e.target.checked)} className="w-4 h-4 accent-[#F76902]" />
+                        Water
+                      </label>
+                      {waterNotIncluded && (
+                        <div className="flex items-center gap-1">
+                          <span className="text-xs text-muted-foreground">~$</span>
+                          <Input type="number" placeholder="30" value={waterCost} onChange={e => setWaterCost(e.target.value)} min="0" className="w-24 h-8 text-sm" />
+                          <span className="text-xs text-muted-foreground">/mo</span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <label className="flex items-center gap-2 cursor-pointer text-sm w-28">
+                        <input type="checkbox" checked={gasNotIncluded} onChange={e => setGasNotIncluded(e.target.checked)} className="w-4 h-4 accent-[#F76902]" />
+                        Gas
+                      </label>
+                      {gasNotIncluded && (
+                        <div className="flex items-center gap-1">
+                          <span className="text-xs text-muted-foreground">~$</span>
+                          <Input type="number" placeholder="40" value={gasCost} onChange={e => setGasCost(e.target.value)} min="0" className="w-24 h-8 text-sm" />
+                          <span className="text-xs text-muted-foreground">/mo</span>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
-                <div className="flex flex-wrap items-center gap-6">
+                <div className="flex flex-wrap items-center gap-6 pt-1 border-t">
                   <label className="flex items-center gap-2 cursor-pointer text-sm">
                     <input type="checkbox" checked={petsAllowed} onChange={e => setPetsAllowed(e.target.checked)} className="w-4 h-4 accent-[#F76902]" />
                     Pets Allowed
                   </label>
                   {petsAllowed && (
                     <div className="flex items-center gap-2">
-                      <Label htmlFor="petFee" className="text-sm whitespace-nowrap">Pet Fee ($/mo)</Label>
-                      <Input id="petFee" type="number" placeholder="50" value={petFee} onChange={e => setPetFee(e.target.value)} min="0" className="w-28" />
+                      <Label htmlFor="petFee" className="text-sm whitespace-nowrap">Pet Fee ~$</Label>
+                      <Input id="petFee" type="number" placeholder="50" value={petFee} onChange={e => setPetFee(e.target.value)} min="0" className="w-24 h-8 text-sm" />
+                      <span className="text-xs text-muted-foreground">/mo</span>
                     </div>
                   )}
                 </div>

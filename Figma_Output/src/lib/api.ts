@@ -178,8 +178,8 @@ export interface ConversationWithDetails {
     type: 'housing' | 'marketplace';
     price: number;
   };
-  buyer: { full_name: string };
-  seller: { full_name: string };
+  buyer: { full_name: string; avatar_url: string | null };
+  seller: { full_name: string; avatar_url: string | null };
   messages: DbMessage[];
 }
 
@@ -189,8 +189,8 @@ export async function fetchConversations(userId: string): Promise<ConversationWi
     .select(`
       *,
       listings!listing_id(title, type, price),
-      buyer:profiles!buyer_id(full_name),
-      seller:profiles!seller_id(full_name),
+      buyer:profiles!buyer_id(full_name, avatar_url),
+      seller:profiles!seller_id(full_name, avatar_url),
       messages(*)
     `)
     .or(`buyer_id.eq.${userId},seller_id.eq.${userId}`)
@@ -216,8 +216,8 @@ export async function findConversation(
     .select(`
       *,
       listings!listing_id(title, type, price),
-      buyer:profiles!buyer_id(full_name),
-      seller:profiles!seller_id(full_name),
+      buyer:profiles!buyer_id(full_name, avatar_url),
+      seller:profiles!seller_id(full_name, avatar_url),
       messages(*)
     `)
     .eq('listing_id', listingId)

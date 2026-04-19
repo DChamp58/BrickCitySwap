@@ -354,6 +354,19 @@ alter table public.profiles
   add column if not exists bio   text;
 
 -- ╔══════════════════════════════════════════════════════════════════════════╗
+-- ║ ADD HOUSING LISTING FIELDS (run if upgrading an existing database)     ║
+-- ╚══════════════════════════════════════════════════════════════════════════╝
+alter table public.listings
+  add column if not exists total_rooms                integer,
+  add column if not exists available_rooms            integer,
+  add column if not exists roommates                  integer,
+  add column if not exists female_roommates           integer,
+  add column if not exists male_roommates             integer,
+  add column if not exists other_roommates            integer,
+  add column if not exists other_roommates_spec       text,
+  add column if not exists prefer_not_to_say_roommates integer;
+
+-- ╔══════════════════════════════════════════════════════════════════════════╗
 -- ║ FIX VIEW RECORDING (run if views are always showing 0)                 ║
 -- ╚══════════════════════════════════════════════════════════════════════════╝
 
@@ -375,3 +388,150 @@ exception when others then
   null; -- silently ignore duplicates or constraint errors
 end;
 $$;
+
+-- ╔══════════════════════════════════════════════════════════════════════════╗
+-- ║ 9. IN-APP NOTIFICATIONS                                                ║
+-- ╚══════════════════════════════════════════════════════════════════════════╝
+
+create table if not exists public.notifications (
+  id         uuid primary key default gen_random_uuid(),
+  user_id    uuid not null references public.profiles(id) on delete cascade,
+  type       text not null check (type in ('new_message', 'listing_saved')),
+  title      text not null,
+  body       text not null,
+  read       boolean not null default false,
+  data       jsonb,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists idx_notifications_user on public.notifications(user_id);
+create index if not exists idx_notifications_read  on public.notifications(user_id, read);
+
+alter table public.notifications enable row level security;
+
+create policy "Users can view their own notifications"
+  on public.notifications for select
+  using (auth.uid() = user_id);
+
+create policy "Users can mark their own notifications read"
+  on public.notifications for update
+  using (auth.uid() = user_id);
+
+create policy "Service can insert notifications"
+  on public.notifications for insert
+  with check (true);
+
+-- Trigger: new message → notify the other conversation participant
+create or replace function public.notify_on_new_message()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_buyer_id          uuid;
+  v_seller_id         uuid;
+  v_listing_id        uuid;
+  v_recipient         uuid;
+  v_sender_name       text;
+  v_listing_title     text;
+  v_listing_image_url text;
+  v_listing_location  text;
+  v_conv_id           uuid;
+begin
+  v_conv_id := NEW.conversation_id;
+
+  v_buyer_id      := (select buyer_id   from public.conversations where id = v_conv_id);
+  v_seller_id     := (select seller_id  from public.conversations where id = v_conv_id);
+  v_listing_id    := (select listing_id from public.conversations where id = v_conv_id);
+  v_listing_title    := (select title    from public.listings where id = v_listing_id);
+  v_listing_location := (select location from public.listings where id = v_listing_id);
+
+  v_listing_image_url := (
+    select url from public.listing_images
+    where listing_id = v_listing_id
+    order by position asc
+    limit 1
+  );
+
+  if NEW.sender_id = v_buyer_id then
+    v_recipient := v_seller_id;
+  else
+    v_recipient := v_buyer_id;
+  end if;
+
+  v_sender_name := (select full_name from public.profiles where id = NEW.sender_id);
+
+  insert into public.notifications (user_id, type, title, body, data)
+  values (
+    v_recipient,
+    'new_message',
+    v_sender_name || ' sent you a message',
+    left(NEW.content, 120),
+    jsonb_build_object(
+      'conversation_id', v_conv_id,
+      'listing_title', v_listing_title,
+      'listing_image_url', v_listing_image_url,
+      'listing_location', v_listing_location
+    )
+  );
+
+  return NEW;
+end;
+$$;
+
+drop trigger if exists trg_notify_new_message on public.messages;
+create trigger trg_notify_new_message
+  after insert on public.messages
+  for each row execute function public.notify_on_new_message();
+
+-- Trigger: listing saved → notify the listing owner
+create or replace function public.notify_on_listing_saved()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_listing_owner     uuid;
+  v_listing_title     text;
+  v_saver_name        text;
+  v_listing_image_url text;
+begin
+  v_listing_owner := (select user_id from public.listings where id = NEW.listing_id);
+  v_listing_title := (select title   from public.listings where id = NEW.listing_id);
+
+  -- Don't notify if the owner is saving their own listing
+  if NEW.user_id = v_listing_owner then
+    return NEW;
+  end if;
+
+  v_listing_image_url := (
+    select url from public.listing_images
+    where listing_id = NEW.listing_id
+    order by position asc
+    limit 1
+  );
+
+  v_saver_name := (select full_name from public.profiles where id = NEW.user_id);
+
+  insert into public.notifications (user_id, type, title, body, data)
+  values (
+    v_listing_owner,
+    'listing_saved',
+    v_saver_name || ' saved your listing',
+    v_listing_title,
+    jsonb_build_object(
+      'listing_id', NEW.listing_id,
+      'listing_image_url', v_listing_image_url
+    )
+  );
+
+  return NEW;
+end;
+$$;
+
+drop trigger if exists trg_notify_listing_saved on public.saved_listings;
+create trigger trg_notify_listing_saved
+  after insert on public.saved_listings
+  for each row execute function public.notify_on_listing_saved();

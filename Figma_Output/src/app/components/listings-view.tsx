@@ -1,9 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Search, SlidersHorizontal, Calendar, Eye } from 'lucide-react';
+import { Search, SlidersHorizontal, Calendar, Eye, Heart } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Listing } from './listing-card';
 import { fetchListings as fetchListingsApi } from '@/lib/api';
 import { supabase } from '@/lib/supabase';
+import { useSaved } from './saved-context';
+import { useAuth } from './auth-context';
 
 interface ListingsViewProps {
   type: 'housing' | 'marketplace';
@@ -12,6 +14,8 @@ interface ListingsViewProps {
 }
 
 export function ListingsView({ type, onContact, onView }: ListingsViewProps) {
+  const { user } = useAuth();
+  const { isSaved, toggleSave } = useSaved();
   const [listings, setListings] = useState<Listing[]>([]);
   const [filteredListings, setFilteredListings] = useState<Listing[]>([]);
   const [loading, setLoading] = useState(true);
@@ -488,7 +492,7 @@ export function ListingsView({ type, onContact, onView }: ListingsViewProps) {
                     onMouseEnter={() => setHoveredId(listing.id)}
                     onMouseLeave={() => setHoveredId(null)}
                   >
-                    <div style={{ width: '100%', height: type === 'housing' ? '260px' : '240px', overflow: 'hidden', backgroundColor: '#F3F4F6' }}>
+                    <div style={{ width: '100%', height: type === 'housing' ? '260px' : '240px', overflow: 'hidden', backgroundColor: '#F3F4F6', position: 'relative' }}>
                       <ImageWithFallback
                         src={listing.listing_images?.[0]?.url || ''}
                         alt={listing.title}
@@ -498,6 +502,32 @@ export function ListingsView({ type, onContact, onView }: ListingsViewProps) {
                           transition: 'transform 280ms ease',
                         }}
                       />
+                      {user && (
+                        <button
+                          onClick={(e) => { e.stopPropagation(); toggleSave(listing.id); }}
+                          style={{
+                            position: 'absolute', top: '10px', right: '10px',
+                            width: '34px', height: '34px', borderRadius: '50%',
+                            border: 'none', cursor: 'pointer', display: 'flex',
+                            alignItems: 'center', justifyContent: 'center',
+                            backgroundColor: 'rgba(255,255,255,0.9)',
+                            boxShadow: '0 2px 6px rgba(0,0,0,0.12)',
+                            transition: 'transform 150ms ease',
+                          }}
+                          onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.15)'; }}
+                          onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
+                          title={isSaved(listing.id) ? 'Remove from saved' : 'Save listing'}
+                        >
+                          <Heart
+                            size={16}
+                            style={{
+                              color: '#F76902',
+                              fill: isSaved(listing.id) ? '#F76902' : 'none',
+                              transition: 'fill 150ms ease',
+                            }}
+                          />
+                        </button>
+                      )}
                     </div>
                     <div style={{ padding: '20px' }}>
                       <h3 className="font-semibold" style={{

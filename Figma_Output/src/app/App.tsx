@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AuthProvider, useAuth } from './components/auth-context';
 import { MessagingProvider } from './components/messaging-context';
+import { SavedProvider } from './components/saved-context';
+import { NotificationsProvider } from './components/notifications-context';
 import { Header } from './components/header';
 import { AuthView } from './components/auth-view';
 import { ListingsView } from './components/listings-view';
@@ -13,13 +15,14 @@ import { HomeView } from './components/home-view';
 import { PricingView } from './components/pricing-view';
 import { PaymentView } from './components/payment-view';
 import { ProfileView } from './components/profile-view';
+import { SavedView } from './components/saved-view';
 import { Footer } from './components/footer';
 import { Listing } from './components/listing-card';
 import { Toaster } from './components/ui/sonner';
 import { Card, CardContent } from './components/ui/card';
 import { recordListingView } from '@/lib/api';
 
-type View = 'home' | 'housing' | 'marketplace' | 'profile' | 'my-listings' | 'pricing' | 'payment' | 'messages';
+type View = 'home' | 'housing' | 'marketplace' | 'profile' | 'my-listings' | 'pricing' | 'payment' | 'messages' | 'saved';
 
 function AppContent() {
   const { user, accessToken, loading } = useAuth();
@@ -32,6 +35,8 @@ function AppContent() {
   const [openConversationId, setOpenConversationId] = useState<string | null>(null);
   const [paymentPlan, setPaymentPlan] = useState<string>('poster');
   const [paymentBilling, setPaymentBilling] = useState<'monthly' | 'yearly'>('monthly');
+
+  useEffect(() => { window.scrollTo({ top: 0, left: 0, behavior: 'instant' }); }, [currentView]);
 
   const handleCreateListing = () => {
     if (!user) {
@@ -172,6 +177,18 @@ function AppContent() {
             <MessagesView openConversationId={openConversationId} />
           </div>
         )}
+
+        {currentView === 'saved' && (
+          user ? (
+            <SavedView onView={handleViewListing} onContact={handleContactSeller} />
+          ) : (
+            <div className="max-w-2xl mx-auto p-6">
+              <div className="text-center py-12">
+                <p className="text-lg mb-4" style={{ color: '#402E32' }}>Please sign in to view saved items</p>
+              </div>
+            </div>
+          )
+        )}
       </main>
 
       {/* Free user ad */}
@@ -233,7 +250,11 @@ export default function App() {
   return (
     <AuthProvider>
       <MessagingProvider>
-        <AppContent />
+        <SavedProvider>
+          <NotificationsProvider>
+            <AppContent />
+          </NotificationsProvider>
+        </SavedProvider>
       </MessagingProvider>
     </AuthProvider>
   );

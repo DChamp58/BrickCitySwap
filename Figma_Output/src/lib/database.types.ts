@@ -87,6 +87,10 @@ export interface Database {
           available_rooms: number | null;
           roommates: number | null;
           female_roommates: number | null;
+          male_roommates: number | null;
+          other_roommates: number | null;
+          other_roommates_spec: string | null;
+          prefer_not_to_say_roommates: number | null;
           // Marketplace fields
           category: string | null;
           condition: string | null;
@@ -115,6 +119,10 @@ export interface Database {
           available_rooms?: number | null;
           roommates?: number | null;
           female_roommates?: number | null;
+          male_roommates?: number | null;
+          other_roommates?: number | null;
+          other_roommates_spec?: string | null;
+          prefer_not_to_say_roommates?: number | null;
           category?: string | null;
           condition?: string | null;
           view_count?: number;
@@ -138,6 +146,10 @@ export interface Database {
           available_rooms?: number | null;
           roommates?: number | null;
           female_roommates?: number | null;
+          male_roommates?: number | null;
+          other_roommates?: number | null;
+          other_roommates_spec?: string | null;
+          prefer_not_to_say_roommates?: number | null;
           category?: string | null;
           condition?: string | null;
           view_count?: number;

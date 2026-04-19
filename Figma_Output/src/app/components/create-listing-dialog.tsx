@@ -31,9 +31,12 @@ export function CreateListingDialog({ open, onClose, onListingCreated }: CreateL
   const [loading, setLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Shared fields
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
+
+  // Housing fields
   const [location, setLocation] = useState('');
   const [housingType, setHousingType] = useState('');
   const [totalRooms, setTotalRooms] = useState('');
@@ -41,17 +44,26 @@ export function CreateListingDialog({ open, onClose, onListingCreated }: CreateL
   const [bathrooms, setBathrooms] = useState('');
   const [roommates, setRoommates] = useState('');
   const [femaleRoommates, setFemaleRoommates] = useState('');
+  const [maleRoommates, setMaleRoommates] = useState('');
+  const [otherRoommates, setOtherRoommates] = useState('');
+  const [otherRoommatesSpec, setOtherRoommatesSpec] = useState('');
+  const [preferNotToSayRoommates, setPreferNotToSayRoommates] = useState('');
   const [availableFrom, setAvailableFrom] = useState('');
   const [availableTo, setAvailableTo] = useState('');
+
+  // Marketplace fields
   const [category, setCategory] = useState('');
   const [condition, setCondition] = useState('');
+
+  // Images
   const [images, setImages] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
 
   const resetForm = () => {
-    setTitle(''); setDescription(''); setPrice(''); setLocation('');
-    setHousingType(''); setTotalRooms(''); setAvailableRooms('');
-    setBathrooms(''); setRoommates(''); setFemaleRoommates('');
+    setTitle(''); setDescription(''); setPrice('');
+    setLocation(''); setHousingType(''); setTotalRooms(''); setAvailableRooms('');
+    setBathrooms(''); setRoommates(''); setFemaleRoommates(''); setMaleRoommates('');
+    setOtherRoommates(''); setOtherRoommatesSpec(''); setPreferNotToSayRoommates('');
     setAvailableFrom(''); setAvailableTo('');
     setCategory(''); setCondition('');
     setImages([]); setImagePreviews([]);
@@ -78,6 +90,12 @@ export function CreateListingDialog({ open, onClose, onListingCreated }: CreateL
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
+
+    if (type === 'housing' && otherRoommates && parseInt(otherRoommates) > 0 && !otherRoommatesSpec.trim()) {
+      toast.error('Please provide a specification for "Other" roommates');
+      return;
+    }
+
     setLoading(true);
     try {
       const listing = await createListing({
@@ -95,6 +113,10 @@ export function CreateListingDialog({ open, onClose, onListingCreated }: CreateL
           bathrooms: parseFloat(bathrooms),
           roommates: roommates ? parseInt(roommates) : null,
           female_roommates: femaleRoommates ? parseInt(femaleRoommates) : null,
+          male_roommates: maleRoommates ? parseInt(maleRoommates) : null,
+          other_roommates: otherRoommates ? parseInt(otherRoommates) : null,
+          other_roommates_spec: otherRoommatesSpec.trim() || null,
+          prefer_not_to_say_roommates: preferNotToSayRoommates ? parseInt(preferNotToSayRoommates) : null,
           available_from: availableFrom || null,
           available_to: availableTo || null,
         } : {
@@ -103,7 +125,6 @@ export function CreateListingDialog({ open, onClose, onListingCreated }: CreateL
         }),
       });
 
-      // Upload images
       for (let i = 0; i < images.length; i++) {
         await uploadListingImage(images[i], listing.id, i);
       }
@@ -140,23 +161,20 @@ export function CreateListingDialog({ open, onClose, onListingCreated }: CreateL
                 <Label htmlFor="title">Title *</Label>
                 <Input id="title" placeholder="e.g., Apartment near RIT — 2 rooms available" value={title} onChange={(e) => setTitle(e.target.value)} required />
               </div>
+
               <div className="space-y-2">
-                <Label htmlFor="description">Description *</Label>
-                <Textarea id="description" placeholder="Describe the housing..." value={description} onChange={(e) => setDescription(e.target.value)} required rows={4} />
+                <Label htmlFor="location">Address *</Label>
+                <Input id="location" placeholder="e.g., 100 Park Point Dr, Rochester, NY" value={location} onChange={(e) => setLocation(e.target.value)} required />
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="location">Address *</Label>
-                  <Input id="location" placeholder="e.g., 100 Park Point Dr, Rochester, NY" value={location} onChange={(e) => setLocation(e.target.value)} required />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="price">Monthly Rent ($) *</Label>
-                  <Input id="price" type="number" placeholder="800" value={price} onChange={(e) => setPrice(e.target.value)} required min="0" step="0.01" />
-                </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="price">Monthly Rent ($) *</Label>
+                <Input id="price" type="number" placeholder="800" value={price} onChange={(e) => setPrice(e.target.value)} required min="0" step="0.01" />
               </div>
+
               <div className="space-y-2">
                 <Label htmlFor="housingType">Property Type *</Label>
-                <Select value={housingType} onValueChange={setHousingType}>
+                <Select value={housingType} onValueChange={setHousingType} required>
                   <SelectTrigger id="housingType"><SelectValue placeholder="Select property type..." /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="apartment">Apartment</SelectItem>
@@ -165,7 +183,8 @@ export function CreateListingDialog({ open, onClose, onListingCreated }: CreateL
                   </SelectContent>
                 </Select>
               </div>
-              <div className="grid grid-cols-3 gap-4">
+
+              <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="totalRooms">Total Rooms *</Label>
                   <Input id="totalRooms" type="number" placeholder="4" value={totalRooms} onChange={(e) => setTotalRooms(e.target.value)} required min="1" />
@@ -174,31 +193,74 @@ export function CreateListingDialog({ open, onClose, onListingCreated }: CreateL
                   <Label htmlFor="availableRooms">Available Rooms *</Label>
                   <Input id="availableRooms" type="number" placeholder="1" value={availableRooms} onChange={(e) => setAvailableRooms(e.target.value)} required min="1" />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="bathrooms">Bathrooms *</Label>
-                  <Input id="bathrooms" type="number" placeholder="1" value={bathrooms} onChange={(e) => setBathrooms(e.target.value)} required min="0" step="0.5" />
-                  <p className="text-xs text-muted-foreground">0.5 = half bathroom (no shower)</p>
-                </div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
+
+              <div className="space-y-2">
+                <Label htmlFor="bathrooms">Bathrooms *</Label>
+                <Input id="bathrooms" type="number" placeholder="1" value={bathrooms} onChange={(e) => setBathrooms(e.target.value)} required min="0" step="0.5" />
+                <p className="text-xs text-muted-foreground">0.5 = half bathroom (no shower)</p>
+              </div>
+
+              {/* Roommates */}
+              <div className="space-y-3 rounded-lg border p-4">
+                <p className="text-sm font-medium">Roommates</p>
                 <div className="space-y-2">
-                  <Label htmlFor="roommates">Roommates</Label>
+                  <Label htmlFor="roommates">Total Roommates</Label>
                   <Input id="roommates" type="number" placeholder="3" value={roommates} onChange={(e) => setRoommates(e.target.value)} min="0" />
                 </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="femaleRoommates">Female</Label>
+                    <Input id="femaleRoommates" type="number" placeholder="0" value={femaleRoommates} onChange={(e) => setFemaleRoommates(e.target.value)} min="0" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="maleRoommates">Male</Label>
+                    <Input id="maleRoommates" type="number" placeholder="0" value={maleRoommates} onChange={(e) => setMaleRoommates(e.target.value)} min="0" />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="otherRoommates">Other</Label>
+                    <Input id="otherRoommates" type="number" placeholder="0" value={otherRoommates} onChange={(e) => setOtherRoommates(e.target.value)} min="0" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="otherRoommatesSpec">
+                      Other — Specification
+                      {otherRoommates && parseInt(otherRoommates) > 0 && <span className="text-destructive ml-1">*</span>}
+                    </Label>
+                    <Input
+                      id="otherRoommatesSpec"
+                      placeholder="e.g., Non-binary"
+                      value={otherRoommatesSpec}
+                      onChange={(e) => setOtherRoommatesSpec(e.target.value)}
+                      disabled={!otherRoommates || parseInt(otherRoommates) === 0}
+                    />
+                  </div>
+                </div>
                 <div className="space-y-2">
-                  <Label htmlFor="femaleRoommates">Female Roommates</Label>
-                  <Input id="femaleRoommates" type="number" placeholder="2" value={femaleRoommates} onChange={(e) => setFemaleRoommates(e.target.value)} min="0" />
+                  <Label htmlFor="preferNotToSayRoommates">Prefer Not to Say</Label>
+                  <Input id="preferNotToSayRoommates" type="number" placeholder="0" value={preferNotToSayRoommates} onChange={(e) => setPreferNotToSayRoommates(e.target.value)} min="0" />
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="availableFrom">Available From *</Label>
-                  <Input id="availableFrom" type="date" value={availableFrom} onChange={(e) => setAvailableFrom(e.target.value)} required />
+
+              {/* Availability */}
+              <div className="space-y-3 rounded-lg border p-4">
+                <p className="text-sm font-medium">Availability</p>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="availableFrom">Start Date *</Label>
+                    <Input id="availableFrom" type="date" value={availableFrom} onChange={(e) => setAvailableFrom(e.target.value)} required />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="availableTo">End Date (Optional)</Label>
+                    <Input id="availableTo" type="date" value={availableTo} onChange={(e) => setAvailableTo(e.target.value)} />
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="availableTo">Available To (Optional)</Label>
-                  <Input id="availableTo" type="date" value={availableTo} onChange={(e) => setAvailableTo(e.target.value)} />
-                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="description">Description *</Label>
+                <Textarea id="description" placeholder="Describe the housing..." value={description} onChange={(e) => setDescription(e.target.value)} required rows={4} />
               </div>
             </TabsContent>
 

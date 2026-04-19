@@ -38,6 +38,10 @@ export interface Listing {
   available_rooms?: number | null;
   roommates?: number | null;
   female_roommates?: number | null;
+  male_roommates?: number | null;
+  other_roommates?: number | null;
+  other_roommates_spec?: string | null;
+  prefer_not_to_say_roommates?: number | null;
 
   // Marketplace specific
   category?: string | null;

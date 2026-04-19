@@ -357,10 +357,14 @@ alter table public.profiles
 -- ║ ADD HOUSING LISTING FIELDS (run if upgrading an existing database)     ║
 -- ╚══════════════════════════════════════════════════════════════════════════╝
 alter table public.listings
-  add column if not exists total_rooms      integer,
-  add column if not exists available_rooms  integer,
-  add column if not exists roommates        integer,
-  add column if not exists female_roommates integer;
+  add column if not exists total_rooms                integer,
+  add column if not exists available_rooms            integer,
+  add column if not exists roommates                  integer,
+  add column if not exists female_roommates           integer,
+  add column if not exists male_roommates             integer,
+  add column if not exists other_roommates            integer,
+  add column if not exists other_roommates_spec       text,
+  add column if not exists prefer_not_to_say_roommates integer;
 
 -- ╔══════════════════════════════════════════════════════════════════════════╗
 -- ║ FIX VIEW RECORDING (run if views are always showing 0)                 ║

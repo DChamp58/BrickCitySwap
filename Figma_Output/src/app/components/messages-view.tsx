@@ -66,10 +66,28 @@ export function MessagesView({ openConversationId }: MessagesViewProps) {
   const otherName = (convo: Conversation) =>
     convo.sellerId === user.id ? convo.buyerName : convo.sellerName;
 
+  const otherAvatar = (convo: Conversation) =>
+    convo.sellerId === user.id ? convo.buyerAvatarUrl : convo.sellerAvatarUrl;
+
   const getInitials = (name: string) => {
     const parts = name.split(' ');
     return parts.length > 1 ? parts[0][0] + parts[1][0] : parts[0].substring(0, 2);
   };
+
+  const Avatar = ({ name, avatarUrl, size, unread }: { name: string; avatarUrl: string | null; size: number; unread?: boolean }) => (
+    <div style={{
+      width: size, height: size, borderRadius: '50%', flexShrink: 0, overflow: 'hidden',
+      backgroundColor: unread ? '#FFF6EE' : '#F3F4F6',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      fontSize: size * 0.33, fontWeight: 600,
+      color: unread ? '#F76902' : '#B5866E',
+    }}>
+      {avatarUrl
+        ? <img src={avatarUrl} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+        : getInitials(name).toUpperCase()
+      }
+    </div>
+  );
 
   return (
     <div className="w-full" style={{ backgroundColor: '#FFF6EE', height: 'calc(100vh - 72px)' }}>
@@ -126,16 +144,7 @@ export function MessagesView({ openConversationId }: MessagesViewProps) {
                       cursor: 'pointer', border: 'none', gap: '12px'
                     }}
                   >
-                    <div
-                      className="flex items-center justify-center font-semibold flex-shrink-0"
-                      style={{
-                        width: '48px', height: '48px', borderRadius: '50%',
-                        backgroundColor: unread > 0 ? '#FFF6EE' : '#F3F4F6',
-                        color: unread > 0 ? '#F76902' : '#B5866E', fontSize: '16px'
-                      }}
-                    >
-                      {getInitials(name).toUpperCase()}
-                    </div>
+                    <Avatar name={name} avatarUrl={otherAvatar(convo)} size={48} unread={unread > 0} />
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
                         <span className="font-semibold" style={{ fontSize: '15px', color: '#402E32', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -184,12 +193,7 @@ export function MessagesView({ openConversationId }: MessagesViewProps) {
                 >
                   <ArrowLeft size={20} />
                 </button>
-                <div
-                  className="flex items-center justify-center font-semibold"
-                  style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: '#FFF6EE', color: '#F76902', fontSize: '14px' }}
-                >
-                  {getInitials(otherName(selected)).toUpperCase()}
-                </div>
+                <Avatar name={otherName(selected)} avatarUrl={otherAvatar(selected)} size={40} />
                 <div>
                   <h3 className="font-semibold" style={{ fontSize: '16px', color: '#402E32' }}>
                     {otherName(selected)}
@@ -202,24 +206,26 @@ export function MessagesView({ openConversationId }: MessagesViewProps) {
 
               {/* Messages */}
               <div className="flex-1" style={{ overflowY: 'auto', padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                {selected.messages.map((message) => (
-                  <div key={message.id} className="flex" style={{ justifyContent: message.senderId === user.id ? 'flex-end' : 'flex-start' }}>
-                    <div style={{
-                      maxWidth: '60%', padding: '12px 16px', borderRadius: '12px',
-                      backgroundColor: message.senderId === user.id ? '#F76902' : '#F3F4F6',
-                      color: message.senderId === user.id ? '#FFFFFF' : '#402E32'
-                    }}>
-                      <p className="font-normal" style={{ fontSize: '15px', marginBottom: '4px', color: message.senderId === user.id ? '#FFFFFF' : '#402E32' }}>{message.content}</p>
-                      <p className="font-normal" style={{
-                        fontSize: '12px',
-                        color: message.senderId === user.id ? 'rgba(255, 255, 255, 0.8)' : '#C4A88E',
-                        textAlign: 'right'
+                {selected.messages.map((message) => {
+                  const isMe = message.senderId === user.id;
+                  const msgAvatar = isMe ? user.avatarUrl : otherAvatar(selected);
+                  const msgName = isMe ? user.name : otherName(selected);
+                  return (
+                    <div key={message.id} className="flex items-end" style={{ justifyContent: isMe ? 'flex-end' : 'flex-start', gap: '8px' }}>
+                      {!isMe && <Avatar name={msgName} avatarUrl={msgAvatar} size={32} />}
+                      <div style={{
+                        maxWidth: '60%', padding: '12px 16px', borderRadius: isMe ? '12px 12px 2px 12px' : '12px 12px 12px 2px',
+                        backgroundColor: isMe ? '#F76902' : '#F3F4F6',
                       }}>
-                        {formatTime(message.timestamp)}
-                      </p>
+                        <p className="font-normal" style={{ fontSize: '15px', marginBottom: '4px', color: isMe ? '#FFFFFF' : '#402E32' }}>{message.content}</p>
+                        <p className="font-normal" style={{ fontSize: '12px', color: isMe ? 'rgba(255,255,255,0.8)' : '#C4A88E', textAlign: 'right' }}>
+                          {formatTime(message.timestamp)}
+                        </p>
+                      </div>
+                      {isMe && <Avatar name={msgName} avatarUrl={msgAvatar} size={32} />}
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
                 <div ref={bottomRef} />
               </div>
 

@@ -27,8 +27,10 @@ export interface Conversation {
   listingPrice: number;
   sellerId: string;
   sellerName: string;
+  sellerAvatarUrl: string | null;
   buyerId: string;
   buyerName: string;
+  buyerAvatarUrl: string | null;
   messages: Message[];
   createdAt: string;
   lastMessageAt: string;
@@ -66,8 +68,10 @@ function dbToConversation(c: ConversationWithDetails): Conversation {
     listingPrice: c.listings.price,
     sellerId: c.seller_id,
     sellerName: c.seller.full_name,
+    sellerAvatarUrl: c.seller.avatar_url ?? null,
     buyerId: c.buyer_id,
     buyerName: c.buyer.full_name,
+    buyerAvatarUrl: c.buyer.avatar_url ?? null,
     messages: c.messages.map(dbToMessage),
     createdAt: c.created_at,
     lastMessageAt: c.updated_at,
@@ -167,8 +171,10 @@ export function MessagingProvider({ children }: { children: React.ReactNode }) {
       listingPrice: params.listingPrice,
       sellerId: params.sellerId,
       sellerName: params.sellerName,
+      sellerAvatarUrl: null,
       buyerId: params.buyerId,
       buyerName: params.buyerName,
+      buyerAvatarUrl: null,
       messages: [{
         id: 'temp',
         senderId: params.buyerId,

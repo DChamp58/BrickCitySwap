@@ -44,8 +44,11 @@ export interface Listing {
   prefer_not_to_say_roommates?: number | null;
   pets_allowed?: boolean | null;
   electric_included?: boolean | null;
+  electric_cost?: number | null;
   water_included?: boolean | null;
+  water_cost?: number | null;
   gas_included?: boolean | null;
+  gas_cost?: number | null;
   pet_fee?: number | null;
 
   // Marketplace specific

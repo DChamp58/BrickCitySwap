@@ -93,8 +93,11 @@ export interface Database {
           prefer_not_to_say_roommates: number | null;
           pets_allowed: boolean;
           electric_included: boolean;
+          electric_cost: number | null;
           water_included: boolean;
+          water_cost: number | null;
           gas_included: boolean;
+          gas_cost: number | null;
           pet_fee: number | null;
           // Marketplace fields
           category: string | null;
@@ -130,8 +133,11 @@ export interface Database {
           prefer_not_to_say_roommates?: number | null;
           pets_allowed?: boolean;
           electric_included?: boolean;
+          electric_cost?: number | null;
           water_included?: boolean;
+          water_cost?: number | null;
           gas_included?: boolean;
+          gas_cost?: number | null;
           pet_fee?: number | null;
           category?: string | null;
           condition?: string | null;
@@ -162,8 +168,11 @@ export interface Database {
           prefer_not_to_say_roommates?: number | null;
           pets_allowed?: boolean;
           electric_included?: boolean;
+          electric_cost?: number | null;
           water_included?: boolean;
+          water_cost?: number | null;
           gas_included?: boolean;
+          gas_cost?: number | null;
           pet_fee?: number | null;
           category?: string | null;
           condition?: string | null;

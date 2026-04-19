@@ -541,7 +541,10 @@ create trigger trg_notify_listing_saved
 -- ╚══════════════════════════════════════════════════════════════════════════╝
 alter table public.listings
   add column if not exists pets_allowed      boolean not null default false,
-  add column if not exists electric_included boolean not null default false,
-  add column if not exists water_included    boolean not null default false,
-  add column if not exists gas_included      boolean not null default false,
+  add column if not exists electric_included boolean not null default true,
+  add column if not exists electric_cost     numeric,
+  add column if not exists water_included    boolean not null default true,
+  add column if not exists water_cost        numeric,
+  add column if not exists gas_included      boolean not null default true,
+  add column if not exists gas_cost          numeric,
   add column if not exists pet_fee           numeric;

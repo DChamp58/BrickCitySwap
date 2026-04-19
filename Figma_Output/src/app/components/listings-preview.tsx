@@ -1,8 +1,10 @@
 import { ImageWithFallback } from './figma/ImageWithFallback';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Heart } from 'lucide-react';
 import { useRef, useState, useEffect } from 'react';
 import { fetchListings } from '@/lib/api';
 import { Listing } from './listing-card';
+import { useSaved } from './saved-context';
+import { useAuth } from './auth-context';
 
 interface ListingsPreviewProps {
   onNavigate: (view: 'housing' | 'marketplace') => void;
@@ -10,6 +12,8 @@ interface ListingsPreviewProps {
 }
 
 export function ListingsPreview({ onNavigate, onView }: ListingsPreviewProps) {
+  const { user } = useAuth();
+  const { isSaved, toggleSave } = useSaved();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [listings, setListings] = useState<Listing[]>([]);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
@@ -133,7 +137,7 @@ export function ListingsPreview({ onNavigate, onView }: ListingsPreviewProps) {
                   }}
                 >
                   {/* Image with zoom */}
-                  <div className="w-full overflow-hidden" style={{ height: '240px', borderRadius: '10px 10px 0 0' }}>
+                  <div className="w-full overflow-hidden relative" style={{ height: '240px', borderRadius: '10px 10px 0 0' }}>
                     <ImageWithFallback
                       src={listing.listing_images?.[0]?.url || ''}
                       alt={listing.title}
@@ -143,6 +147,25 @@ export function ListingsPreview({ onNavigate, onView }: ListingsPreviewProps) {
                         transition: 'transform 320ms ease',
                       }}
                     />
+                    {user && (
+                      <button
+                        onClick={(e) => { e.stopPropagation(); toggleSave(listing.id); }}
+                        style={{
+                          position: 'absolute', top: '10px', right: '10px',
+                          width: '34px', height: '34px', borderRadius: '50%',
+                          border: 'none', cursor: 'pointer', display: 'flex',
+                          alignItems: 'center', justifyContent: 'center',
+                          backgroundColor: 'rgba(255,255,255,0.9)',
+                          boxShadow: '0 2px 6px rgba(0,0,0,0.12)',
+                          transition: 'transform 150ms ease',
+                        }}
+                        onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.15)'; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
+                        title={isSaved(listing.id) ? 'Remove from saved' : 'Save listing'}
+                      >
+                        <Heart size={16} style={{ color: '#F76902', fill: isSaved(listing.id) ? '#F76902' : 'none', transition: 'fill 150ms ease' }} />
+                      </button>
+                    )}
                   </div>
 
                   <div className="flex flex-col" style={{ padding: '24px', gap: '8px' }}>

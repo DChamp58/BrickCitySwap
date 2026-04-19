@@ -375,3 +375,129 @@ exception when others then
   null; -- silently ignore duplicates or constraint errors
 end;
 $$;
+
+-- ╔══════════════════════════════════════════════════════════════════════════╗
+-- ║ 9. IN-APP NOTIFICATIONS                                                ║
+-- ╚══════════════════════════════════════════════════════════════════════════╝
+
+create table if not exists public.notifications (
+  id         uuid primary key default gen_random_uuid(),
+  user_id    uuid not null references public.profiles(id) on delete cascade,
+  type       text not null check (type in ('new_message', 'listing_saved')),
+  title      text not null,
+  body       text not null,
+  read       boolean not null default false,
+  data       jsonb,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists idx_notifications_user on public.notifications(user_id);
+create index if not exists idx_notifications_read  on public.notifications(user_id, read);
+
+alter table public.notifications enable row level security;
+
+create policy "Users can view their own notifications"
+  on public.notifications for select
+  using (auth.uid() = user_id);
+
+create policy "Users can mark their own notifications read"
+  on public.notifications for update
+  using (auth.uid() = user_id);
+
+create policy "Service can insert notifications"
+  on public.notifications for insert
+  with check (true);
+
+-- Trigger: new message → notify the other conversation participant
+create or replace function public.notify_on_new_message()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_buyer_id  uuid;
+  v_seller_id uuid;
+  v_recipient uuid;
+  v_sender_name text;
+  v_listing_title text;
+  v_conv_id uuid;
+begin
+  v_conv_id := NEW.conversation_id;
+
+  select c.buyer_id, c.seller_id, l.title
+  into v_buyer_id, v_seller_id, v_listing_title
+  from public.conversations c
+  join public.listings l on l.id = c.listing_id
+  where c.id = v_conv_id;
+
+  if NEW.sender_id = v_buyer_id then
+    v_recipient := v_seller_id;
+  else
+    v_recipient := v_buyer_id;
+  end if;
+
+  select full_name into v_sender_name
+  from public.profiles where id = NEW.sender_id;
+
+  insert into public.notifications (user_id, type, title, body, data)
+  values (
+    v_recipient,
+    'new_message',
+    v_sender_name || ' sent you a message',
+    left(NEW.content, 120),
+    jsonb_build_object(
+      'conversation_id', v_conv_id,
+      'listing_title', v_listing_title
+    )
+  );
+
+  return NEW;
+end;
+$$;
+
+drop trigger if exists trg_notify_new_message on public.messages;
+create trigger trg_notify_new_message
+  after insert on public.messages
+  for each row execute function public.notify_on_new_message();
+
+-- Trigger: listing saved → notify the listing owner
+create or replace function public.notify_on_listing_saved()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_listing_owner uuid;
+  v_listing_title text;
+  v_saver_name    text;
+begin
+  select user_id, title into v_listing_owner, v_listing_title
+  from public.listings where id = NEW.listing_id;
+
+  -- Don't notify if the owner is saving their own listing
+  if NEW.user_id = v_listing_owner then
+    return NEW;
+  end if;
+
+  select full_name into v_saver_name
+  from public.profiles where id = NEW.user_id;
+
+  insert into public.notifications (user_id, type, title, body, data)
+  values (
+    v_listing_owner,
+    'listing_saved',
+    v_saver_name || ' saved your listing',
+    v_listing_title,
+    jsonb_build_object('listing_id', NEW.listing_id)
+  );
+
+  return NEW;
+end;
+$$;
+
+drop trigger if exists trg_notify_listing_saved on public.saved_listings;
+create trigger trg_notify_listing_saved
+  after insert on public.saved_listings
+  for each row execute function public.notify_on_listing_saved();

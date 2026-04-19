@@ -7,6 +7,7 @@ import { useAuth } from './auth-context';
 import { fetchMyListings as fetchMyListingsApi } from '@/lib/api';
 import { Listing } from './listing-card';
 import { EditProfileDialog } from './edit-profile-dialog';
+import { ChangePasswordDialog } from './change-password-dialog';
 
 interface ProfileViewProps {
   onNavigate: (view: string) => void;
@@ -18,6 +19,7 @@ export function ProfileView({ onNavigate, onCreateListing }: ProfileViewProps) {
   const [listings, setListings] = useState<Listing[]>([]);
   const [loadingListings, setLoadingListings] = useState(true);
   const [editProfileOpen, setEditProfileOpen] = useState(false);
+  const [changePasswordOpen, setChangePasswordOpen] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -66,6 +68,7 @@ export function ProfileView({ onNavigate, onCreateListing }: ProfileViewProps) {
                 }
               </div>
               <button
+                onClick={() => setEditProfileOpen(true)}
                 className="absolute flex items-center justify-center"
                 style={{
                   bottom: '2px', right: '2px', width: '32px', height: '32px',
@@ -410,7 +413,7 @@ export function ProfileView({ onNavigate, onCreateListing }: ProfileViewProps) {
                 {[
                   { icon: <Package size={15} style={{ color: '#B5866E' }} />, label: 'My Listings', view: 'my-listings' },
                   { icon: <MessageCircle size={15} style={{ color: '#B5866E' }} />, label: 'Messages', view: 'messages' },
-                  { icon: <Heart size={15} style={{ color: '#B5866E' }} />, label: 'Saved Items', view: null },
+                  { icon: <Heart size={15} style={{ color: '#B5866E' }} />, label: 'Saved Items', view: 'saved' },
                 ].map(({ icon, label, view }) => (
                   <button
                     key={label}
@@ -437,7 +440,7 @@ export function ProfileView({ onNavigate, onCreateListing }: ProfileViewProps) {
           <h2 className="font-semibold" style={{ fontSize: '20px', color: '#402E32', marginBottom: '24px' }}>Account Settings</h2>
           <div className="grid" style={{ gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
             {[
-              { title: 'Change Password', sub: 'Update your password', danger: false, action: () => {} },
+              { title: 'Change Password', sub: 'Update your password', danger: false, action: () => setChangePasswordOpen(true) },
               { title: 'Notifications', sub: 'Manage preferences', danger: false, action: () => {} },
             ].map(({ title, sub, danger, action }) => (
               <button
@@ -464,6 +467,10 @@ export function ProfileView({ onNavigate, onCreateListing }: ProfileViewProps) {
       <EditProfileDialog
         open={editProfileOpen}
         onClose={() => setEditProfileOpen(false)}
+      />
+      <ChangePasswordDialog
+        open={changePasswordOpen}
+        onClose={() => setChangePasswordOpen(false)}
       />
     </div>
   );

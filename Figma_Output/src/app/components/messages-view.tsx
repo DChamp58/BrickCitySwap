@@ -21,10 +21,18 @@ export function MessagesView({ openConversationId }: MessagesViewProps) {
   const [selectedId, setSelectedId] = useState<string | null>(openConversationId ?? null);
   const [mobileShowChat, setMobileShowChat] = useState(!!openConversationId);
   const [input, setInput] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  const conversations = user ? getConversationsForUser(user.id) : [];
-  const selected = conversations.find(c => c.id === selectedId) ?? null;
+  const allConversations = user ? getConversationsForUser(user.id) : [];
+  const conversations = searchQuery.trim()
+    ? allConversations.filter(c => {
+        const q = searchQuery.toLowerCase();
+        const other = c.sellerId === user?.id ? c.buyerName : c.sellerName;
+        return other.toLowerCase().includes(q) || c.listingTitle.toLowerCase().includes(q);
+      })
+    : allConversations;
+  const selected = allConversations.find(c => c.id === selectedId) ?? null;
 
   useEffect(() => {
     if (selected && user) {
@@ -80,6 +88,8 @@ export function MessagesView({ openConversationId }: MessagesViewProps) {
               <Search size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#C4A88E' }} />
               <input
                 type="text" placeholder="Search messages..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full outline-none"
                 style={{ padding: '10px 12px 10px 40px', borderRadius: '8px', border: '1px solid #E8D5C4', fontSize: '14px', color: '#402E32' }}
               />

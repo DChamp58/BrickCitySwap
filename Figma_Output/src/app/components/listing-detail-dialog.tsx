@@ -169,56 +169,111 @@ export function ListingDetailDialog({
       <>
         {/* Fullscreen gallery — portalled to document.body so it sits above the Radix dialog in the root stacking context */}
         {galleryOpen && images.length > 0 && createPortal(
-          <div className="fixed inset-0 flex flex-col" style={{ backgroundColor: 'rgba(0,0,0,0.96)', zIndex: 9999 }}>
-            {/* Header: counter + close (safe-area aware) */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', paddingTop: 'max(env(safe-area-inset-top), 16px)', flexShrink: 0 }}>
-              <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: '14px', fontWeight: 500 }}>
-                {images.length > 1 ? `${imgIdx + 1} of ${images.length}` : ''}
-              </span>
-              <button onClick={() => setGalleryOpen(false)} aria-label="Close gallery"
-                style={{ width: '48px', height: '48px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.18)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <X size={22} style={{ color: '#fff' }} />
-              </button>
-            </div>
+          <div
+            className="fixed inset-0 flex items-center justify-center"
+            style={{ backgroundColor: 'rgba(0,0,0,0.78)', zIndex: 9999, backdropFilter: 'blur(8px)' }}
+            onClick={() => setGalleryOpen(false)}
+          >
+            {/* Close button — white, top-right, always visible */}
+            <button
+              onClick={(e) => { e.stopPropagation(); setGalleryOpen(false); }}
+              aria-label="Close"
+              style={{
+                position: 'absolute', top: '20px', right: '20px',
+                width: '44px', height: '44px', borderRadius: '50%',
+                backgroundColor: '#FFFFFF', border: 'none', cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
+              }}
+            >
+              <X size={20} style={{ color: '#402E32' }} />
+            </button>
 
-            {/* Image area — swipe horizontally to navigate, swipe down to close */}
+            {/* Counter */}
+            {images.length > 1 && (
+              <div
+                style={{
+                  position: 'absolute', top: '24px', left: '50%', transform: 'translateX(-50%)',
+                  backgroundColor: 'rgba(0,0,0,0.5)', color: '#fff',
+                  fontSize: '13px', fontWeight: 600, padding: '5px 14px', borderRadius: '20px',
+                  pointerEvents: 'none',
+                }}
+              >
+                {imgIdx + 1} / {images.length}
+              </div>
+            )}
+
+            {/* Image + side arrows */}
             <div
+              className="relative flex items-center justify-center"
+              style={{ maxWidth: '88vw', maxHeight: '82vh' }}
+              onClick={(e) => e.stopPropagation()}
               onTouchStart={onImgTouchStart}
               onTouchEnd={onImgTouchEnd}
-              style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden', touchAction: 'none' }}
             >
+              {images.length > 1 && !isMobile && (
+                <button
+                  onClick={(e) => { e.stopPropagation(); setImgIdx((imgIdx - 1 + images.length) % images.length); }}
+                  style={{
+                    position: 'absolute', left: '-60px', top: '50%', transform: 'translateY(-50%)',
+                    width: '44px', height: '44px', borderRadius: '50%',
+                    backgroundColor: '#FFFFFF', border: 'none', cursor: 'pointer',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    boxShadow: '0 4px 20px rgba(0,0,0,0.25)',
+                  }}
+                >
+                  <ChevronLeft size={22} style={{ color: '#402E32' }} />
+                </button>
+              )}
+
               <img
                 src={images[imgIdx]?.url}
                 alt={listing.title}
-                style={{ maxWidth: '92vw', maxHeight: '100%', objectFit: 'contain', borderRadius: '8px', userSelect: 'none', pointerEvents: 'none' }}
+                style={{
+                  maxWidth: '88vw', maxHeight: '82vh',
+                  objectFit: 'contain', borderRadius: '12px',
+                  boxShadow: '0 24px 64px rgba(0,0,0,0.5)',
+                  userSelect: 'none', display: 'block',
+                }}
                 draggable={false}
               />
-              {/* Desktop arrows only */}
+
               {images.length > 1 && !isMobile && (
-                <>
-                  <button onClick={() => setImgIdx((imgIdx - 1 + images.length) % images.length)}
-                    style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', width: '48px', height: '48px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.15)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <ChevronLeft size={28} style={{ color: '#fff' }} />
-                  </button>
-                  <button onClick={() => setImgIdx((imgIdx + 1) % images.length)}
-                    style={{ position: 'absolute', right: '16px', top: '50%', transform: 'translateY(-50%)', width: '48px', height: '48px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.15)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <ChevronRight size={28} style={{ color: '#fff' }} />
-                  </button>
-                </>
+                <button
+                  onClick={(e) => { e.stopPropagation(); setImgIdx((imgIdx + 1) % images.length); }}
+                  style={{
+                    position: 'absolute', right: '-60px', top: '50%', transform: 'translateY(-50%)',
+                    width: '44px', height: '44px', borderRadius: '50%',
+                    backgroundColor: '#FFFFFF', border: 'none', cursor: 'pointer',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    boxShadow: '0 4px 20px rgba(0,0,0,0.25)',
+                  }}
+                >
+                  <ChevronRight size={22} style={{ color: '#402E32' }} />
+                </button>
               )}
             </div>
 
-            {/* Bottom: pill dots (multi-image) or close hint (single) */}
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', padding: '20px', paddingBottom: 'max(env(safe-area-inset-bottom), 20px)', flexShrink: 0, minHeight: '64px' }}>
-              {images.length > 1
-                ? images.map((_, i) => (
-                    <button key={i} onClick={() => setImgIdx(i)}
-                      style={{ width: i === imgIdx ? '24px' : '8px', height: '8px', borderRadius: '4px', backgroundColor: i === imgIdx ? '#F76902' : 'rgba(255,255,255,0.35)', border: 'none', cursor: 'pointer', padding: 0, transition: 'all 200ms ease' }}
-                    />
-                  ))
-                : <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '12px', margin: 0 }}>Swipe down or tap × to close</p>
-              }
-            </div>
+            {/* Dot navigation */}
+            {images.length > 1 && (
+              <div
+                style={{
+                  position: 'absolute', bottom: '28px', left: '50%', transform: 'translateX(-50%)',
+                  display: 'flex', gap: '8px', alignItems: 'center',
+                }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                {images.map((_, i) => (
+                  <button key={i} onClick={() => setImgIdx(i)}
+                    style={{
+                      width: i === imgIdx ? '24px' : '8px', height: '8px', borderRadius: '4px',
+                      backgroundColor: i === imgIdx ? '#F76902' : 'rgba(255,255,255,0.45)',
+                      border: 'none', cursor: 'pointer', padding: 0, transition: 'all 200ms ease',
+                    }}
+                  />
+                ))}
+              </div>
+            )}
           </div>,
           document.body
         )}

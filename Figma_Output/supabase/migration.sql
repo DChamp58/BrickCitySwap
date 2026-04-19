@@ -423,6 +423,7 @@ declare
   v_sender_name       text;
   v_listing_title     text;
   v_listing_image_url text;
+  v_listing_location  text;
   v_conv_id           uuid;
 begin
   v_conv_id := NEW.conversation_id;
@@ -430,7 +431,8 @@ begin
   v_buyer_id      := (select buyer_id   from public.conversations where id = v_conv_id);
   v_seller_id     := (select seller_id  from public.conversations where id = v_conv_id);
   v_listing_id    := (select listing_id from public.conversations where id = v_conv_id);
-  v_listing_title := (select title      from public.listings       where id = v_listing_id);
+  v_listing_title    := (select title    from public.listings where id = v_listing_id);
+  v_listing_location := (select location from public.listings where id = v_listing_id);
 
   v_listing_image_url := (
     select url from public.listing_images
@@ -456,7 +458,8 @@ begin
     jsonb_build_object(
       'conversation_id', v_conv_id,
       'listing_title', v_listing_title,
-      'listing_image_url', v_listing_image_url
+      'listing_image_url', v_listing_image_url,
+      'listing_location', v_listing_location
     )
   );
 

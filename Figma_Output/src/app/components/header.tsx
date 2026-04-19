@@ -214,7 +214,14 @@ export function Header({ currentView, onViewChange, onCreateListing }: HeaderPro
                             </div>
                             <div style={{ flex: 1, minWidth: 0 }}>
                               <p className="font-medium" style={{ fontSize: '13px', color: '#402E32', marginBottom: '2px', lineHeight: '1.4' }}>{n.title}</p>
-                              <p style={{ fontSize: '12px', color: '#B5866E', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{n.body}</p>
+                              <p style={{ fontSize: '12px', color: '#B5866E', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                {n.body.split('📍')[0].trim()}
+                              </p>
+                              {n.data?.listing_location && (
+                                <p style={{ fontSize: '12px', color: '#B5866E', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginTop: '1px' }}>
+                                  📍 {n.data.listing_location}
+                                </p>
+                              )}
                               <p style={{ fontSize: '11px', color: '#C4A88E', marginTop: '4px' }}>{formatRelativeTime(n.created_at)}</p>
                             </div>
                             {!n.read && (

@@ -48,6 +48,11 @@ export function CreateListingDialog({ open, onClose, onListingCreated }: CreateL
   const [otherRoommates, setOtherRoommates] = useState('');
   const [otherRoommatesSpec, setOtherRoommatesSpec] = useState('');
   const [preferNotToSayRoommates, setPreferNotToSayRoommates] = useState('');
+  const [petsAllowed, setPetsAllowed] = useState(false);
+  const [electricIncluded, setElectricIncluded] = useState(false);
+  const [waterIncluded, setWaterIncluded] = useState(false);
+  const [gasIncluded, setGasIncluded] = useState(false);
+  const [petFee, setPetFee] = useState('');
   const [availableFrom, setAvailableFrom] = useState('');
   const [availableTo, setAvailableTo] = useState('');
 
@@ -65,6 +70,8 @@ export function CreateListingDialog({ open, onClose, onListingCreated }: CreateL
     setBathrooms(''); setRoommates(''); setFemaleRoommates(''); setMaleRoommates('');
     setOtherRoommates(''); setOtherRoommatesSpec(''); setPreferNotToSayRoommates('');
     setAvailableFrom(''); setAvailableTo('');
+    setPetsAllowed(false); setElectricIncluded(false); setWaterIncluded(false);
+    setGasIncluded(false); setPetFee('');
     setCategory(''); setCondition('');
     setImages([]); setImagePreviews([]);
   };
@@ -119,6 +126,11 @@ export function CreateListingDialog({ open, onClose, onListingCreated }: CreateL
           prefer_not_to_say_roommates: preferNotToSayRoommates ? parseInt(preferNotToSayRoommates) : null,
           available_from: availableFrom || null,
           available_to: availableTo || null,
+          pets_allowed: petsAllowed,
+          electric_included: electricIncluded,
+          water_included: waterIncluded,
+          gas_included: gasIncluded,
+          pet_fee: petFee ? parseFloat(petFee) : null,
         } : {
           category,
           condition,
@@ -238,6 +250,40 @@ export function CreateListingDialog({ open, onClose, onListingCreated }: CreateL
                     />
                   </div>
                 )}
+              </div>
+
+              {/* Utilities & Pets */}
+              <div className="space-y-3 rounded-lg border p-4">
+                <p className="text-sm font-medium">Utilities & Extras</p>
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground">Utilities included in rent:</p>
+                  <div className="flex flex-wrap gap-4 pt-1">
+                    <label className="flex items-center gap-2 cursor-pointer text-sm">
+                      <input type="checkbox" checked={electricIncluded} onChange={e => setElectricIncluded(e.target.checked)} className="w-4 h-4 accent-[#F76902]" />
+                      Electric
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer text-sm">
+                      <input type="checkbox" checked={waterIncluded} onChange={e => setWaterIncluded(e.target.checked)} className="w-4 h-4 accent-[#F76902]" />
+                      Water
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer text-sm">
+                      <input type="checkbox" checked={gasIncluded} onChange={e => setGasIncluded(e.target.checked)} className="w-4 h-4 accent-[#F76902]" />
+                      Gas
+                    </label>
+                  </div>
+                </div>
+                <div className="flex flex-wrap items-center gap-6">
+                  <label className="flex items-center gap-2 cursor-pointer text-sm">
+                    <input type="checkbox" checked={petsAllowed} onChange={e => setPetsAllowed(e.target.checked)} className="w-4 h-4 accent-[#F76902]" />
+                    Pets Allowed
+                  </label>
+                  {petsAllowed && (
+                    <div className="flex items-center gap-2">
+                      <Label htmlFor="petFee" className="text-sm whitespace-nowrap">Pet Fee ($/mo)</Label>
+                      <Input id="petFee" type="number" placeholder="50" value={petFee} onChange={e => setPetFee(e.target.value)} min="0" className="w-28" />
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Availability */}

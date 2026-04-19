@@ -41,7 +41,9 @@ export function MessagesView({ openConversationId }: MessagesViewProps) {
   }, [selected?.id, selected?.messages.length]);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (bottomRef.current) {
+      bottomRef.current.scrollIntoView({ behavior: 'instant' });
+    }
   }, [selected?.messages.length]);
 
   if (!user) {

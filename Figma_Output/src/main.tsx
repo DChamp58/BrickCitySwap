@@ -1,7 +1,9 @@
 
-  import { createRoot } from "react-dom/client";
-  import App from "./app/App.tsx";
-  import "./styles/index.css";
+import { createRoot } from "react-dom/client";
+import App from "./app/App.tsx";
+import "./styles/index.css";
 
-  createRoot(document.getElementById("root")!).render(<App />);
-  
+// Prevent browser from restoring scroll position on navigation
+history.scrollRestoration = 'manual';
+
+createRoot(document.getElementById("root")!).render(<App />);

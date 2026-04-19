@@ -36,7 +36,7 @@ function AppContent() {
   const [paymentPlan, setPaymentPlan] = useState<string>('poster');
   const [paymentBilling, setPaymentBilling] = useState<'monthly' | 'yearly'>('monthly');
 
-  useEffect(() => { window.scrollTo(0, 0); }, [currentView]);
+  useEffect(() => { window.scrollTo({ top: 0, left: 0, behavior: 'instant' }); }, [currentView]);
 
   const handleCreateListing = () => {
     if (!user) {

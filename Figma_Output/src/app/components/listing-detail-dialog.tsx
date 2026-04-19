@@ -706,58 +706,12 @@ export function ListingDetailDialog({
                       <span style={{ fontSize: '13px', color: '#402E32' }}>{listing.bathrooms} bath</span>
                     </div>
                   )}
-                  {(listing.total_rooms != null || listing.available_rooms != null) && (
-                    <div className="flex items-center" style={{ gap: '6px' }}>
-                      <DoorOpen size={15} style={{ color: '#F76902', flexShrink: 0 }} />
-                      <span style={{ fontSize: '13px', color: '#402E32' }}>
-                        {listing.available_rooms != null && listing.total_rooms != null
-                          ? `${listing.available_rooms} of ${listing.total_rooms} rooms available`
-                          : listing.total_rooms != null
-                            ? `${listing.total_rooms} rooms total`
-                            : `${listing.available_rooms} rooms available`}
-                      </span>
-                    </div>
-                  )}
-                  {listing.roommates != null && (
-                    <div className="flex items-center" style={{ gap: '6px' }}>
-                      <Users size={15} style={{ color: '#F76902', flexShrink: 0 }} />
-                      <span style={{ fontSize: '13px', color: '#402E32' }}>{listing.roommates} roommate{listing.roommates !== 1 ? 's' : ''}</span>
-                    </div>
-                  )}
                 </div>
 
                 <div style={{ marginBottom: '24px' }}>
                   <h3 className="font-semibold" style={{ fontSize: '16px', color: '#402E32', marginBottom: '10px' }}>About this place</h3>
                   <p style={{ fontSize: '15px', color: '#5A4A44', lineHeight: '1.7' }}>{listing.description}</p>
                 </div>
-
-                {/* Roommates breakdown — circles */}
-                {(listing.female_roommates != null || listing.male_roommates != null || listing.other_roommates != null || listing.prefer_not_to_say_roommates != null) && (
-                  <div style={{ marginBottom: '24px' }}>
-                    <h3 className="font-semibold" style={{ fontSize: '16px', color: '#402E32', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '7px' }}>
-                      <Users size={16} style={{ color: '#F76902' }} /> Roommates
-                    </h3>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px' }}>
-                      {[
-                        { count: listing.female_roommates, label: 'Female' },
-                        { count: listing.male_roommates, label: 'Male' },
-                        { count: listing.other_roommates, label: listing.other_roommates_spec || 'Other' },
-                        { count: listing.prefer_not_to_say_roommates, label: 'Prefer Not to Say' },
-                      ].filter(r => r.count != null && r.count > 0).map(r => (
-                        <div key={r.label} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
-                          <div style={{
-                            width: '64px', height: '64px', borderRadius: '50%',
-                            backgroundColor: '#FFF6EE', border: '2px solid #F76902',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          }}>
-                            <span style={{ fontSize: '24px', fontWeight: 800, color: '#F76902' }}>{r.count}</span>
-                          </div>
-                          <span style={{ fontSize: '12px', color: '#B5866E', textAlign: 'center', maxWidth: '70px' }}>{r.label}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
 
                 <div>
                   <h3 className="font-semibold" style={{ fontSize: '16px', color: '#402E32', marginBottom: '12px' }}>Location</h3>
@@ -814,7 +768,7 @@ export function ListingDetailDialog({
                       )}
                     </div>
                     {/* Compact roommates */}
-                    {(listing.female_roommates != null || listing.male_roommates != null || listing.other_roommates != null || listing.prefer_not_to_say_roommates != null) && (
+                    {[listing.female_roommates, listing.male_roommates, listing.other_roommates, listing.prefer_not_to_say_roommates].some(c => c != null && c > 0) && (
                       <div style={{ padding: '18px', borderRadius: '14px', border: '1.5px solid #E8D5C4', backgroundColor: '#FFFFFF' }}>
                         <p style={{ fontSize: '13px', fontWeight: 600, color: '#402E32', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                           <Users size={14} style={{ color: '#F76902' }} /> Roommates

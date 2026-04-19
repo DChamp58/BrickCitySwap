@@ -206,8 +206,11 @@ export function Header({ currentView, onViewChange, onCreateListing }: HeaderPro
                             onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#FFF6EE'; }}
                             onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = n.read ? '#FFFFFF' : '#FFF6EE'; }}
                           >
-                            <div style={{ width: '30px', height: '30px', borderRadius: '50%', backgroundColor: '#FFEEE0', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                              {notifIcon(n)}
+                            <div style={{ width: '36px', height: '36px', borderRadius: '8px', backgroundColor: '#FFEEE0', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                              {n.data?.listing_image_url
+                                ? <img src={n.data.listing_image_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                : notifIcon(n)
+                              }
                             </div>
                             <div style={{ flex: 1, minWidth: 0 }}>
                               <p className="font-medium" style={{ fontSize: '13px', color: '#402E32', marginBottom: '2px', lineHeight: '1.4' }}>{n.title}</p>
@@ -224,6 +227,32 @@ export function Header({ currentView, onViewChange, onCreateListing }: HeaderPro
                   </div>
                 )}
               </div>
+            )}
+
+            {/* Saved Items heart */}
+            {user && (
+              <button
+                onClick={() => navigate('saved')}
+                style={{
+                  width: '38px', height: '38px', borderRadius: '50%',
+                  border: 'none',
+                  backgroundColor: currentView === 'saved' ? '#FFF6EE' : 'transparent',
+                  cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  marginRight: '4px', transition: 'background-color 150ms ease',
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#FFF6EE'; }}
+                onMouseLeave={(e) => { if (currentView !== 'saved') e.currentTarget.style.backgroundColor = 'transparent'; }}
+                title="Saved Items"
+              >
+                <Heart
+                  size={20}
+                  style={{
+                    color: '#F76902',
+                    fill: currentView === 'saved' ? '#F76902' : 'none',
+                    transition: 'fill 150ms ease',
+                  }}
+                />
+              </button>
             )}
 
             <div className="relative flex items-center" style={{ gap: '4px' }} ref={dropdownRef}>

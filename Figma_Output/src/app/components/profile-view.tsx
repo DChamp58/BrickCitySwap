@@ -8,6 +8,7 @@ import { fetchMyListings as fetchMyListingsApi } from '@/lib/api';
 import { Listing } from './listing-card';
 import { EditProfileDialog } from './edit-profile-dialog';
 import { ChangePasswordDialog } from './change-password-dialog';
+import { NotificationPreferencesDialog } from './notification-preferences-dialog';
 
 interface ProfileViewProps {
   onNavigate: (view: string) => void;
@@ -20,6 +21,7 @@ export function ProfileView({ onNavigate, onCreateListing }: ProfileViewProps) {
   const [loadingListings, setLoadingListings] = useState(true);
   const [editProfileOpen, setEditProfileOpen] = useState(false);
   const [changePasswordOpen, setChangePasswordOpen] = useState(false);
+  const [notifPrefsOpen, setNotifPrefsOpen] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -441,7 +443,7 @@ export function ProfileView({ onNavigate, onCreateListing }: ProfileViewProps) {
           <div className="grid" style={{ gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
             {[
               { title: 'Change Password', sub: 'Update your password', danger: false, action: () => setChangePasswordOpen(true) },
-              { title: 'Notifications', sub: 'Manage preferences', danger: false, action: () => {} },
+              { title: 'Notifications', sub: 'Manage preferences', danger: false, action: () => setNotifPrefsOpen(true) },
             ].map(({ title, sub, danger, action }) => (
               <button
                 key={title}
@@ -471,6 +473,10 @@ export function ProfileView({ onNavigate, onCreateListing }: ProfileViewProps) {
       <ChangePasswordDialog
         open={changePasswordOpen}
         onClose={() => setChangePasswordOpen(false)}
+      />
+      <NotificationPreferencesDialog
+        open={notifPrefsOpen}
+        onClose={() => setNotifPrefsOpen(false)}
       />
     </div>
   );

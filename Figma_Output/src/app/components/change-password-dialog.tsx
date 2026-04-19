@@ -28,10 +28,6 @@ export function ChangePasswordDialog({ open, onClose }: ChangePasswordDialogProp
   };
 
   const handleSave = async () => {
-    if (newPassword.length < 8) {
-      toast.error('Password must be at least 8 characters');
-      return;
-    }
     if (newPassword !== confirmPassword) {
       toast.error('Passwords do not match');
       return;
@@ -77,7 +73,7 @@ export function ChangePasswordDialog({ open, onClose }: ChangePasswordDialogProp
           <h2 className="font-bold" style={{ fontSize: '22px', color: '#402E32' }}>Change Password</h2>
         </div>
         <p style={{ fontSize: '14px', color: '#B5866E', marginBottom: '28px' }}>
-          Choose a strong password with at least 8 characters.
+          Enter a new password for your account.
         </p>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>

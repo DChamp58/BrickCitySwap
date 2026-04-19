@@ -416,20 +416,28 @@ security definer
 set search_path = public
 as $$
 declare
-  v_buyer_id  uuid;
-  v_seller_id uuid;
-  v_recipient uuid;
-  v_sender_name text;
-  v_listing_title text;
-  v_conv_id uuid;
+  v_buyer_id          uuid;
+  v_seller_id         uuid;
+  v_listing_id        uuid;
+  v_recipient         uuid;
+  v_sender_name       text;
+  v_listing_title     text;
+  v_listing_image_url text;
+  v_conv_id           uuid;
 begin
   v_conv_id := NEW.conversation_id;
 
-  select c.buyer_id, c.seller_id, l.title
-  into v_buyer_id, v_seller_id, v_listing_title
-  from public.conversations c
-  join public.listings l on l.id = c.listing_id
-  where c.id = v_conv_id;
+  v_buyer_id      := (select buyer_id   from public.conversations where id = v_conv_id);
+  v_seller_id     := (select seller_id  from public.conversations where id = v_conv_id);
+  v_listing_id    := (select listing_id from public.conversations where id = v_conv_id);
+  v_listing_title := (select title      from public.listings       where id = v_listing_id);
+
+  v_listing_image_url := (
+    select url from public.listing_images
+    where listing_id = v_listing_id
+    order by sort_order asc
+    limit 1
+  );
 
   if NEW.sender_id = v_buyer_id then
     v_recipient := v_seller_id;
@@ -437,8 +445,7 @@ begin
     v_recipient := v_buyer_id;
   end if;
 
-  select full_name into v_sender_name
-  from public.profiles where id = NEW.sender_id;
+  v_sender_name := (select full_name from public.profiles where id = NEW.sender_id);
 
   insert into public.notifications (user_id, type, title, body, data)
   values (
@@ -448,7 +455,8 @@ begin
     left(NEW.content, 120),
     jsonb_build_object(
       'conversation_id', v_conv_id,
-      'listing_title', v_listing_title
+      'listing_title', v_listing_title,
+      'listing_image_url', v_listing_image_url
     )
   );
 
@@ -469,20 +477,27 @@ security definer
 set search_path = public
 as $$
 declare
-  v_listing_owner uuid;
-  v_listing_title text;
-  v_saver_name    text;
+  v_listing_owner     uuid;
+  v_listing_title     text;
+  v_saver_name        text;
+  v_listing_image_url text;
 begin
-  select user_id, title into v_listing_owner, v_listing_title
-  from public.listings where id = NEW.listing_id;
+  v_listing_owner := (select user_id from public.listings where id = NEW.listing_id);
+  v_listing_title := (select title   from public.listings where id = NEW.listing_id);
 
   -- Don't notify if the owner is saving their own listing
   if NEW.user_id = v_listing_owner then
     return NEW;
   end if;
 
-  select full_name into v_saver_name
-  from public.profiles where id = NEW.user_id;
+  v_listing_image_url := (
+    select url from public.listing_images
+    where listing_id = NEW.listing_id
+    order by sort_order asc
+    limit 1
+  );
+
+  v_saver_name := (select full_name from public.profiles where id = NEW.user_id);
 
   insert into public.notifications (user_id, type, title, body, data)
   values (
@@ -490,7 +505,10 @@ begin
     'listing_saved',
     v_saver_name || ' saved your listing',
     v_listing_title,
-    jsonb_build_object('listing_id', NEW.listing_id)
+    jsonb_build_object(
+      'listing_id', NEW.listing_id,
+      'listing_image_url', v_listing_image_url
+    )
   );
 
   return NEW;

@@ -162,7 +162,7 @@ export function CreateListingDialog({ open, onClose, onListingCreated }: CreateL
                 <Input id="title" placeholder="e.g., Apartment near RIT — 2 rooms available" value={title} onChange={(e) => setTitle(e.target.value)} required />
               </div>
 
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-3 gap-4 items-end">
                 <div className="space-y-2 col-span-2">
                   <Label htmlFor="location">Address *</Label>
                   <Input id="location" placeholder="e.g., 100 Park Point Dr, Rochester, NY" value={location} onChange={(e) => setLocation(e.target.value)} required />
@@ -173,7 +173,7 @@ export function CreateListingDialog({ open, onClose, onListingCreated }: CreateL
                 </div>
               </div>
 
-              <div className="grid grid-cols-4 gap-4">
+              <div className="grid grid-cols-5 gap-4 items-end">
                 <div className="space-y-2 col-span-2">
                   <Label htmlFor="housingType">Property Type *</Label>
                   <Select value={housingType} onValueChange={setHousingType} required>
@@ -193,18 +193,17 @@ export function CreateListingDialog({ open, onClose, onListingCreated }: CreateL
                   <Label htmlFor="availableRooms">Available Rooms *</Label>
                   <Input id="availableRooms" type="number" placeholder="1" value={availableRooms} onChange={(e) => setAvailableRooms(e.target.value)} required min="1" />
                 </div>
-              </div>
-
-              <div className="space-y-2 w-1/4">
-                <Label htmlFor="bathrooms">Bathrooms *</Label>
-                <Input id="bathrooms" type="number" placeholder="1" value={bathrooms} onChange={(e) => setBathrooms(e.target.value)} required min="0" step="0.5" />
-                <p className="text-xs text-muted-foreground">0.5 = half bathroom (no shower)</p>
+                <div className="space-y-2">
+                  <Label htmlFor="bathrooms">Bathrooms *</Label>
+                  <Input id="bathrooms" type="number" placeholder="1" value={bathrooms} onChange={(e) => setBathrooms(e.target.value)} required min="0" step="0.5" />
+                  <p className="text-xs text-muted-foreground">0.5 = half bath (no shower)</p>
+                </div>
               </div>
 
               {/* Roommates */}
               <div className="space-y-3 rounded-lg border p-4">
                 <p className="text-sm font-medium">Roommates</p>
-                <div className="grid grid-cols-4 gap-4">
+                <div className="grid grid-cols-5 gap-4 items-end">
                   <div className="space-y-2">
                     <Label htmlFor="roommates">Total</Label>
                     <Input id="roommates" type="number" placeholder="3" value={roommates} onChange={(e) => setRoommates(e.target.value)} min="0" />
@@ -218,29 +217,27 @@ export function CreateListingDialog({ open, onClose, onListingCreated }: CreateL
                     <Input id="maleRoommates" type="number" placeholder="0" value={maleRoommates} onChange={(e) => setMaleRoommates(e.target.value)} min="0" />
                   </div>
                   <div className="space-y-2">
+                    <Label htmlFor="otherRoommates">Other</Label>
+                    <Input id="otherRoommates" type="number" placeholder="0" value={otherRoommates} onChange={(e) => setOtherRoommates(e.target.value)} min="0" />
+                  </div>
+                  <div className="space-y-2">
                     <Label htmlFor="preferNotToSayRoommates">Prefer Not to Say</Label>
                     <Input id="preferNotToSayRoommates" type="number" placeholder="0" value={preferNotToSayRoommates} onChange={(e) => setPreferNotToSayRoommates(e.target.value)} min="0" />
                   </div>
                 </div>
-                <div className="grid grid-cols-4 gap-4">
+                {otherRoommates && parseInt(otherRoommates) > 0 && (
                   <div className="space-y-2">
-                    <Label htmlFor="otherRoommates">Other</Label>
-                    <Input id="otherRoommates" type="number" placeholder="0" value={otherRoommates} onChange={(e) => setOtherRoommates(e.target.value)} min="0" />
-                  </div>
-                  <div className="space-y-2 col-span-3">
                     <Label htmlFor="otherRoommatesSpec">
-                      Other — Specification
-                      {otherRoommates && parseInt(otherRoommates) > 0 && <span className="text-destructive ml-1">*</span>}
+                      Other — Specification <span className="text-destructive">*</span>
                     </Label>
                     <Input
                       id="otherRoommatesSpec"
                       placeholder="e.g., Non-binary"
                       value={otherRoommatesSpec}
                       onChange={(e) => setOtherRoommatesSpec(e.target.value)}
-                      disabled={!otherRoommates || parseInt(otherRoommates) === 0}
                     />
                   </div>
-                </div>
+                )}
               </div>
 
               {/* Availability */}

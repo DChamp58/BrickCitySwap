@@ -54,6 +54,11 @@ export function EditListingDialog({ open, onClose, listing, onListingUpdated }: 
   const [gasNotIncluded, setGasNotIncluded] = useState(false);
   const [gasCost, setGasCost] = useState('');
   const [petFee, setPetFee] = useState('');
+  const [femaleRoommates, setFemaleRoommates] = useState('');
+  const [maleRoommates, setMaleRoommates] = useState('');
+  const [otherRoommates, setOtherRoommates] = useState('');
+  const [otherRoommatesSpec, setOtherRoommatesSpec] = useState('');
+  const [preferNotToSayRoommates, setPreferNotToSayRoommates] = useState('');
   const [category, setCategory] = useState('');
   const [condition, setCondition] = useState('');
 
@@ -87,6 +92,11 @@ export function EditListingDialog({ open, onClose, listing, onListingUpdated }: 
     setGasNotIncluded(!(listing.gas_included ?? true));
     setGasCost(listing.gas_cost != null ? String(listing.gas_cost) : '');
     setPetFee(listing.pet_fee != null ? String(listing.pet_fee) : '');
+    setFemaleRoommates(listing.female_roommates != null ? String(listing.female_roommates) : '');
+    setMaleRoommates(listing.male_roommates != null ? String(listing.male_roommates) : '');
+    setOtherRoommates(listing.other_roommates != null ? String(listing.other_roommates) : '');
+    setOtherRoommatesSpec(listing.other_roommates_spec ?? '');
+    setPreferNotToSayRoommates(listing.prefer_not_to_say_roommates != null ? String(listing.prefer_not_to_say_roommates) : '');
     setCategory(listing.category ?? '');
     setCondition(listing.condition ?? '');
 
@@ -188,6 +198,11 @@ export function EditListingDialog({ open, onClose, listing, onListingUpdated }: 
               gas_included: !gasNotIncluded,
               gas_cost: gasNotIncluded && gasCost ? parseFloat(gasCost) : null,
               pet_fee: petFee ? parseFloat(petFee) : null,
+              female_roommates: femaleRoommates !== '' ? parseInt(femaleRoommates) : null,
+              male_roommates: maleRoommates !== '' ? parseInt(maleRoommates) : null,
+              other_roommates: otherRoommates !== '' ? parseInt(otherRoommates) : null,
+              other_roommates_spec: otherRoommatesSpec || null,
+              prefer_not_to_say_roommates: preferNotToSayRoommates !== '' ? parseInt(preferNotToSayRoommates) : null,
             }
           : { title, description, price: parseFloat(price), category, condition };
 
@@ -429,6 +444,32 @@ export function EditListingDialog({ open, onClose, listing, onListingUpdated }: 
               <div className="space-y-2">
                 <Label htmlFor="edit-distance">Distance from Campus (miles)</Label>
                 <Input id="edit-distance" type="number" value={distanceFromCampus} onChange={e => setDistanceFromCampus(e.target.value)} min="0" step="0.1" placeholder="e.g. 0.5" />
+              </div>
+
+              {/* Roommates */}
+              <div className="space-y-3 rounded-lg border p-4">
+                <p className="text-sm font-medium">Current Roommates</p>
+                <div className="grid grid-cols-4 gap-3 items-end">
+                  {([
+                    ['Female', femaleRoommates, setFemaleRoommates],
+                    ['Male', maleRoommates, setMaleRoommates],
+                    ['Other', otherRoommates, setOtherRoommates],
+                    ['Prefer not to say', preferNotToSayRoommates, setPreferNotToSayRoommates],
+                  ] as const).map(([label, val, setter]) => (
+                    <div key={label} className="space-y-1">
+                      <Label className="text-xs">{label}</Label>
+                      <Input type="number" min="0" placeholder="0" value={val}
+                        onChange={e => setter(e.target.value)} className="h-8 text-sm" />
+                    </div>
+                  ))}
+                </div>
+                {parseInt(otherRoommates) > 0 && (
+                  <div className="space-y-1">
+                    <Label className="text-xs">Specify "Other"</Label>
+                    <Input placeholder="e.g. Non-binary, Genderqueer…" value={otherRoommatesSpec}
+                      onChange={e => setOtherRoommatesSpec(e.target.value)} className="h-8 text-sm" />
+                  </div>
+                )}
               </div>
 
               {/* Utilities & Pets */}

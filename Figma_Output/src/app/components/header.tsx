@@ -281,20 +281,16 @@ export function Header({ currentView, onViewChange, onCreateListing }: HeaderPro
               <button
                 onClick={onCreateListing}
                 style={{
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  gap: '6px', height: '36px', padding: '0 14px',
-                  borderRadius: '18px', border: 'none',
-                  backgroundColor: '#F76902', color: '#fff',
-                  cursor: 'pointer', fontSize: '14px', fontWeight: 600,
-                  marginRight: '8px',
-                  transition: 'background-color 150ms ease, transform 150ms ease',
+                  width: '38px', height: '38px', borderRadius: '50%',
+                  border: 'none', backgroundColor: 'transparent',
+                  cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  marginRight: '4px', transition: 'background-color 150ms ease',
                 }}
-                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#D85802'; e.currentTarget.style.transform = 'scale(1.04)'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#F76902'; e.currentTarget.style.transform = 'scale(1)'; }}
+                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#FFF6EE'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
                 title="Post a listing"
               >
-                <Plus size={16} style={{ color: '#fff' }} />
-                Post
+                <Plus size={20} style={{ color: '#402E32' }} />
               </button>
             )}
 

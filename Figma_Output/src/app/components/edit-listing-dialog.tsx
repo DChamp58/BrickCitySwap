@@ -42,6 +42,9 @@ export function EditListingDialog({ open, onClose, listing, onListingUpdated }: 
   const [availableFrom, setAvailableFrom] = useState('');
   const [availableTo, setAvailableTo] = useState('');
   const [gender, setGender] = useState('any');
+  const [housingType, setHousingType] = useState('');
+  const [totalRooms, setTotalRooms] = useState('');
+  const [availableRooms, setAvailableRooms] = useState('');
   const [category, setCategory] = useState('');
   const [condition, setCondition] = useState('');
 
@@ -63,6 +66,9 @@ export function EditListingDialog({ open, onClose, listing, onListingUpdated }: 
     setAvailableFrom(listing.available_from?.slice(0, 10) ?? '');
     setAvailableTo(listing.available_to?.slice(0, 10) ?? '');
     setGender(listing.gender_pref ?? 'any');
+    setHousingType(listing.housing_type ?? '');
+    setTotalRooms(listing.total_rooms != null ? String(listing.total_rooms) : '');
+    setAvailableRooms(listing.available_rooms != null ? String(listing.available_rooms) : '');
     setCategory(listing.category ?? '');
     setCondition(listing.condition ?? '');
 
@@ -144,10 +150,14 @@ export function EditListingDialog({ open, onClose, listing, onListingUpdated }: 
       const fieldUpdates =
         listing.type === 'housing'
           ? {
-              title, description, price: parseFloat(price),
+              title, description,
+              price: parseFloat(price),
               location,
-              bedrooms: parseInt(bedrooms),
-              bathrooms: parseFloat(bathrooms),
+              bedrooms: bedrooms !== '' ? parseInt(bedrooms) : null,
+              bathrooms: bathrooms !== '' ? parseFloat(bathrooms) : null,
+              housing_type: housingType || null,
+              total_rooms: totalRooms !== '' ? parseInt(totalRooms) : null,
+              available_rooms: availableRooms !== '' ? parseInt(availableRooms) : null,
               available_from: availableFrom || null,
               available_to: availableTo || null,
               gender_pref: gender,
@@ -334,14 +344,36 @@ export function EditListingDialog({ open, onClose, listing, onListingUpdated }: 
                 <Input id="edit-location" value={location} onChange={e => setLocation(e.target.value)} required />
               </div>
 
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-4 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="edit-bedrooms">Bedrooms *</Label>
-                  <Input id="edit-bedrooms" type="number" value={bedrooms} onChange={e => setBedrooms(e.target.value)} required min="0" />
+                  <Label htmlFor="edit-bedrooms">Bedrooms</Label>
+                  <Input id="edit-bedrooms" type="number" value={bedrooms} onChange={e => setBedrooms(e.target.value)} min="0" placeholder="e.g. 2" />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="edit-bathrooms">Bathrooms *</Label>
-                  <Input id="edit-bathrooms" type="number" value={bathrooms} onChange={e => setBathrooms(e.target.value)} required min="0" step="0.5" />
+                  <Label htmlFor="edit-bathrooms">Bathrooms</Label>
+                  <Input id="edit-bathrooms" type="number" value={bathrooms} onChange={e => setBathrooms(e.target.value)} min="0" step="0.5" placeholder="e.g. 1" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="edit-total-rooms">Total Rooms</Label>
+                  <Input id="edit-total-rooms" type="number" value={totalRooms} onChange={e => setTotalRooms(e.target.value)} min="0" placeholder="e.g. 5" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="edit-avail-rooms">Available Rooms</Label>
+                  <Input id="edit-avail-rooms" type="number" value={availableRooms} onChange={e => setAvailableRooms(e.target.value)} min="0" placeholder="e.g. 2" />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Property Type</Label>
+                  <Select value={housingType} onValueChange={setHousingType}>
+                    <SelectTrigger><SelectValue placeholder="Select type..." /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Apartment">Apartment</SelectItem>
+                      <SelectItem value="House">House</SelectItem>
+                      <SelectItem value="Studio">Studio</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="space-y-2">
                   <Label>Gender Preference</Label>

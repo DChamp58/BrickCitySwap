@@ -724,7 +724,7 @@ export function ListingsView({ type, onContact, onView }: ListingsViewProps) {
                           </div>
                           <div className="flex flex-col" style={{ gap: '6px', marginBottom: '20px' }}>
                             <p className="font-normal" style={{ fontSize: '14px', color: '#C4A88E' }}>
-                              {listing.bedrooms === 0 ? 'Studio' : `${listing.bedrooms} bed`} · {listing.bathrooms} bath
+                              {listing.bedrooms != null ? (listing.bedrooms === 0 ? 'Studio' : `${listing.bedrooms} bed`) : ''}{listing.bedrooms != null && listing.bathrooms != null ? ' · ' : ''}{listing.bathrooms != null ? `${listing.bathrooms} bath` : ''}
                               {listing.housing_type ? ` · ${listing.housing_type}` : ''}
                             </p>
                             {listing.available_from && (

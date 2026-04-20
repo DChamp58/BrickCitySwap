@@ -276,6 +276,28 @@ export function Header({ currentView, onViewChange, onCreateListing }: HeaderPro
               </button>
             )}
 
+            {/* Add Post button */}
+            {user && (
+              <button
+                onClick={onCreateListing}
+                style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  gap: '6px', height: '36px', padding: '0 14px',
+                  borderRadius: '18px', border: 'none',
+                  backgroundColor: '#F76902', color: '#fff',
+                  cursor: 'pointer', fontSize: '14px', fontWeight: 600,
+                  marginRight: '8px',
+                  transition: 'background-color 150ms ease, transform 150ms ease',
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#D85802'; e.currentTarget.style.transform = 'scale(1.04)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#F76902'; e.currentTarget.style.transform = 'scale(1)'; }}
+                title="Post a listing"
+              >
+                <Plus size={16} style={{ color: '#fff' }} />
+                Post
+              </button>
+            )}
+
             <div className="relative flex items-center" style={{ gap: '4px' }} ref={dropdownRef}>
               {/* Name / Sign In */}
               <button

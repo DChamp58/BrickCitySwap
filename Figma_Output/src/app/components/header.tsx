@@ -125,6 +125,50 @@ export function Header({ currentView, onViewChange, onCreateListing }: HeaderPro
           {/* Desktop profile area — hidden on mobile */}
           <div className="hidden md:flex flex-1 items-center justify-end">
 
+            {/* Add Post button */}
+            {user && (
+              <button
+                onClick={onCreateListing}
+                style={{
+                  width: '38px', height: '38px', borderRadius: '50%',
+                  border: 'none', outline: 'none', backgroundColor: 'transparent',
+                  cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  marginRight: '4px', transition: 'background-color 150ms ease',
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#FFF6EE'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+                title="Post a listing"
+              >
+                <Plus size={20} style={{ color: '#F76902' }} />
+              </button>
+            )}
+
+            {/* Saved Items heart */}
+            {user && (
+              <button
+                onClick={() => navigate('saved')}
+                style={{
+                  width: '38px', height: '38px', borderRadius: '50%',
+                  border: 'none',
+                  backgroundColor: currentView === 'saved' ? '#FFF6EE' : 'transparent',
+                  cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  marginRight: '4px', transition: 'background-color 150ms ease',
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#FFF6EE'; }}
+                onMouseLeave={(e) => { if (currentView !== 'saved') e.currentTarget.style.backgroundColor = 'transparent'; }}
+                title="Saved Items"
+              >
+                <Heart
+                  size={20}
+                  style={{
+                    color: '#F76902',
+                    fill: currentView === 'saved' ? '#F76902' : 'none',
+                    transition: 'fill 150ms ease',
+                  }}
+                />
+              </button>
+            )}
+
             {/* Notification bell */}
             {user && (
               <div className="relative" style={{ marginRight: '4px' }} ref={notifRef}>
@@ -248,50 +292,6 @@ export function Header({ currentView, onViewChange, onCreateListing }: HeaderPro
                   </div>
                 )}
               </div>
-            )}
-
-            {/* Saved Items heart */}
-            {user && (
-              <button
-                onClick={() => navigate('saved')}
-                style={{
-                  width: '38px', height: '38px', borderRadius: '50%',
-                  border: 'none',
-                  backgroundColor: currentView === 'saved' ? '#FFF6EE' : 'transparent',
-                  cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  marginRight: '4px', transition: 'background-color 150ms ease',
-                }}
-                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#FFF6EE'; }}
-                onMouseLeave={(e) => { if (currentView !== 'saved') e.currentTarget.style.backgroundColor = 'transparent'; }}
-                title="Saved Items"
-              >
-                <Heart
-                  size={20}
-                  style={{
-                    color: '#F76902',
-                    fill: currentView === 'saved' ? '#F76902' : 'none',
-                    transition: 'fill 150ms ease',
-                  }}
-                />
-              </button>
-            )}
-
-            {/* Add Post button */}
-            {user && (
-              <button
-                onClick={onCreateListing}
-                style={{
-                  width: '38px', height: '38px', borderRadius: '50%',
-                  border: 'none', outline: 'none', backgroundColor: 'transparent',
-                  cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  marginRight: '4px', transition: 'background-color 150ms ease',
-                }}
-                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#FFF6EE'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
-                title="Post a listing"
-              >
-                <Plus size={20} style={{ color: '#F76902' }} />
-              </button>
             )}
 
             <div className="relative flex items-center" style={{ gap: '4px' }} ref={dropdownRef}>

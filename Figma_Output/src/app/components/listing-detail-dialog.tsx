@@ -166,63 +166,6 @@ export function ListingDetailDialog({
 
     return (
       <>
-        {/* Fullscreen gallery — portalled to document.body so it sits above the Radix dialog in the root stacking context */}
-        {/* Inline gallery — overlays the dialog content, never leaves the listing context */}
-        {galleryOpen && images.length > 0 && (
-          <div style={{
-            position: 'absolute', inset: 0, zIndex: 10, backgroundColor: '#111',
-            display: 'flex', flexDirection: 'column',
-            borderRadius: isMobile ? '16px 16px 0 0' : '16px', overflow: 'hidden',
-          }}>
-            {/* Header: back + counter + close */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 20px', borderBottom: '1px solid rgba(255,255,255,0.08)', flexShrink: 0 }}>
-              <button onClick={() => setGalleryOpen(false)}
-                style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'none', border: 'none', color: '#fff', cursor: 'pointer', fontSize: '14px', fontWeight: 500, padding: '4px 0' }}>
-                <ChevronLeft size={18} /> Back
-              </button>
-              <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.45)', fontWeight: 500 }}>
-                {images.length > 1 ? `${imgIdx + 1} / ${images.length}` : listing.title}
-              </span>
-              <button onClick={() => setGalleryOpen(false)} aria-label="Close gallery"
-                style={{ width: '36px', height: '36px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.1)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <X size={17} style={{ color: '#fff' }} />
-              </button>
-            </div>
-
-            {/* Image */}
-            <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden', padding: '16px' }}
-              onTouchStart={onImgTouchStart} onTouchEnd={onImgTouchEnd}>
-              <img src={images[imgIdx]?.url} alt={listing.title}
-                style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', borderRadius: '8px', userSelect: 'none' }}
-                draggable={false} />
-              {images.length > 1 && !isMobile && (<>
-                <button onClick={() => setImgIdx((imgIdx - 1 + images.length) % images.length)}
-                  style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', width: '40px', height: '40px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.12)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                  onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.22)'; }}
-                  onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.12)'; }}>
-                  <ChevronLeft size={22} style={{ color: '#fff' }} />
-                </button>
-                <button onClick={() => setImgIdx((imgIdx + 1) % images.length)}
-                  style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', width: '40px', height: '40px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.12)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                  onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.22)'; }}
-                  onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.12)'; }}>
-                  <ChevronRight size={22} style={{ color: '#fff' }} />
-                </button>
-              </>)}
-            </div>
-
-            {/* Dots */}
-            {images.length > 1 && (
-              <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', padding: '16px', flexShrink: 0 }}>
-                {images.map((_, i) => (
-                  <button key={i} onClick={() => setImgIdx(i)}
-                    style={{ width: i === imgIdx ? '24px' : '8px', height: '8px', borderRadius: '4px', backgroundColor: i === imgIdx ? '#F76902' : 'rgba(255,255,255,0.3)', border: 'none', cursor: 'pointer', padding: 0, transition: 'all 200ms ease' }} />
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
         <Dialog open={open} onOpenChange={o => { if (!o) { setGalleryOpen(false); onClose(); } }}>
           <DialogContent
             showCloseButton={!isMobile}
@@ -236,7 +179,7 @@ export function ListingDetailDialog({
           >
             {/* Outer transform wrapper — whole sheet slides together (DOM-driven for 60fps) */}
             <div ref={isMobile ? sheetRef : undefined} style={{
-              display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden',
+              position: 'relative', display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden',
               ...(isMobile ? {
                 backgroundColor: '#FFFFFF',
                 borderRadius: '16px 16px 0 0',
@@ -244,6 +187,52 @@ export function ListingDetailDialog({
                 willChange: 'transform',
               } : {}),
             }}>
+
+            {/* Image gallery overlay — hides listing, shows only images */}
+            {galleryOpen && images.length > 0 && (
+              <div style={{
+                position: 'absolute', inset: 0, zIndex: 50,
+                backgroundColor: 'rgba(0,0,0,0.96)',
+                display: 'flex', flexDirection: 'column',
+                borderRadius: isMobile ? '16px 16px 0 0' : '16px',
+                overflow: 'hidden',
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', flexShrink: 0 }}>
+                  <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: '14px', fontWeight: 500 }}>
+                    {images.length > 1 ? `${imgIdx + 1} of ${images.length}` : listing.title}
+                  </span>
+                  <button onClick={() => setGalleryOpen(false)} aria-label="Close gallery"
+                    style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.18)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <X size={20} style={{ color: '#fff' }} />
+                  </button>
+                </div>
+                <div onTouchStart={onImgTouchStart} onTouchEnd={onImgTouchEnd}
+                  style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden', touchAction: 'none' }}>
+                  <img src={images[imgIdx]?.url} alt={listing.title}
+                    style={{ maxWidth: '92%', maxHeight: '100%', objectFit: 'contain', borderRadius: '8px', userSelect: 'none', pointerEvents: 'none' }}
+                    draggable={false} />
+                  {images.length > 1 && !isMobile && (<>
+                    <button onClick={() => setImgIdx((imgIdx - 1 + images.length) % images.length)}
+                      style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', width: '48px', height: '48px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.15)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <ChevronLeft size={28} style={{ color: '#fff' }} />
+                    </button>
+                    <button onClick={() => setImgIdx((imgIdx + 1) % images.length)}
+                      style={{ position: 'absolute', right: '16px', top: '50%', transform: 'translateY(-50%)', width: '48px', height: '48px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.15)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <ChevronRight size={28} style={{ color: '#fff' }} />
+                    </button>
+                  </>)}
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', padding: '20px', flexShrink: 0, minHeight: '64px' }}>
+                  {images.length > 1
+                    ? images.map((_, i) => (
+                        <button key={i} onClick={() => setImgIdx(i)}
+                          style={{ width: i === imgIdx ? '24px' : '8px', height: '8px', borderRadius: '4px', backgroundColor: i === imgIdx ? '#F76902' : 'rgba(255,255,255,0.35)', border: 'none', cursor: 'pointer', padding: 0, transition: 'all 200ms ease' }} />
+                      ))
+                    : <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '12px', margin: 0 }}>Tap × to close</p>
+                  }
+                </div>
+              </div>
+            )}
 
             {/* Mobile: drag handle bar */}
             {isMobile && (
@@ -475,62 +464,6 @@ export function ListingDetailDialog({
 
   return (
     <>
-      {/* Full-screen gallery — portalled to document.body so it sits above the Radix dialog in the root stacking context */}
-      {galleryOpen && images.length > 0 && createPortal(
-        <div className="fixed inset-0 flex flex-col" style={{ backgroundColor: 'rgba(0,0,0,0.96)', zIndex: 9999 }}>
-          {/* Header: counter + close (safe-area aware) */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', paddingTop: 'max(env(safe-area-inset-top), 16px)', flexShrink: 0 }}>
-            <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: '14px', fontWeight: 500 }}>
-              {images.length > 1 ? `${imgIdx + 1} of ${images.length}` : ''}
-            </span>
-            <button onClick={() => setGalleryOpen(false)} aria-label="Close gallery"
-              style={{ width: '48px', height: '48px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.18)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <X size={22} style={{ color: '#fff' }} />
-            </button>
-          </div>
-
-          {/* Image area — swipe horizontally to navigate, swipe down to close */}
-          <div
-            onTouchStart={onImgTouchStart}
-            onTouchEnd={onImgTouchEnd}
-            style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden', touchAction: 'none' }}
-          >
-            <img
-              src={images[imgIdx]?.url}
-              alt={listing.title}
-              style={{ maxWidth: '92vw', maxHeight: '100%', objectFit: 'contain', borderRadius: '8px', userSelect: 'none', pointerEvents: 'none' }}
-              draggable={false}
-            />
-            {/* Desktop arrows only */}
-            {images.length > 1 && !isMobile && (
-              <>
-                <button onClick={() => setImgIdx((imgIdx - 1 + images.length) % images.length)}
-                  style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', width: '48px', height: '48px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.15)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <ChevronLeft size={28} style={{ color: '#fff' }} />
-                </button>
-                <button onClick={() => setImgIdx((imgIdx + 1) % images.length)}
-                  style={{ position: 'absolute', right: '16px', top: '50%', transform: 'translateY(-50%)', width: '48px', height: '48px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.15)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <ChevronRight size={28} style={{ color: '#fff' }} />
-                </button>
-              </>
-            )}
-          </div>
-
-          {/* Bottom: pill dots (multi-image) or close hint (single) */}
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', padding: '20px', paddingBottom: 'max(env(safe-area-inset-bottom), 20px)', flexShrink: 0, minHeight: '64px' }}>
-            {images.length > 1
-              ? images.map((_, i) => (
-                  <button key={i} onClick={() => setImgIdx(i)}
-                    style={{ width: i === imgIdx ? '24px' : '8px', height: '8px', borderRadius: '4px', backgroundColor: i === imgIdx ? '#F76902' : 'rgba(255,255,255,0.35)', border: 'none', cursor: 'pointer', padding: 0, transition: 'all 200ms ease' }}
-                  />
-                ))
-              : <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '12px', margin: 0 }}>Swipe down or tap × to close</p>
-            }
-          </div>
-        </div>,
-        document.body
-      )}
-
       <Dialog open={open} onOpenChange={o => { if (!o) { setGalleryOpen(false); onClose(); } }}>
         <DialogContent
           showCloseButton={!isMobile}
@@ -552,6 +485,52 @@ export function ListingDetailDialog({
               willChange: 'transform',
             } : {}),
           }}>
+
+          {/* Image gallery overlay — hides listing, shows only images */}
+          {galleryOpen && images.length > 0 && (
+            <div style={{
+              position: 'absolute', inset: 0, zIndex: 50,
+              backgroundColor: 'rgba(0,0,0,0.96)',
+              display: 'flex', flexDirection: 'column',
+              borderRadius: isMobile ? '16px 16px 0 0' : '16px',
+              overflow: 'hidden',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', flexShrink: 0 }}>
+                <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: '14px', fontWeight: 500 }}>
+                  {images.length > 1 ? `${imgIdx + 1} of ${images.length}` : listing.title}
+                </span>
+                <button onClick={() => setGalleryOpen(false)} aria-label="Close gallery"
+                  style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.18)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <X size={20} style={{ color: '#fff' }} />
+                </button>
+              </div>
+              <div onTouchStart={onImgTouchStart} onTouchEnd={onImgTouchEnd}
+                style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden', touchAction: 'none' }}>
+                <img src={images[imgIdx]?.url} alt={listing.title}
+                  style={{ maxWidth: '92%', maxHeight: '100%', objectFit: 'contain', borderRadius: '8px', userSelect: 'none', pointerEvents: 'none' }}
+                  draggable={false} />
+                {images.length > 1 && !isMobile && (<>
+                  <button onClick={() => setImgIdx((imgIdx - 1 + images.length) % images.length)}
+                    style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', width: '48px', height: '48px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.15)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <ChevronLeft size={28} style={{ color: '#fff' }} />
+                  </button>
+                  <button onClick={() => setImgIdx((imgIdx + 1) % images.length)}
+                    style={{ position: 'absolute', right: '16px', top: '50%', transform: 'translateY(-50%)', width: '48px', height: '48px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.15)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <ChevronRight size={28} style={{ color: '#fff' }} />
+                  </button>
+                </>)}
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', padding: '20px', flexShrink: 0, minHeight: '64px' }}>
+                {images.length > 1
+                  ? images.map((_, i) => (
+                      <button key={i} onClick={() => setImgIdx(i)}
+                        style={{ width: i === imgIdx ? '24px' : '8px', height: '8px', borderRadius: '4px', backgroundColor: i === imgIdx ? '#F76902' : 'rgba(255,255,255,0.35)', border: 'none', cursor: 'pointer', padding: 0, transition: 'all 200ms ease' }} />
+                    ))
+                  : <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '12px', margin: 0 }}>Tap × to close</p>
+                }
+              </div>
+            </div>
+          )}
 
           {/* Mobile: drag handle bar */}
           {isMobile && (

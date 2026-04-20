@@ -282,7 +282,7 @@ export function Header({ currentView, onViewChange, onCreateListing }: HeaderPro
                 onClick={onCreateListing}
                 style={{
                   width: '38px', height: '38px', borderRadius: '50%',
-                  border: 'none', backgroundColor: 'transparent',
+                  border: 'none', outline: 'none', backgroundColor: 'transparent',
                   cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
                   marginRight: '4px', transition: 'background-color 150ms ease',
                 }}
@@ -290,7 +290,7 @@ export function Header({ currentView, onViewChange, onCreateListing }: HeaderPro
                 onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
                 title="Post a listing"
               >
-                <Plus size={20} style={{ color: '#402E32' }} />
+                <Plus size={20} style={{ color: '#F76902' }} />
               </button>
             )}
 

@@ -45,6 +45,15 @@ export function EditListingDialog({ open, onClose, listing, onListingUpdated }: 
   const [housingType, setHousingType] = useState('');
   const [totalRooms, setTotalRooms] = useState('');
   const [availableRooms, setAvailableRooms] = useState('');
+  const [distanceFromCampus, setDistanceFromCampus] = useState('');
+  const [petsAllowed, setPetsAllowed] = useState(false);
+  const [electricNotIncluded, setElectricNotIncluded] = useState(false);
+  const [electricCost, setElectricCost] = useState('');
+  const [waterNotIncluded, setWaterNotIncluded] = useState(false);
+  const [waterCost, setWaterCost] = useState('');
+  const [gasNotIncluded, setGasNotIncluded] = useState(false);
+  const [gasCost, setGasCost] = useState('');
+  const [petFee, setPetFee] = useState('');
   const [category, setCategory] = useState('');
   const [condition, setCondition] = useState('');
 
@@ -69,6 +78,15 @@ export function EditListingDialog({ open, onClose, listing, onListingUpdated }: 
     setHousingType(listing.housing_type ?? '');
     setTotalRooms(listing.total_rooms != null ? String(listing.total_rooms) : '');
     setAvailableRooms(listing.available_rooms != null ? String(listing.available_rooms) : '');
+    setDistanceFromCampus(listing.distance_from_campus != null ? String(listing.distance_from_campus) : '');
+    setPetsAllowed(listing.pets_allowed ?? false);
+    setElectricNotIncluded(!(listing.electric_included ?? true));
+    setElectricCost(listing.electric_cost != null ? String(listing.electric_cost) : '');
+    setWaterNotIncluded(!(listing.water_included ?? true));
+    setWaterCost(listing.water_cost != null ? String(listing.water_cost) : '');
+    setGasNotIncluded(!(listing.gas_included ?? true));
+    setGasCost(listing.gas_cost != null ? String(listing.gas_cost) : '');
+    setPetFee(listing.pet_fee != null ? String(listing.pet_fee) : '');
     setCategory(listing.category ?? '');
     setCondition(listing.condition ?? '');
 
@@ -126,8 +144,8 @@ export function EditListingDialog({ open, onClose, listing, onListingUpdated }: 
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? []);
-    const remaining = 5 - slots.length;
-    if (remaining <= 0) { toast.error('Maximum 5 images allowed'); return; }
+    const remaining = 10 - slots.length;
+    if (remaining <= 0) { toast.error('Maximum 10 images allowed'); return; }
     const accepted = files.slice(0, remaining);
     const newSlots: ImageSlot[] = accepted.map(file => ({
       kind: 'new',
@@ -158,9 +176,18 @@ export function EditListingDialog({ open, onClose, listing, onListingUpdated }: 
               housing_type: housingType || null,
               total_rooms: totalRooms !== '' ? parseInt(totalRooms) : null,
               available_rooms: availableRooms !== '' ? parseInt(availableRooms) : null,
+              distance_from_campus: distanceFromCampus !== '' ? parseFloat(distanceFromCampus) : null,
               available_from: availableFrom || null,
               available_to: availableTo || null,
               gender_pref: gender,
+              pets_allowed: petsAllowed,
+              electric_included: !electricNotIncluded,
+              electric_cost: electricNotIncluded && electricCost ? parseFloat(electricCost) : null,
+              water_included: !waterNotIncluded,
+              water_cost: waterNotIncluded && waterCost ? parseFloat(waterCost) : null,
+              gas_included: !gasNotIncluded,
+              gas_cost: gasNotIncluded && gasCost ? parseFloat(gasCost) : null,
+              pet_fee: petFee ? parseFloat(petFee) : null,
             }
           : { title, description, price: parseFloat(price), category, condition };
 
@@ -222,7 +249,7 @@ export function EditListingDialog({ open, onClose, listing, onListingUpdated }: 
             <Label>
               Photos{' '}
               <span style={{ color: '#B5866E', fontWeight: 400 }}>
-                (up to 5 — drag to reorder)
+                (up to 10 — drag to reorder)
               </span>
             </Label>
             <div className="flex flex-wrap gap-3">
@@ -294,7 +321,7 @@ export function EditListingDialog({ open, onClose, listing, onListingUpdated }: 
               })}
 
               {/* Add button */}
-              {slots.length < 5 && (
+              {slots.length < 10 && (
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
@@ -369,9 +396,9 @@ export function EditListingDialog({ open, onClose, listing, onListingUpdated }: 
                   <Select value={housingType} onValueChange={setHousingType}>
                     <SelectTrigger><SelectValue placeholder="Select type..." /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Apartment">Apartment</SelectItem>
-                      <SelectItem value="House">House</SelectItem>
-                      <SelectItem value="Studio">Studio</SelectItem>
+                      <SelectItem value="apartment">Apartment</SelectItem>
+                      <SelectItem value="house">House</SelectItem>
+                      <SelectItem value="studio">Studio</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -396,6 +423,53 @@ export function EditListingDialog({ open, onClose, listing, onListingUpdated }: 
                 <div className="space-y-2">
                   <Label htmlFor="edit-to">Available To (Optional)</Label>
                   <Input id="edit-to" type="date" value={availableTo} onChange={e => setAvailableTo(e.target.value)} />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="edit-distance">Distance from Campus (miles)</Label>
+                <Input id="edit-distance" type="number" value={distanceFromCampus} onChange={e => setDistanceFromCampus(e.target.value)} min="0" step="0.1" placeholder="e.g. 0.5" />
+              </div>
+
+              {/* Utilities & Pets */}
+              <div className="space-y-3 rounded-lg border p-4">
+                <p className="text-sm font-medium">Utilities & Extras</p>
+                <div className="space-y-2">
+                  <p className="text-xs text-muted-foreground">Check utilities NOT included in rent — add approximate monthly cost if known:</p>
+                  <div className="space-y-2 pt-1">
+                    {([
+                      ['electricNotIncluded', electricNotIncluded, setElectricNotIncluded, electricCost, setElectricCost, 'Electric'] as const,
+                      ['waterNotIncluded', waterNotIncluded, setWaterNotIncluded, waterCost, setWaterCost, 'Water'] as const,
+                      ['gasNotIncluded', gasNotIncluded, setGasNotIncluded, gasCost, setGasCost, 'Gas'] as const,
+                    ]).map(([key, checked, setChecked, cost, setCost, label]) => (
+                      <div key={key} className="flex items-center gap-3">
+                        <label className="flex items-center gap-2 cursor-pointer text-sm w-28">
+                          <input type="checkbox" checked={checked} onChange={e => setChecked(e.target.checked)} className="w-4 h-4 accent-[#F76902]" />
+                          {label}
+                        </label>
+                        {checked && (
+                          <div className="flex items-center gap-1">
+                            <span className="text-xs text-muted-foreground">~$</span>
+                            <Input type="number" placeholder="80" value={cost} onChange={e => setCost(e.target.value)} min="0" className="w-24 h-8 text-sm" />
+                            <span className="text-xs text-muted-foreground">/mo</span>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="flex flex-wrap items-center gap-6 pt-1 border-t">
+                  <label className="flex items-center gap-2 cursor-pointer text-sm">
+                    <input type="checkbox" checked={petsAllowed} onChange={e => setPetsAllowed(e.target.checked)} className="w-4 h-4 accent-[#F76902]" />
+                    Pets Allowed
+                  </label>
+                  {petsAllowed && (
+                    <div className="flex items-center gap-2">
+                      <Label className="text-sm whitespace-nowrap">Pet Fee ~$</Label>
+                      <Input type="number" placeholder="50" value={petFee} onChange={e => setPetFee(e.target.value)} min="0" className="w-24 h-8 text-sm" />
+                      <span className="text-xs text-muted-foreground">/mo</span>
+                    </div>
+                  )}
                 </div>
               </div>
             </>

@@ -708,7 +708,7 @@ export function ListingDetailDialog({
                   )}
                   {listing.total_rooms != null && (
                     <div className="flex items-center" style={{ gap: '6px' }}>
-                      <DoorOpen size={15} style={{ color: '#F76902', flexShrink: 0 }} />
+                      <BedDouble size={15} style={{ color: '#F76902', flexShrink: 0 }} />
                       <span style={{ fontSize: '13px', color: '#402E32' }}>{listing.total_rooms} rooms</span>
                     </div>
                   )}

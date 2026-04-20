@@ -795,6 +795,21 @@ export function ListingDetailDialog({
                       </div>
                     )}
 
+                    {/* Gender Preference */}
+                    {listing.gender_pref && listing.gender_pref !== 'any' && (
+                      <div style={{ padding: '18px', borderRadius: '14px', border: '1.5px solid #E8D5C4', backgroundColor: '#FFFFFF' }}>
+                        <p style={{ fontSize: '13px', fontWeight: 600, color: '#402E32', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <Users size={14} style={{ color: '#F76902' }} /> Preferred Tenant Gender
+                        </p>
+                        <span style={{
+                          display: 'inline-block', padding: '4px 12px', borderRadius: '20px', fontSize: '13px', fontWeight: 600,
+                          backgroundColor: '#FFF6EE', border: '1px solid #E8D5C4', color: '#402E32', textTransform: 'capitalize',
+                        }}>
+                          {listing.gender_pref} preferred
+                        </span>
+                      </div>
+                    )}
+
                     {/* Pets */}
                     {listing.pets_allowed != null && (
                       <div style={{ padding: '18px', borderRadius: '14px', border: '1.5px solid #E8D5C4', backgroundColor: '#FFFFFF' }}>

@@ -1,7 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from './auth-context';
 import { useMessaging, Conversation } from './messaging-context';
-import { Send, Search, MessageSquare, ArrowLeft, Loader2 } from 'lucide-react';
+import { Send, Search, MessageSquare, ArrowLeft, Loader2, HandCoins, MapPin } from 'lucide-react';
+
+function parseOffer(content: string): { amount: number; meetup: string } | null {
+  if (!content.startsWith('__OFFER__')) return null;
+  try { return JSON.parse(content.slice(9)); } catch { return null; }
+}
 
 function formatTime(iso: string) {
   const d = new Date(iso);
@@ -166,7 +171,10 @@ export function MessagesView({ openConversationId }: MessagesViewProps) {
                           fontWeight: unread > 0 ? 500 : 400,
                           overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'
                         }}>
-                          {lastMsg.content}
+                          {(() => {
+                            const o = parseOffer(lastMsg.content);
+                            return o ? `💰 Offer: $${o.amount}` : lastMsg.content;
+                          })()}
                         </p>
                       )}
                     </div>
@@ -213,6 +221,43 @@ export function MessagesView({ openConversationId }: MessagesViewProps) {
                   const isMe = message.senderId === user.id;
                   const msgAvatar = isMe ? user.avatarUrl : otherAvatar(selected);
                   const msgName = isMe ? user.name : otherName(selected);
+                  const offer = parseOffer(message.content);
+
+                  if (offer) {
+                    return (
+                      <div key={message.id} className="flex items-end" style={{ justifyContent: isMe ? 'flex-end' : 'flex-start', gap: '8px' }}>
+                        {!isMe && <Avatar name={msgName} avatarUrl={msgAvatar} size={32} />}
+                        <div style={{
+                          maxWidth: '72%', borderRadius: isMe ? '14px 14px 2px 14px' : '14px 14px 14px 2px',
+                          border: '2px solid #F76902', backgroundColor: isMe ? '#FFF6EE' : '#FFFFFF',
+                          overflow: 'hidden', boxShadow: '0 2px 12px rgba(247,105,2,0.12)',
+                        }}>
+                          {/* Offer header */}
+                          <div style={{ padding: '10px 14px 8px', backgroundColor: '#F76902', display: 'flex', alignItems: 'center', gap: '7px' }}>
+                            <HandCoins size={14} style={{ color: '#FFFFFF', flexShrink: 0 }} />
+                            <span style={{ fontSize: '12px', fontWeight: 700, color: '#FFFFFF', letterSpacing: '0.02em' }}>OFFER</span>
+                          </div>
+                          {/* Offer body */}
+                          <div style={{ padding: '12px 14px' }}>
+                            <p style={{ fontSize: '26px', fontWeight: 800, color: '#F76902', marginBottom: '6px', lineHeight: 1 }}>
+                              ${offer.amount}
+                            </p>
+                            <div className="flex items-center" style={{ gap: '5px' }}>
+                              <MapPin size={12} style={{ color: '#B5866E', flexShrink: 0 }} />
+                              <span style={{ fontSize: '12px', color: '#5A4A44' }}>{offer.meetup}</span>
+                            </div>
+                          </div>
+                          <div style={{ padding: '0 14px 10px' }}>
+                            <p style={{ fontSize: '11px', color: '#C4A88E', textAlign: 'right' }}>
+                              {formatTime(message.timestamp)}
+                            </p>
+                          </div>
+                        </div>
+                        {isMe && <Avatar name={msgName} avatarUrl={msgAvatar} size={32} />}
+                      </div>
+                    );
+                  }
+
                   return (
                     <div key={message.id} className="flex items-end" style={{ justifyContent: isMe ? 'flex-end' : 'flex-start', gap: '8px' }}>
                       {!isMe && <Avatar name={msgName} avatarUrl={msgAvatar} size={32} />}

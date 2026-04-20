@@ -103,6 +103,7 @@ export interface Database {
           category: string | null;
           condition: string | null;
           view_count: number;
+          open_to_offers: boolean;
         };
         Insert: {
           id?: string;
@@ -142,6 +143,7 @@ export interface Database {
           category?: string | null;
           condition?: string | null;
           view_count?: number;
+          open_to_offers?: boolean;
         };
         Update: {
           type?: 'housing' | 'marketplace';
@@ -177,6 +179,7 @@ export interface Database {
           category?: string | null;
           condition?: string | null;
           view_count?: number;
+          open_to_offers?: boolean;
         };
       };
       listing_images: {

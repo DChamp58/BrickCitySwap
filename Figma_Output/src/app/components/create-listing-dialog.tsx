@@ -62,6 +62,7 @@ export function CreateListingDialog({ open, onClose, onListingCreated }: CreateL
   // Marketplace fields
   const [category, setCategory] = useState('');
   const [condition, setCondition] = useState('');
+  const [openToOffers, setOpenToOffers] = useState(false);
 
   // Images
   const [images, setImages] = useState<File[]>([]);
@@ -78,7 +79,7 @@ export function CreateListingDialog({ open, onClose, onListingCreated }: CreateL
     setWaterNotIncluded(false); setWaterCost('');
     setGasNotIncluded(false); setGasCost('');
     setPetFee('');
-    setCategory(''); setCondition('');
+    setCategory(''); setCondition(''); setOpenToOffers(false);
     setImages([]); setImagePreviews([]);
   };
 
@@ -143,6 +144,7 @@ export function CreateListingDialog({ open, onClose, onListingCreated }: CreateL
         } : {
           category,
           condition,
+          open_to_offers: openToOffers,
         }),
       });
 
@@ -385,6 +387,33 @@ export function CreateListingDialog({ open, onClose, onListingCreated }: CreateL
                     </SelectContent>
                   </Select>
                 </div>
+              </div>
+
+              <div className="flex items-center gap-3 pt-1">
+                <button
+                  type="button"
+                  onClick={() => setOpenToOffers(o => !o)}
+                  aria-label="Toggle open to offers"
+                  style={{
+                    position: 'relative', width: '44px', height: '24px', borderRadius: '12px',
+                    backgroundColor: openToOffers ? '#F76902' : '#D1D5DB',
+                    border: 'none', cursor: 'pointer', transition: 'background-color 200ms ease', flexShrink: 0,
+                  }}
+                >
+                  <span style={{
+                    position: 'absolute', top: '3px',
+                    left: openToOffers ? '23px' : '3px',
+                    width: '18px', height: '18px', borderRadius: '50%',
+                    backgroundColor: '#FFFFFF', boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+                    transition: 'left 200ms ease',
+                  }} />
+                </button>
+                <span className="text-sm font-medium" style={{ color: openToOffers ? '#F76902' : '#6B7280' }}>
+                  Open to Offers
+                </span>
+                <span className="text-xs" style={{ color: '#B5866E' }}>
+                  Buyers can propose their own price
+                </span>
               </div>
             </TabsContent>
 

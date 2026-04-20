@@ -548,3 +548,9 @@ alter table public.listings
   add column if not exists gas_included      boolean not null default true,
   add column if not exists gas_cost          numeric,
   add column if not exists pet_fee           numeric;
+
+-- ╔══════════════════════════════════════════════════════════════════════════╗
+-- ║ ADD OPEN TO OFFERS FIELD                                               ║
+-- ╚══════════════════════════════════════════════════════════════════════════╝
+alter table public.listings
+  add column if not exists open_to_offers boolean not null default false;

@@ -7,9 +7,28 @@ import {
   MapPin, Calendar, Bath, BedDouble, Home, MessageCircle,
   ChevronLeft, ChevronRight, X, Share2, Heart,
   Tag, ShieldCheck, Users, DoorOpen, PawPrint, Zap, Droplets, Flame,
+  HandCoins, Loader2,
 } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { trackEvent } from '@/lib/analytics';
+import { useAuth } from './auth-context';
+import { useMessaging } from './messaging-context';
+import { toast } from 'sonner';
+
+const RIT_MEETUP_LOCATIONS = [
+  'SAU (Student Alumni Union)',
+  'Golisano Hall Lobby',
+  'Wallace Library Entrance',
+  'Global Village Café',
+  'SHED Lobby',
+  'Crossroads / Quarter Mile',
+  'RIT Inn Lobby',
+  'Sol Heumann Hall',
+  'NRH (NTID) Lobby',
+  'Engineering Quad',
+  'Park Point Community Center',
+  'Other — coordinate in chat',
+];
 
 interface ListingDetailDialogProps {
   open: boolean;
@@ -31,10 +50,15 @@ const conditionStyle: Record<string, { bg: string; color: string; label: string 
 export function ListingDetailDialog({
   open, onClose, listing, onContact, showContactButton = true,
 }: ListingDetailDialogProps) {
+  const { user } = useAuth();
+  const { startConversation } = useMessaging();
   const [imgIdx, setImgIdx] = useState(0);
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [saved, setSaved] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [offerAmount, setOfferAmount] = useState(0);
+  const [offerMeetup, setOfferMeetup] = useState('');
+  const [offerLoading, setOfferLoading] = useState(false);
   const scrollRef = React.useRef<HTMLDivElement>(null);
   // sheetRef is used for direct DOM transforms (60fps drag, no React re-renders)
   const sheetRef = React.useRef<HTMLDivElement>(null);
@@ -129,9 +153,38 @@ export function ListingDetailDialog({
   useEffect(() => {
     if (open && listing) {
       setImgIdx(0);
+      setOfferAmount(listing.price);
+      setOfferMeetup('');
       trackEvent('listing_viewed', { listing_id: listing.id, listing_type: listing.type });
     }
   }, [open, listing?.id]);
+
+  const handleSendOffer = async () => {
+    if (!user) { toast.error('Sign in to make an offer'); return; }
+    if (!offerMeetup) { toast.error('Please select a meet-up location'); return; }
+    if (offerAmount <= 0) { toast.error('Please enter a valid offer amount'); return; }
+    setOfferLoading(true);
+    try {
+      const offerMsg = `__OFFER__${JSON.stringify({ amount: offerAmount, meetup: offerMeetup })}`;
+      await startConversation({
+        listingId: listing!.id,
+        listingTitle: listing!.title,
+        listingType: listing!.type,
+        listingPrice: listing!.price,
+        sellerId: listing!.user_id,
+        sellerName: listing!.profiles?.full_name ?? 'Seller',
+        buyerId: user.id,
+        buyerName: user.name,
+        initialMessage: offerMsg,
+      });
+      toast.success('Offer sent! Check your messages.');
+      onClose();
+    } catch {
+      toast.error('Failed to send offer. Try again.');
+    } finally {
+      setOfferLoading(false);
+    }
+  };
 
   if (!listing) return null;
 
@@ -365,6 +418,49 @@ export function ListingDetailDialog({
                         </button>
                       )}
                     </div>
+
+                    {/* Make an Offer — mobile */}
+                    {showContactButton && listing.open_to_offers && (
+                      <div style={{ marginTop: '12px', padding: '18px', borderRadius: '14px', border: '1.5px solid #F76902', backgroundColor: '#FFF6EE', boxShadow: '0 4px 16px rgba(247,105,2,0.08)' }}>
+                        <p className="flex items-center font-semibold" style={{ fontSize: '14px', color: '#402E32', marginBottom: '12px', gap: '7px' }}>
+                          <HandCoins size={15} style={{ color: '#F76902' }} /> Make an Offer
+                        </p>
+                        <div className="flex items-center" style={{ gap: '8px', marginBottom: '10px' }}>
+                          <button onClick={() => setOfferAmount(a => Math.max(1, a - 1))}
+                            style={{ width: '32px', height: '32px', borderRadius: '8px', border: '1.5px solid #E8D5C4', backgroundColor: '#FFFFFF', cursor: 'pointer', fontSize: '18px', fontWeight: 600, color: '#402E32', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                            −
+                          </button>
+                          <div style={{ flex: 1, position: 'relative' }}>
+                            <span style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', fontSize: '13px', color: '#B5866E' }}>$</span>
+                            <input
+                              type="number" min={1} value={offerAmount}
+                              onChange={e => setOfferAmount(Math.max(1, parseInt(e.target.value) || 1))}
+                              style={{ width: '100%', padding: '7px 10px 7px 22px', borderRadius: '8px', border: '1.5px solid #E8D5C4', fontSize: '15px', fontWeight: 700, color: '#402E32', textAlign: 'center', outline: 'none', backgroundColor: '#FFFFFF' }}
+                            />
+                          </div>
+                          <button onClick={() => setOfferAmount(a => a + 1)}
+                            style={{ width: '32px', height: '32px', borderRadius: '8px', border: '1.5px solid #E8D5C4', backgroundColor: '#FFFFFF', cursor: 'pointer', fontSize: '18px', fontWeight: 600, color: '#402E32', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                            +
+                          </button>
+                        </div>
+                        <p style={{ fontSize: '12px', fontWeight: 600, color: '#402E32', marginBottom: '5px' }}>Meet-up location</p>
+                        <select
+                          value={offerMeetup}
+                          onChange={e => setOfferMeetup(e.target.value)}
+                          style={{ width: '100%', padding: '8px 10px', borderRadius: '8px', border: '1.5px solid #E8D5C4', fontSize: '13px', color: offerMeetup ? '#402E32' : '#B5866E', backgroundColor: '#FFFFFF', outline: 'none', marginBottom: '10px', cursor: 'pointer' }}>
+                          <option value="" disabled>Select location...</option>
+                          {RIT_MEETUP_LOCATIONS.map(loc => <option key={loc} value={loc}>{loc}</option>)}
+                        </select>
+                        <button
+                          onClick={handleSendOffer}
+                          disabled={offerLoading}
+                          className="w-full flex items-center justify-center font-semibold"
+                          style={{ padding: '11px', borderRadius: '10px', fontSize: '14px', gap: '7px', border: 'none', backgroundColor: '#F76902', color: '#FFFFFF', cursor: offerLoading ? 'not-allowed' : 'pointer' }}>
+                          {offerLoading ? <Loader2 size={15} className="animate-spin" /> : <HandCoins size={15} />}
+                          {offerLoading ? 'Sending...' : 'Send Offer'}
+                        </button>
+                      </div>
+                    )}
                   </div>
                 )}
 
@@ -445,6 +541,57 @@ export function ListingDetailDialog({
                         </button>
                       )}
                     </div>
+
+                    {/* Make an Offer — desktop sidebar */}
+                    {showContactButton && listing.open_to_offers && (
+                      <div style={{ padding: '20px', borderRadius: '14px', border: '1.5px solid #F76902', backgroundColor: '#FFF6EE', boxShadow: '0 4px 16px rgba(247,105,2,0.08)' }}>
+                        <p className="flex items-center font-semibold" style={{ fontSize: '14px', color: '#402E32', marginBottom: '14px', gap: '7px' }}>
+                          <HandCoins size={16} style={{ color: '#F76902' }} /> Make an Offer
+                        </p>
+                        {/* Price stepper */}
+                        <div className="flex items-center" style={{ gap: '8px', marginBottom: '12px' }}>
+                          <button
+                            onClick={() => setOfferAmount(a => Math.max(1, a - 1))}
+                            style={{ width: '32px', height: '32px', borderRadius: '8px', border: '1.5px solid #E8D5C4', backgroundColor: '#FFFFFF', cursor: 'pointer', fontSize: '18px', fontWeight: 600, color: '#402E32', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                            −
+                          </button>
+                          <div style={{ flex: 1, position: 'relative' }}>
+                            <span style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', fontSize: '14px', color: '#B5866E' }}>$</span>
+                            <input
+                              type="number" min={1} value={offerAmount}
+                              onChange={e => setOfferAmount(Math.max(1, parseInt(e.target.value) || 1))}
+                              style={{ width: '100%', padding: '7px 10px 7px 22px', borderRadius: '8px', border: '1.5px solid #E8D5C4', fontSize: '15px', fontWeight: 700, color: '#402E32', textAlign: 'center', outline: 'none', backgroundColor: '#FFFFFF' }}
+                            />
+                          </div>
+                          <button
+                            onClick={() => setOfferAmount(a => a + 1)}
+                            style={{ width: '32px', height: '32px', borderRadius: '8px', border: '1.5px solid #E8D5C4', backgroundColor: '#FFFFFF', cursor: 'pointer', fontSize: '18px', fontWeight: 600, color: '#402E32', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                            +
+                          </button>
+                        </div>
+                        {/* Meet-up dropdown */}
+                        <p style={{ fontSize: '12px', fontWeight: 600, color: '#402E32', marginBottom: '6px' }}>Meet-up location</p>
+                        <select
+                          value={offerMeetup}
+                          onChange={e => setOfferMeetup(e.target.value)}
+                          style={{ width: '100%', padding: '8px 10px', borderRadius: '8px', border: '1.5px solid #E8D5C4', fontSize: '13px', color: offerMeetup ? '#402E32' : '#B5866E', backgroundColor: '#FFFFFF', outline: 'none', marginBottom: '12px', cursor: 'pointer' }}>
+                          <option value="" disabled>Select location...</option>
+                          {RIT_MEETUP_LOCATIONS.map(loc => <option key={loc} value={loc}>{loc}</option>)}
+                        </select>
+                        {/* Send offer button */}
+                        <button
+                          onClick={handleSendOffer}
+                          disabled={offerLoading}
+                          className="w-full flex items-center justify-center font-semibold"
+                          style={{ padding: '11px', borderRadius: '10px', fontSize: '14px', gap: '7px', border: 'none', backgroundColor: offerLoading ? '#D85802' : '#F76902', color: '#FFFFFF', cursor: offerLoading ? 'not-allowed' : 'pointer', transition: 'background 180ms ease' }}
+                          onMouseEnter={e => { if (!offerLoading) e.currentTarget.style.backgroundColor = '#D85802'; }}
+                          onMouseLeave={e => { if (!offerLoading) e.currentTarget.style.backgroundColor = '#F76902'; }}>
+                          {offerLoading ? <Loader2 size={15} className="animate-spin" /> : <HandCoins size={15} />}
+                          {offerLoading ? 'Sending...' : 'Send Offer'}
+                        </button>
+                      </div>
+                    )}
+
                     <div style={{ padding: '16px', borderRadius: '12px', backgroundColor: '#FFF6EE', border: '1px solid #E8D5C4' }}>
                       <div className="flex items-center" style={{ gap: '8px', marginBottom: '8px' }}>
                         <ShieldCheck size={15} style={{ color: '#F76902', flexShrink: 0 }} />

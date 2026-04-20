@@ -54,6 +54,7 @@ export interface Listing {
   // Marketplace specific
   category?: string | null;
   condition?: string | null;
+  open_to_offers?: boolean | null;
 
   // Analytics
   view_count?: number;

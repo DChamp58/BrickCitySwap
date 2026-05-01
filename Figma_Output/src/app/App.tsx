@@ -16,13 +16,15 @@ import { PricingView } from './components/pricing-view';
 import { PaymentView } from './components/payment-view';
 import { ProfileView } from './components/profile-view';
 import { SavedView } from './components/saved-view';
+import { PrivacyView } from './components/privacy-view';
+import { TermsView } from './components/terms-view';
 import { Footer } from './components/footer';
 import { Listing } from './components/listing-card';
 import { Toaster } from './components/ui/sonner';
 import { Card, CardContent } from './components/ui/card';
 import { recordListingView } from '@/lib/api';
 
-type View = 'home' | 'housing' | 'marketplace' | 'profile' | 'my-listings' | 'pricing' | 'payment' | 'messages' | 'saved';
+type View = 'home' | 'housing' | 'marketplace' | 'profile' | 'my-listings' | 'pricing' | 'payment' | 'messages' | 'saved' | 'privacy' | 'terms';
 
 function AppContent() {
   const { user, accessToken, loading } = useAuth();
@@ -189,6 +191,14 @@ function AppContent() {
             </div>
           )
         )}
+
+        {currentView === 'privacy' && (
+          <PrivacyView onNavigate={(v) => setCurrentView(v)} />
+        )}
+
+        {currentView === 'terms' && (
+          <TermsView onNavigate={(v) => setCurrentView(v)} />
+        )}
       </main>
 
       {/* Free user ad */}
@@ -241,7 +251,7 @@ function AppContent() {
       />
 
       <Toaster />
-      <Footer />
+      <Footer onNavigate={setCurrentView} />
     </div>
   );
 }

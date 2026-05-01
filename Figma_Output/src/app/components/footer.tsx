@@ -1,4 +1,19 @@
-export function Footer() {
+interface FooterProps {
+  onNavigate?: (view: 'privacy' | 'terms') => void;
+}
+
+export function Footer({ onNavigate }: FooterProps = {}) {
+  const linkButtonStyle: React.CSSProperties = {
+    background: 'none',
+    border: 'none',
+    padding: 0,
+    cursor: 'pointer',
+    fontSize: '14px',
+    color: '#E8D5C4',
+    textAlign: 'left',
+    fontFamily: 'inherit'
+  };
+
   return (
     <footer
       className="w-full"
@@ -50,6 +65,30 @@ export function Footer() {
             <p className="font-normal" style={{ fontSize: '14px', color: '#E8D5C4' }}>Housing & Subletting</p>
             <p className="font-normal" style={{ fontSize: '14px', color: '#E8D5C4' }}>Student Marketplace</p>
             <p className="font-normal" style={{ fontSize: '14px', color: '#E8D5C4' }}>Safe Transactions</p>
+          </div>
+        </div>
+
+        {/* Legal */}
+        <div>
+          <h3 className="font-semibold" style={{ fontSize: '14px', color: '#B5866E', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '16px' }}>
+            Legal
+          </h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {onNavigate ? (
+              <>
+                <button onClick={() => onNavigate('privacy')} className="font-normal" style={linkButtonStyle}>
+                  Privacy Policy
+                </button>
+                <button onClick={() => onNavigate('terms')} className="font-normal" style={linkButtonStyle}>
+                  Terms of Service
+                </button>
+              </>
+            ) : (
+              <>
+                <p className="font-normal" style={{ fontSize: '14px', color: '#E8D5C4' }}>Privacy Policy</p>
+                <p className="font-normal" style={{ fontSize: '14px', color: '#E8D5C4' }}>Terms of Service</p>
+              </>
+            )}
           </div>
         </div>
       </div>

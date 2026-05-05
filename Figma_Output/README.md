@@ -1,11 +1,18 @@
+# BrickCitySwap — Application Source
 
-  # Student Housing Marketplace
+This directory contains the full source code for the BrickCitySwap React application.
 
-  This is a code bundle for Student Housing Marketplace. The original project is available at https://www.figma.com/design/WU3IEFBQjduV3vUhZbgp08/Student-Housing-Marketplace.
+For complete setup instructions, architecture notes, and project documentation, see the [root README](../README.md).
 
-  ## Running the code
+## Quick Start
 
-  Run `npm i` to install the dependencies.
+```bash
+cp .env.example .env
+# Fill in VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in .env
 
-  Run `npm run dev` to start the development server.
-  
+npm install
+npm run dev     # http://localhost:5173
+npm run build   # Production build → dist/
+```
+
+> Use `npm` or `pnpm`. Do not use `yarn`.
